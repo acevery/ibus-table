@@ -23,7 +23,7 @@ SUBDIRS = \
 	icons \
 	m4 \
 	tables \
-#	po \
+	po \
 	$(NULL)
 
 ACLOCAL_AMFLAGS = -I m4
