@@ -24,4 +24,4 @@
 #
 
 pytable_DATA = pinyin_table.txt.bz2
-pytablesdir = $(pkgdatadir)/data
+pytabledir = $(pkgdatadir)/data
