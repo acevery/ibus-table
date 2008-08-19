@@ -1,6 +1,6 @@
 # vim:set noet ts=4:
 #
-# ibus-tables - The Tables engine for IBus
+# ibus-table - The Table engine for IBus
 #
 # Copyright (c) 2008-2008 Yu Yuwei <acevery@gmail.com>
 #

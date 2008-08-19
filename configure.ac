@@ -65,10 +65,10 @@ AM_GNU_GETTEXT_VERSION(0.16.1)
 # OUTPUT files
 AC_CONFIG_FILES(po/Makefile.in
 Makefile
-ibus-tables.spec
+ibus-table.spec
 engine/Makefile
-engine/ibus-engine-tables
-engine/tables.engine
+engine/ibus-engine-table
+engine/table.engine
 icons/Makefile
 m4/Makefile
 )
