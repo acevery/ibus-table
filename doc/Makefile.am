@@ -18,38 +18,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-engine_table_PYTHON = \
-	factory.py \
-	main.py \
-	table.py \
-	tabcreatedb.py \
-	tabdict.py \
-	tabsqlitedb.py \
-	$(NULL)
-engine_table_DATA = \
-	$(NULL)
-engine_tabledir = $(datadir)/ibus-table/engine
-
-bin_SCRIPTS = ibus-engine-table
-
 engine_DATA = table.engine
-enginedir = $(datadir)/ibus/engine
-
+enginedir = $(datadir)/ibus-table/ibus/engine
 
 EXTRA_DIST = \
-	ibus-engine-table.in \
+	table.engine.in \
 	$(NULL)
-
-CLEANFILES = \
-	*.pyc \
-	py.db \
-	$(NULL)
-
-test:
-	$(ENV) \
-		IBUS_TABLES_LOCATION=$(abs_top_srcdir) \
-		DBUS_DEBUG=true \
-		LANG=en_US \
-		PYTHONPATH=$(abs_top_srcdir) \
-		$(PYTHON) $(srcdir)/main.py
 
