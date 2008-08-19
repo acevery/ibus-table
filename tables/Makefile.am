@@ -1,6 +1,6 @@
 # vim:set noet ts=4:
 #
-# ibus-tables 
+# ibus-table
 #
 # Copyright (c) 2007-2008 Yu Yuwei <acevery@gmail.com>
 #

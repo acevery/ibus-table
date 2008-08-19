@@ -70,6 +70,7 @@ engine/Makefile
 engine/ibus-engine-table
 engine/table.engine
 icons/Makefile
+tables/Makefile
 m4/Makefile
 )
 
