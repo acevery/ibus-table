@@ -29,6 +29,10 @@ import table
 import tabsqlitedb
 import os
 
+from gettext import dgettext
+_  = lambda a : dgettext ("ibus-table", a)
+N_ = lambda a : a
+
 fatory_base_path = "/com/redhat/IBus/engines/tables/%s/factory"
 engine_base_path = "/com/redhat/IBus/engines/tables/%s/engine/"
 
