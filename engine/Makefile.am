@@ -1,6 +1,6 @@
 # vim:set noet ts=4:
 #
-# ibus-tables - The Tables engine for IBus
+# ibus-table - The Tables engine for IBus
 #
 # Copyright (c) 2008-2008 Yu Yuwei <acevery@gmail.com>
 #
@@ -18,7 +18,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-engine_tables_PYTHON = \
+engine_table_PYTHON = \
 	factory.py \
 	main.py \
 	table.py \
@@ -26,19 +26,19 @@ engine_tables_PYTHON = \
 	tabdict.py \
 	tabsqlitedb.py \
 	$(NULL)
-engine_tables_DATA = \
+engine_table_DATA = \
 	$(NULL)
-engine_tablesdir = $(datadir)/ibus-tables/engine
+engine_tabledir = $(datadir)/ibus-table/engine
 
-bin_SCRIPTS = ibus-engine-tables
+bin_SCRIPTS = ibus-engine-table
 
-engine_DATA = tables.engine
+engine_DATA = table.engine
 enginedir = $(datadir)/ibus/engine
 
 
 EXTRA_DIST = \
-	ibus-engine-tables.in \
-	tables.engine.in \
+	ibus-engine-table.in \
+	table.engine.in \
 	$(NULL)
 
 CLEANFILES = \

@@ -1,6 +1,6 @@
 # vim:set et sts=4 sw=4:
 #
-# ibus-tables - The Tables engine for IBus
+# ibus-table - The Tables engine for IBus
 #
 # Copyright (c) 2008-2008 Yu Yuwei <acevery@gmail.com>
 #

@@ -1,7 +1,7 @@
 #!/bin/sh
 # vim:set noet ts=4:
 #
-# ibus-tables - The Input Bus Tables Base Framework project
+# ibus-table - The Input Bus Tables Base Framework project
 #
 # Copyright (c) 2008-2008 Yu Yuwei <acevery@gmail.com>
 #
@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-export IBUS_TABLES_LOCATION=@prefix@/share/ibus-tables
-exec python @prefix@/share/ibus-tables/engine/main.py $@
+export IBUS_TABLES_LOCATION=@prefix@/share/ibus-table
+exec python @prefix@/share/ibus-table/engine/main.py $@
 
 

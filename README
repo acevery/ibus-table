@@ -1,0 +1,4 @@
+IBus-Table is the IM Engine framework for table-based input methods, such as
+ZhengMa, WuBi, ErBi, ChangJie and so on.
+This package only provide the framwork and the specific input engine
+database need be install from ibus-table-zhengma, ibus-table-wubi and etc.

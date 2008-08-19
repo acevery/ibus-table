@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # vim: set noet ts=4:
 #
-# ibus-tables
+# ibus-table
 #
 # Copyright (c) 2008-2008 Yu Yuwei <acevery@gmail.com>
 #
@@ -40,7 +40,7 @@ patt_edit = re.compile (r'(.*)###(.*)###(.*)')
 patt_uncommit = re.compile (r'(.*)@@@(.*)')
 
 from gettext import dgettext
-_  = lambda a : dgettext ("ibus-tables", a)
+_  = lambda a : dgettext ("ibus-table", a)
 N_ = lambda a : a
 
 
@@ -726,10 +726,6 @@ class tabengine (ibus.EngineBase):
 				]
 		
 		# some properties we will involved, Property is taken from scim.
-		self._status_property = Property ("status", "")
-		self._letter_property = Property ("full_letter", "")
-		self._punct_property = Property ("full_punct", "")
-		self._py_property = Property ("py_mode", "")
 		#self._setup_property = Property ("setup", _("Setup"))
 		self.reset ()
 		
@@ -744,10 +740,10 @@ class tabengine (ibus.EngineBase):
 
 	def _init_properties (self):
 		self.properties= ibus.PropList ()
-		self._status_property = ibus.Property('status')
-		self._letter_property = ibus.Property('letter')
-		self._punct_property = ibus.Property('punct')
-		self._py_property = ibus.Property('py')
+		self._status_property = ibus.Property(u'status')
+		self._letter_property = ibus.Property(u'letter')
+		self._punct_property = ibus.Property(u'punct')
+		self._py_property = ibus.Property(u'py_mode')
 		for prop in (self._status_property,
 			self._letter_property,
 			self._punct_property,
@@ -763,31 +759,33 @@ class tabengine (ibus.EngineBase):
 		'''Method used to update properties'''
 		# taken and modified from PinYin.py :)
 		if self._mode == 1: # refresh mode
-			self._status_property.label = _(self._status)
+			self._status_property.set_label(  _(self._status) )
+			self._status_property.set_tooltip (  _(u'Switch to English mode') )
 		else:
-			self._status_property.label = _("EN")
+			self._status_property.set_label( _(u'EN') )
+			self._status_property.set_tooltip (  _(u'Switch to Table mode') )
 
 		if self._full_width_letter[self._mode]:
-			self._letter_property.label = ''
-			self._letter_property.icon = '%s%s' % (self._icon_dir, 'full-letter.svg')
+			self._letter_property.set_icon ( u'%s%s' % (self._icon_dir, 'full-letter.svg') )
+			self._letter_property.set_tooltip ( _(u'Switch to half letter') )
 		else:
-			self._letter_property.label = ''
-			self._letter_property.icon = '%s%s' % (self._icon_dir, 'half-letter.svg')
+			self._letter_property.set_icon ( u'%s%s' % (self._icon_dir, 'half-letter.svg') )
+			self._letter_property.set_tooltip ( _(u'Switch to full letter') )
 
 		if self._full_width_punct[self._mode]:
-			self._punct_property.label = ''
-			self._punct_property.icon = '%s%s' % (self._icon_dir, 'full-punct.svg')
+			self._punct_property.set_icon ( u'%s%s' % (self._icon_dir, 'full-punct.svg') )
+			self._punct_property.set_tooltip ( _( u'Switch to half punction' ) )
 		else:
-			self._punct_property.label = '' 
-			self._punct_property.icon = '%s%s' % (self._icon_dir,'half-punct.svg' )
+			self._punct_property.set_icon ( u'%s%s' % (self._icon_dir,'half-punct.svg' ) )
+			self._punct_property.set_tooltip ( _( u'Switch to full punction' ) )
 		
 		if self._editor._py_mode:
-			self._py_property.label = ''
-			self._py_property.icon = '%s%s' % (self._icon_dir, 'py-mode.svg' )
+			self._py_property.set_icon ( u'%s%s' % (self._icon_dir, 'py-mode.svg' ) )
+			self._py_property.set_tooltip ( _(u'Switch to Table mode') )
 		
 		else:
-			self._py_property.label = ''
-			self._py_property.icon = '%s%s' % (self._icon_dir, 'tab-mode.svg' )
+			self._py_property.set_icon ( u'%s%s' % (self._icon_dir, 'tab-mode.svg' ) )
+			self._py_property.set_tooltip ( _(u'Switch to PinYin mode') )
 
 		# use buildin method to update properties :)
 		map (self.update_property, self.properties)
@@ -799,21 +797,21 @@ class tabengine (ibus.EngineBase):
 		self.reset ()
 		self._update_ui ()
 
-	def trigger_property (self, property):
+	def property_activate (self, property,prop_state = ibus.PROP_STATE_UNCHECKED):
 		'''Shift property'''
-		if property == "status":
+		if property == u"status":
 			self._change_mode ()
-		elif property == "full_letter":
+		elif property == u'letter':
 			self._full_width_letter [self._mode] = not self._full_width_letter [self._mode]
-		elif property == "full_punct":
+		elif property == u'punct':
 			self._full_width_punct [self._mode] = not self._full_width_punct [self._mode]
-		elif property == 'py_mode' and self._ime_py:
+		elif property == u'py_mode' and self._ime_py:
 			self._editor.r_shift ()
+		self._refresh_properties ()
 	#	elif property == "setup":
 			# Need implementation
 	#		self.start_helper ("96c07b6f-0c3d-4403-ab57-908dd9b8d513")
 		# at last invoke default method 
-		self._refresh_properties ()
 	
 	def _update_preedit (self):
 		'''Update Preedit String in UI'''
@@ -948,12 +946,12 @@ class tabengine (ibus.EngineBase):
 
 		# Match full half letter mode switch hotkey
 		if self._match_hotkey (key, keysyms.space, modifier.SHIFT_MASK):
-			self.trigger_property ("full_letter")
+			self.property_activate ("letter")
 			return True
 		
 		# Match full half punct mode switch hotkey
 		if self._match_hotkey (key, keysyms.period, modifier.CONTROL_MASK):
-			self.trigger_property ("full_punct")
+			self.property_activate ("punct")
 			return True
 		
 		# we ignore all hotkeys
