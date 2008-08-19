@@ -1,6 +1,6 @@
 # vim:set et ts=4:
 #
-# ibus-tables - The Tables engine for IBus
+# ibus-table - The Tables engine for IBus
 #
 # Copyright (c) 2008-2008 Yu Yuwei <acevery@gmail.com>
 #
@@ -19,7 +19,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 # if not 1, append datestamp to the version number.
-m4_define([package_name], [ibus-tables])
+m4_define([package_name], [ibus-table])
 m4_define([ibus_released], [0])
 m4_define([ibus_major_version], [0])
 m4_define([ibus_minor_version], [1])
