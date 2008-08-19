@@ -19,7 +19,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 icons_DATA = \
-	ibus-tables.svg \
+	ibus-table.svg \
 	full-letter.svg \
 	half-letter.svg \
 	full-punct.svg \

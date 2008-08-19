@@ -16,7 +16,7 @@
    sodipodi:version="0.32"
    inkscape:version="0.46"
    sodipodi:docbase="/home/acevery/pictures"
-   sodipodi:docname="xingma.svg"
+   sodipodi:docname="tab-mode.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    inkscape:export-filename="/home/acevery/pictures/xingma.png"
    inkscape:export-xdpi="33.75"
@@ -429,7 +429,7 @@
        fx="-140.42271"
        fy="62.003635"
        r="56.774963"
-       gradientTransform="matrix(0.8334323,-0.1146627,9.4880741e-2,0.6896461,159.7959,-12.264455)"
+       gradientTransform="matrix(0.924097,-0.1271362,0.1052023,0.764669,168.93849,-21.156291)"
        gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
@@ -439,14 +439,14 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4492187"
-     inkscape:cx="-86.4598"
-     inkscape:cy="49.656755"
+     inkscape:zoom="1.0247524"
+     inkscape:cx="-130.97279"
+     inkscape:cy="165.49921"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      inkscape:window-width="882"
      inkscape:window-height="737"
-     inkscape:window-x="41"
+     inkscape:window-x="-4"
      inkscape:window-y="0"
      showguides="true"
      inkscape:guide-bbox="true"
@@ -480,8 +480,8 @@
        style="stroke:#000000"
        transform="matrix(1.842255,0,0,1.842255,9.6749488,9.8839751)" />
     <path
-       d="M 14.532723,64.538243 C 14.532723,93.283486 37.239753,116.66976 65.151923,116.66976 C 93.064093,116.66976 115.77351,93.283486 115.77351,64.538243 C 115.77351,35.793003 93.066493,12.404265 65.151923,12.404265 C 37.242153,12.406714 14.532723,35.793003 14.532723,64.538243 z "
+       d="M 7.8728842,64.001366 C 7.8728842,95.873652 33.050092,121.80399 63.998679,121.80399 C 94.947266,121.80399 120.12712,95.873652 120.12712,64.001366 C 120.12712,32.129085 94.949927,6.1960091 63.998679,6.1960091 C 33.052754,6.1987246 7.8728842,32.129085 7.8728842,64.001366 z"
        id="path197"
-       style="fill:url(#radialGradient16108);fill-opacity:1;stroke:#10af31;stroke-width:3.56638813;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       style="fill:url(#radialGradient16108);fill-opacity:1;stroke:#10af31;stroke-width:7;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
   </g>
 </svg>
