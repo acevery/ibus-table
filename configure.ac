@@ -68,6 +68,7 @@ Makefile
 ibus-table.spec
 engine/Makefile
 engine/ibus-engine-table
+engine/table-createdb
 doc/Makefile
 doc/table.engine
 icons/Makefile
