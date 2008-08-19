@@ -23,6 +23,7 @@ SUBDIRS = \
 	icons \
 	m4 \
 	tables \
+	doc \
 	po \
 	$(NULL)
 
