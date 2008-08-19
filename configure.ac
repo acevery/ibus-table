@@ -69,6 +69,7 @@ ibus-table.spec
 engine/Makefile
 engine/ibus-engine-table
 engine/table-createdb
+data/Makefile
 doc/Makefile
 doc/table.engine
 icons/Makefile

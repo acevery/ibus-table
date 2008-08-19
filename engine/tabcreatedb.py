@@ -43,7 +43,7 @@ opt_parser.add_option( '-s', '--source',
 		help = 'tell me which file is the source file of IME, default is %default')
 
 opt_parser.add_option( '-p', '--pinyin',
-		action = 'store', dest='pinyin', default = '/usr/share/scim-python/data/pinyin_table.txt',
+		action = 'store', dest='pinyin', default = '/usr/share/ibus-table/data/pinyin_table.txt.bz2',
 		help = 'tell me which file is the source file of pinyin, default is %default')
 
 opt_parser.add_option( '-o', '--no-create-index',
