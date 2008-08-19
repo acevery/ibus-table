@@ -32,9 +32,6 @@ engine_tabledir = $(datadir)/ibus-table/engine
 
 bin_SCRIPTS = ibus-engine-table
 
-engine_DATA = table.engine
-enginedir = $(datadir)/ibus/engine
-
 
 EXTRA_DIST = \
 	ibus-engine-table.in \
