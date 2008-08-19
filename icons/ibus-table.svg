@@ -70,7 +70,7 @@
        x2="43.518669"
        y2="22.483055"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.9998565,0,0,0.9998565,9.6400219e-2,-1.2094215)" />
+       gradientTransform="matrix(0.9274684,0,0,0.9274685,1.7977084,1.6470837)" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -82,9 +82,9 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4"
-     inkscape:cx="-99.360762"
-     inkscape:cy="89.162917"
+     inkscape:zoom="1.979899"
+     inkscape:cx="-57.740653"
+     inkscape:cy="-40.298485"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -108,6 +108,15 @@
      inkscape:groupmode="layer"
      id="layer1">
     <rect
+       style="opacity:1;color:#000000;fill:#ffffff;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.45357633000000019;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.73725492000000004;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect2393"
+       width="43.993137"
+       height="43.993137"
+       x="1.9945551"
+       y="2.0123093"
+       rx="6.1198311"
+       ry="6.3010397" />
+    <rect
        style="opacity:1;color:#000000;fill:#276bf2;fill-opacity:0.78431374;fill-rule:nonzero;stroke:#80bae6;stroke-width:2.45357633000000019;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.73725492000000004;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
        id="rect2383"
        width="43.993137"
@@ -130,15 +139,15 @@
          style="font-size:45.74446869px;fill:#0c1584;fill-opacity:0.83057849">码</tspan></text>
     <text
        xml:space="preserve"
-       style="font-size:36.59557343px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:url(#linearGradient3167);fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:'方正行楷_GBK';-inkscape-font-specification:'方正行楷_GBK'"
-       x="1.6168339"
-       y="36.459"
+       style="font-size:33.94611359px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:url(#linearGradient3167);fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:'方正行楷_GBK';-inkscape-font-specification:'方正行楷_GBK'"
+       x="3.2080653"
+       y="36.588371"
        id="text3155"
        transform="scale(0.9831997,1.0170874)"><tspan
          sodipodi:role="line"
          id="tspan3157"
-         x="1.6168339"
-         y="36.459"
-         style="font-size:45.74446869px;fill:url(#linearGradient3167);fill-opacity:1">码</tspan></text>
+         x="3.2080653"
+         y="36.588371"
+         style="font-size:42.43264008px;fill:url(#linearGradient3167);fill-opacity:1">码</tspan></text>
   </g>
 </svg>
