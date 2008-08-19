@@ -42,28 +42,32 @@ patt_p = re.compile(r'p(-{0,1}\d)(\d)')
 class tabsqlitedb:
 	'''Phrase database for tables'''
 	def __init__(self, name = 'table.db', user_db = None, filename = None ):
+		# use filename when you are creating db from source
+		# use name when you are using db
 		# first we use the Parse in tabdict, which transform the char(a,b,c,...) to int(1,2,3,...) to fasten the sql enquiry
 		self.parse = tabdict.parse
 		self.deparse = tabdict.deparse
-		if filename:
-			self.db = sqlite3.connect( filename )
-			return
 		
-		# we try to copy the system db to /dev/shm
-		tmpname = '/dev/shm/ibus/tables/%s' % path.basename(name)
-		if not path.exists( tmpname ):
-			if not path.exists ('/dev/shm'):
-				# no /dev/shm, so we still use the disk db :'(
-				tmpname = name
-			else:
-				if not path.exists ('/dev/shm/ibus/tables'):
-					# we need to mkdir first
-					os.system('mkdir -p /dev/shm/ibus/tables')
-				# then we just copy the disk db to the dir :)
-				os.system('cp %s %s' % (name, tmpname ) )
-				
-		# open system phrase db
-		self.db = sqlite3.connect(  tmpname )
+		if filename:
+			# now we are creating db
+			self.db = sqlite3.connect( filename )
+		else:
+			# we are using db
+			# we try to copy the system db to /dev/shm
+			tmpname = '/dev/shm/ibus/tables/%s' % path.basename(name)
+			if not path.exists( tmpname ):
+				if not path.exists ('/dev/shm'):
+					# no /dev/shm, so we still use the disk db :'(
+					tmpname = name
+				else:
+					if not path.exists ('/dev/shm/ibus/tables'):
+						# we need to mkdir first
+						os.system('mkdir -p /dev/shm/ibus/tables')
+					# then we just copy the disk db to the dir :)
+					os.system('cp %s %s' % (name, tmpname ) )
+					
+			# open system phrase db
+			self.db = sqlite3.connect(  tmpname )
 		try:
 			self.db.execute( 'PRAGMA page_size = 8192; ' )
 			self.db.execute( 'PRAGMA cache_size = 20000; ' )
@@ -123,7 +127,10 @@ class tabsqlitedb:
 			print 'Could not find "user_can_define_phrase" entry from database, is it a outdated database?'
 			self.user_can_define_phrase = False
 		self.rules = self.get_rules ()
-
+		
+		if filename:
+			# since we just creating db, we do not need userdb and mudb
+			return
 		
 		# user database:
 		if user_db != None:
@@ -209,9 +216,9 @@ class tabsqlitedb:
 		
 			# create goucima table, this table is used in construct new phrases
 			sqlstr = 'CREATE TABLE IF NOT EXISTS %s.goucima (zi TEXT PRIMARY KEY' % database
-			#for i in range(self._mlen):
-			#	sqlstr += ', g%d INTEGER' % i 
-			sqlstr += ''.join(map (lambda x: ', g%d INTEGER' % x, range(self._mlen)) )
+			for i in range(self._mlen):
+				sqlstr += ', g%d INTEGER' % i 
+			#sqlstr += ''.join(map (lambda x: ', g%d INTEGER' % x, range(self._mlen)) )
 			sqlstr += ');'
 			self.db.execute ( sqlstr )
 
