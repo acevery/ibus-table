@@ -1,0 +1,6 @@
+Exec=@prefix@/bin/ibus-engine-tables
+Name=Tables
+Lang=zh_CN
+Icon=@prefix@/share/ibus-tables/icons/ibus-tables.svg
+Author=Yu Yuwei <acevery@gmail.com>
+Credits=
