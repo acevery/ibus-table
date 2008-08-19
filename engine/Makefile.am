@@ -47,7 +47,7 @@ CLEANFILES = \
 
 test:
 	$(ENV) \
-		IBUS_TABLES_LOCATION=$(abs_top_srcdir) \
+		IBUS_TABLE_LOCATION=$(abs_top_srcdir) \
 		DBUS_DEBUG=true \
 		LANG=en_US \
 		PYTHONPATH=$(abs_top_srcdir) \

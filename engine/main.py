@@ -25,7 +25,7 @@ import ibus
 import gobject
 import factory
 
-db_dir = os.path.join (os.getenv('IBUS_TABLES_LOCATION'),'tables')
+db_dir = os.path.join (os.getenv('IBUS_TABLE_LOCATION'),'tables')
 
 opt = optparse.OptionParser()
 

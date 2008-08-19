@@ -33,8 +33,8 @@ from gettext import dgettext
 _  = lambda a : dgettext ("ibus-table", a)
 N_ = lambda a : a
 
-fatory_base_path = "/com/redhat/IBus/engines/tables/%s/factory"
-engine_base_path = "/com/redhat/IBus/engines/tables/%s/engine/"
+fatory_base_path = "/com/redhat/IBus/engines/table/%s/factory"
+engine_base_path = "/com/redhat/IBus/engines/table/%s/engine/"
 
 class EngineFactory (ibus.EngineFactoryBase):
 	"""Table IM Engine Factory"""
@@ -57,7 +57,7 @@ class EngineFactory (ibus.EngineFactoryBase):
 			self.name 		= _( self.db.get_ime_property ('name') )
 		self.uuid		= self.db.get_ime_property ('uuid')
 		self.authors	= self.db.get_ime_property ('author')
-		self.icon		= '%s%s%s%s%s' % ( os.getenv("IBUS_PINYIN_LOCATION") ,
+		self.icon		= '%s%s%s%s%s' % ( os.getenv("IBUS_TABLE_LOCATION") ,
 				os.path.sep,'icons',os.path.sep, self.db.get_ime_property ('icon') )
 		self.credits	= self.db.get_ime_property ('credit')
 		self.lang		= self.db.get_ime_property ('languages') 

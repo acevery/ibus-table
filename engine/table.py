@@ -679,7 +679,7 @@ class tabengine (ibus.EngineBase):
 		# this is the parer which parse the input string to key object
 		self._parser = tabdict.parse
 		
-		self._icon_dir = '%s%s%s%s' % (os.getenv('IBUS_TABLES_LOCATION'),
+		self._icon_dir = '%s%s%s%s' % (os.getenv('IBUS_TABLE_LOCATION'),
 				os.path.sep, 'icons', os.path.sep)
 		# 0 = english input mode
 		# 1 = table input mode
