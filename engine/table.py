@@ -1128,8 +1128,6 @@ class tabengine (ibus.EngineBase):
 				self.db.check_phrase (sp_res[1])
 				self._refresh_properties ()
 			else:
-				if not self._full_width_letter[self._mode]:
-					return False
 				self.commit_string ( cond_letter_translate(u" ") )
 			return True
 		# now we ignore all else hotkeys
