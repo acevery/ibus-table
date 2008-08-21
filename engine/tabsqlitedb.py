@@ -309,9 +309,21 @@ class tabsqlitedb:
 		if database == 'main':
 			map (self.add_phrase, phrases)
 		else:
-			for phrase in phrases:
-				self.add_phrase ( phrase, database )
+			map (self.add_phrase, phrases, [database]*len(phrases) )
 		#self.db.commit()	
+	
+	def add_new_phrases (self, nphrases, database='main'):
+		'''Add new phrases into db, new phrases is a object
+		of [(phrase,freq), (phrase,freq),...]'''
+		n_phrases=[]
+		for phrase in nphrases:
+			_ph, _freq = phrase
+			_tabkey = self.parse_phrase_to_tabkeys(_ph)
+			if not self.check_phrase_internal (_ph, _tabkey, database):
+				# we don't have this phrase
+				n_phrases.append ( (_tabkey, _ph, _freq, 0) )
+		if n_phrases:
+			self.add_phrases ( n_phrases, database )
 	
 	def u_add_phrase (self,nphrase):
 		'''Add a phrase to userdb'''
@@ -330,7 +342,11 @@ class tabsqlitedb:
 		sql_suffix += '?, ?, ? );'
 		sqlstr += sql_suffix
 		
-		tabkeys,phrase,freq,user_freq = aphrase
+		try:
+			tabkeys,phrase,freq,user_freq = aphrase
+		except:
+			tabkeys,phrase,freq = aphrase
+			user_freq = 0
 		try:
 			tbks = self.parse(tabkeys)
 			if len(tbks) != len(tabkeys):
@@ -350,7 +366,7 @@ class tabsqlitedb:
 			traceback.print_exc()
 		#if database != 'mudb':
 		self.db.commit()	
-
+	
 	def add_goucima (self, gcms):
 		'''Add goucima into database, gcms is iterable object
 		Like gcms = [(zi,goucima),(zi,goucima), ...]
@@ -380,7 +396,7 @@ class tabsqlitedb:
 				traceback.print_exc()
 			count += 1
 		self.db.commit()
-
+	
 	def add_pinyin (self, pinyins, database = 'main'):
 		'''Add pinyin to database, pinyins is a iterable object
 		Like: [(zi,pinyin, freq), (zi, pinyin, freq), ...]
@@ -441,7 +457,7 @@ class tabsqlitedb:
 	def create_indexes(self, database):
 		sqlstr = '''
 			DROP INDEX IF EXISTS %(database)s.goucima_index_z;
-			CREATE INDEX IF NOT EXISTS %(database)s.goucima_index_z ON goucima (zi,g0,g1);
+			CREATE INDEX IF NOT EXISTS %(database)s.goucima_index_z ON goucima (zi);
 			DROP INDEX IF EXISTS %(database)s.pinyin_index_i;
 			CREATE INDEX IF NOT EXISTS %(database)s.pinyin_index_i ON pinyin (p0,p1,p2,p3,p4,p5,plen ASC, freq DESC);
 			VACUUM; 
@@ -468,9 +484,9 @@ class tabsqlitedb:
 
 	def select_words( self, tabkeys ):
 		'''
-		Get phrases from database by XingMa_Key objects
+		Get phrases from database by tab_key objects
 		( which should be equal or less than the max key length)
-		This method is called in XingMa by passing UserInput held data
+		This method is called in table.py by passing UserInput held data
 		Return result[:] 
 		'''
 		# firstly, we make sure the len we used is equal or less than the max key length
@@ -547,9 +563,9 @@ class tabsqlitedb:
 
 	def select_zi( self, tabkeys ):
 		'''
-		Get zi from database by XingMa_Key objects
+		Get zi from database by tab_key objects
 		( which should be equal or less than 6)
-		This method is called in XingMa by passing UserInput held data
+		This method is called in table.py by passing UserInput held data
 		Return  result[:] 
 		'''
 		# firstly, we make sure the len we used is equal or less than the max pinyin length 6
@@ -625,11 +641,11 @@ class tabsqlitedb:
 	
 	def get_gcm_id (self, zi):
 		'''Get goucima of given character'''
-		sqlstr = 'SELECT g0,g1 FROM main.goucima WHERE zi =?;'
+		sqlstr = 'SELECT %s FROM main.goucima WHERE zi =?;' % ','.join( map (lambda x: 'g%d' % x, range(self._mlen) ) )
 		return self.db.execute(sqlstr,(zi,)).fetchall()[0]
 
 	def parse_phrase (self, phrase):
-		'''Parse phrase to get its XingMa code'''
+		'''Parse phrase to get its Table code'''
 		# first we make sure that we are parsing unicode string
 		try:
 			phrase = unicode(phrase)
@@ -662,23 +678,23 @@ class tabsqlitedb:
 			traceback.print_exc ()
 
 	def parse_phrase_to_tabkeys (self,phrase):
-		'''Get the XingMa encoding of the phrase in string form'''
+		'''Get the Table encoding of the phrase in string form'''
 		tabres = self.parse_phrase (phrase) [2:-1]
 		tabkeys= u''.join ( map(self.deparse, tabres) )
 		return tabkeys
 
-	def check_phrase (self,phrase,tabkey=None):
+	def check_phrase (self,phrase,tabkey=None,database='main'):
 		# if IME didn't support user define phrase,
 		# we divide user input phrase into characters,
 		# and then check its frequence
 		if type(phrase) != type(u''):
 			phrase = phrase.decode('utf8')
 		if self.user_can_define_phrase:
-			self.check_phrase_internal (phrase, tabkey)
+			self.check_phrase_internal (phrase, tabkey, database)
 		else:
-			map(self.check_phrase_internal, phrase, tabkey)
+			map(self.check_phrase_internal, phrase)
 	
-	def check_phrase_internal (self,phrase,tabkey=None):
+	def check_phrase_internal (self,phrase,tabkey=None,database='main'):
 		'''Check word freq and user_freq
 		'''
 		if type(phrase) != type(u''):
@@ -694,12 +710,13 @@ class tabsqlitedb:
 			''' 
 			result = self.db.execute(sqlstr, (phrase,phrase,phrase)).fetchall()
 		else:
-			sqlstr = '''SELECT * FROM (SELECT * FROM main.phrases WHERE phrase = ?
-			UNION ALL SELECT * FROM user_db.phrases WHERE phrase = ?
-			UNION ALL SELECT * FROM mudb.phrases WHERE phrase = ?)
-			ORDER BY user_freq DESC, freq DESC
-			''' 
-			result = self.db.execute(sqlstr, (phrase,phrase,phrase)).fetchall()
+			# we are using this to check whether the tab-key and phrase is in db
+			tabks = self.parse (tabkey)
+			tabkids = tuple( map(int,tabks) )
+			condition = ' and '.join( map(lambda x: 'm%d = ?' % x, range( len(tabks) )) )
+			sqlstr = '''SELECT * FROM %(database)s.phrases WHERE phrase = ? and %(cond)s;''' % {'database':database, 'cond':condition}
+			result = self.db.execute(sqlstr, (phrase,)+tabkids ).fetchall()
+			return bool(result)
 
 		sysdb = {}
 		usrdb = {}
