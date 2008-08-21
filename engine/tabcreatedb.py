@@ -188,7 +188,7 @@ def main ():
 		return 0
 
 	# now we parse the ime source file
-	debug_print ("\tLoad sources %s" % opts.source)
+	debug_print ("\tLoad sources \"%s\"" % opts.source)
 	patt_s = re.compile( r'.*\.bz2' )
 	_bz2s = patt_s.match(opts.source)
 	if _bz2s:
@@ -220,7 +220,7 @@ def main ():
 		db.add_goucima ( goucima )
 	
 	if db.get_ime_property ('pinyin_mode').lower() == u'true':
-		debug_print ('\tLoad pinyin source %s' % opts.pinyin)
+		debug_print ('\tLoad pinyin source \"%s\"' % opts.pinyin)
 		_bz2p = patt_s.match(opts.pinyin)
 		if _bz2p:
 			pinyin_s = bz2.BZ2File ( opts.pinyin, "r" )
@@ -239,7 +239,7 @@ def main ():
 	if opts.extra:
 		print '\tPreparing for adding extra words'
 		db.create_indexes ('main')
-		debug_print ('\tLoad extra words source %s' % opts.extra)
+		debug_print ('\tLoad extra words source \"%s\"' % opts.extra)
 		_bz2p = patt_s.match(opts.extra)
 		if _bz2p:
 			extra_s = bz2.BZ2File ( opts.extra, "r" )
@@ -251,6 +251,8 @@ def main ():
 		extrawds = extra_parser (extraline)
 		debug_print ('\tAdding extra words into DB ')
 		db.add_new_phrases (extrawds)
+		debug_print ("Optimizing database ")
+		db.optimize_database ()
 	
 	if opts.index:
 		debug_print ('Create Indexes ')
