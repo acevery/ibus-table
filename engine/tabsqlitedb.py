@@ -316,12 +316,14 @@ class tabsqlitedb:
 		'''Add new phrases into db, new phrases is a object
 		of [(phrase,freq), (phrase,freq),...]'''
 		n_phrases=[]
-		for phrase in nphrases:
-			_ph, _freq = phrase
-			_tabkey = self.parse_phrase_to_tabkeys(_ph)
-			if not self.check_phrase_internal (_ph, _tabkey, database):
-				# we don't have this phrase
-				n_phrases.append ( (_tabkey, _ph, _freq, 0) )
+		for _ph, _freq in nphrases:
+			try:
+				_tabkey = self.parse_phrase_to_tabkeys(_ph)
+				if not self.check_phrase_internal (_ph, _tabkey, database):
+					# we don't have this phrase
+					n_phrases.append ( (_tabkey, _ph, _freq, 0) )
+			except:
+				print '\"%s\" would not been added' % _ph
 		if n_phrases:
 			self.add_phrases ( n_phrases, database )
 	
@@ -452,6 +454,19 @@ class tabsqlitedb:
 			tabkeystr +='m%d, ' % i
 		self.db.executescript (sqlstr % {'database':database,'tabkeystr':tabkeystr })
 		self.db.executescript ("VACUUM;")
+		self.db.commit()
+	
+	def drop_indexes(self, database):
+		'''Drop the index in database to reduce it's size'''
+		sqlstr = '''
+			DROP INDEX IF EXISTS %(database)s.goucima_index_z;
+			DROP INDEX IF EXISTS %(database)s.pinyin_index_i;
+			DROP INDEX IF EXISTS %(database)s.phrases_index_p;
+			DROP INDEX IF EXISTS %(database)s.phrases_index_i;
+			VACUUM; 
+			''' % { 'database':database }
+		
+		self.db.executescript (sqlstr)
 		self.db.commit()
 	
 	def create_indexes(self, database):

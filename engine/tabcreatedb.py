@@ -38,9 +38,14 @@ opt_parser = OptionParser()
 opt_parser.add_option( '-n', '--name',
 		action = 'store', dest='name',default = None,
 		help = 'set the database name we will use, default is %default')
+
 opt_parser.add_option( '-s', '--source',
 		action = 'store', dest='source', default = 'xingma.txt.bz2',
 		help = 'tell me which file is the source file of IME, default is %default')
+
+opt_parser.add_option( '-e', '--extra',
+		action = 'store', dest='extra', default = '',
+		help = 'tell me which file is the extra words file for IME, default is %default')
 
 opt_parser.add_option( '-p', '--pinyin',
 		action = 'store', dest='pinyin', default = '/usr/share/ibus-table/data/pinyin_table.txt.bz2',
@@ -126,7 +131,21 @@ def main ():
 				if patt_py.match(l):
 					_pinyins.append(l)
 		return _pinyins[:]
-
+	
+	def parse_extra (f):
+		_extra = []
+		patt_com = re.compile(r'^###.*')
+		patt_blank = re.compile(r'^[ \t]*$')
+		patt_extra = re.compile(r'(.*)\t(.*)')
+		patt_s = re.compile(r'(.*)\t([\x00-\xff]{3})\t.*')
+		
+		for l in f:
+			if ( not patt_com.match(l) ) and ( not patt_blank.match(l) ):
+				if patt_extra.match(l):
+					_extra.append(l)
+		
+		return _extra
+	
 	def pinyin_parser (f):
 		for py in f:
 			_zi, _pinyin, _freq = unicode (py,'utf-8').strip ().split()
@@ -153,7 +172,10 @@ def main ():
 			val = val.strip()
 			yield (attr,val)
 	
-
+	def extra_parser (f):
+		for l in f:
+			phrase, freq = unicode (l, "utf-8").strip ().split ()
+			yield (phrase,freq)
 
 	if opts.only_index:
 		debug_print ('Only create Indexes')
@@ -174,7 +196,7 @@ def main ():
 	else:
 		source = file ( opts.source, 'r' )
 	# first get config line and table line and goucima line respectively
-	debug_print ('\tParsing xingma source file ')
+	debug_print ('\tParsing table source file ')
 	attri,table,gouci =  parse_source ( source )
 	
 	debug_print ('\t  get attribute of IME :)')
@@ -206,18 +228,36 @@ def main ():
 			pinyin_s = file ( opts.pinyin, 'r' )
 		debug_print ('\tParsing pinyin source file ')
 		pyline = parse_pinyin (pinyin_s)
-		debug_print ('\tParsing pinyin source file')
+		debug_print ('\tPreapring pinyin entries')
 		pinyin = pinyin_parser (pyline)
 		debug_print ('\t  add pinyin into DB ')
 		db.add_pinyin ( pinyin )
 
 	debug_print ("Optimizing database ")
 	db.optimize_database ()
+	
+	if opts.extra:
+		print '\tPreparing for adding extra words'
+		db.create_indexes ('main')
+		debug_print ('\tLoad extra words source %s' % opts.extra)
+		_bz2p = patt_s.match(opts.extra)
+		if _bz2p:
+			extra_s = bz2.BZ2File ( opts.extra, "r" )
+		else:
+			extra_s = file ( opts.extra, 'r' )
+		debug_print ('\tParsing extra words source file ')
+		extraline = parse_extra (extra_s)
+		debug_print ('\tPreparing extra words lines')
+		extrawds = extra_parser (extraline)
+		debug_print ('\tAdding extra words into DB ')
+		db.add_new_phrases (extrawds)
+	
 	if opts.index:
 		debug_print ('Create Indexes ')
 		db.create_indexes ('main')
 	else:
 		debug_print ("We don't create index on database, you should only active this function only for distribution purpose")
+		db.drop_indexes ('main')
 	debug_print ('Done! :D')
 	
 if __name__ == "__main__":
