@@ -19,7 +19,6 @@ PinYin engine for IBus platform. It provides a Chinese PinYin input method.
 
 %prep
 %setup -q
-cp %{SOURCE1} engine
 
 %build
 %configure --disable-static
@@ -38,10 +37,10 @@ rm -rf $RPM_BUILD_ROOT
 %files -f %{name}.lang
 %defattr(-,root,root,-)
 %doc AUTHORS COPYING README
-%dir %{_datadir}/ibus-tables
-%{_datadir}/ibus-tables/*
-%{_datadir}/ibus/engine/tables.engine
-%{_bindir}/ibus-engine-tables
+%dir %{_datadir}/ibus-table
+%{_datadir}/ibus-table/*
+%{_bindir}/ibus-engine-table
+%{_bindir}/table-createdb
 
 %changelog
 * Wed Aug 19 2008 Yu Yuwei <acevery@gmail.com> - @VERSION@-1
