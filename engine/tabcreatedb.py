@@ -1,4 +1,4 @@
-#! /usr/bin/python
+# -*- coding: utf-8 -*-
 # vim: set noet ts=4:
 #
 # scim-python

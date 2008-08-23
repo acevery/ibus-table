@@ -23,8 +23,6 @@
 # $Id: $
 #
 
-tables_DATA = .keep
-tablesdir = $(pkgdatadir)/tables
+install-data-local:
+	$(MKDIR_P) $(DESTDIR)$(pkgdatadir)/tables
 
-EXTRA_DIST = .keep \
-			 $(NULL)
