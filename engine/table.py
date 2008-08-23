@@ -89,6 +89,8 @@ class editor:
 		self._zi = u''
 		# self._caret: caret position in lookup_table
 		self._caret = 0
+		# self._onechar: whether we only select single character
+		self._onechar = False
 
 	def clear (self):
 		'''Remove data holded'''
@@ -427,7 +429,7 @@ class editor:
 				# here we need to consider two parts, table and pinyin
 				# first table
 				if not self._py_mode:
-					self._candidates[0] = self.db.select_words( self._tabkey_list )
+					self._candidates[0] = self.db.select_words( self._tabkey_list, self._onechar )
 				else:
 					self._candidates[0] = self.db.select_zi( self._tabkey_list )
 				self._chars[2] = self._chars[0][:]
@@ -724,7 +726,6 @@ class tabengine (ibus.EngineBase):
 				False,
 				self.db.get_ime_property('def_full_width_punct').lower() == u'true'
 				]
-		
 		# some properties we will involved, Property is taken from scim.
 		#self._setup_property = Property ("setup", _("Setup"))
 		self.reset ()
@@ -735,6 +736,7 @@ class tabengine (ibus.EngineBase):
 		self._double_quotation_state = False
 		self._single_quotation_state = False
 		self._prev_key = None
+		self._editor._onechar = False	
 		self._init_properties ()
 		self._update_ui ()
 
@@ -744,10 +746,12 @@ class tabengine (ibus.EngineBase):
 		self._letter_property = ibus.Property(u'letter')
 		self._punct_property = ibus.Property(u'punct')
 		self._py_property = ibus.Property(u'py_mode')
+		self._onechar_property = ibus.Property(u'onechar')
 		for prop in (self._status_property,
 			self._letter_property,
 			self._punct_property,
-			self._py_property 
+			self._py_property,
+			self._onechar_property
 			#self._setup_property
 			):
 			self.properties.append(prop)
@@ -787,6 +791,13 @@ class tabengine (ibus.EngineBase):
 			self._py_property.set_icon ( u'%s%s' % (self._icon_dir, 'tab-mode.svg' ) )
 			self._py_property.set_tooltip ( _(u'Switch to PinYin mode') )
 
+		if self._editor._onechar:
+			self._onechar_property.set_icon ( u'%s%s' % (self._icon_dir, 'onechar.svg' ))
+			self._onechar_property.set_tooltip ( _(u'Switch to phrase mode') )
+		else:
+			self._onechar_property.set_icon ( u'%s%s' % (self._icon_dir, 'phrase.svg' ))
+			self._onechar_property.set_tooltip ( _(u'Switch to sigle char mode') )
+
 		# use buildin method to update properties :)
 		map (self.update_property, self.properties)
 	
@@ -807,6 +818,8 @@ class tabengine (ibus.EngineBase):
 			self._full_width_punct [self._mode] = not self._full_width_punct [self._mode]
 		elif property == u'py_mode' and self._ime_py:
 			self._editor.r_shift ()
+		elif property == u'onechar':
+			self._editor._onechar = not self._editor._onechar
 		self._refresh_properties ()
 	#	elif property == "setup":
 			# Need implementation
@@ -1017,6 +1030,11 @@ class tabengine (ibus.EngineBase):
 			res = self._editor.l_shift ()
 			self._update_ui ()
 			return res
+		
+		# Match sigle char mode switch hotkey
+		if self._match_hotkey (key, keysyms.comma, modifier.CONTROL_MASK):
+			self.property_activate ( u"onechar" )
+			return True
 		
 		# Ignore key release event now :)
 		if key.mask & modifier.RELEASE_MASK:

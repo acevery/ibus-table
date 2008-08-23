@@ -36,13 +36,12 @@ bin_SCRIPTS = ibus-engine-table \
 
 
 EXTRA_DIST = \
-	table-createdb.in \
+	ibus-table-createdb.in \
 	ibus-engine-table.in \
 	$(NULL)
 
 CLEANFILES = \
 	*.pyc \
-	py.db \
 	$(NULL)
 
 test:

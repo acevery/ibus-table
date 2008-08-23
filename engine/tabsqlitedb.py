@@ -497,7 +497,7 @@ class tabsqlitedb:
 	def compare (self,x,y):
 		return cmp (x[0],y[0]) or -(cmp (x[-1],y[-1])) or -(cmp (x[-2],y[-2]))
 
-	def select_words( self, tabkeys ):
+	def select_words( self, tabkeys, onechar=False ):
 		'''
 		Get phrases from database by tab_key objects
 		( which should be equal or less than the max key length)
@@ -508,6 +508,9 @@ class tabsqlitedb:
 		_len = min( len(tabkeys),self._mlen )
 		_condition = ''
 		_condition += ''.join ( map (lambda x: 'AND m%d = ? ' %x, range(_len) ) )
+		if onechar:
+			# for some users really like to select only single characters
+			_condition += 'AND clen=1 '
 		# you can increase the x in _len + x to include more result, but in the most case, we only need one more key result, so we don't need the extra overhead :)
 		# we start search for 1 key more, if nothing, then 2 key more and so on
 		# this is the max len we need to add into the select cause.

@@ -26,6 +26,8 @@ icons_DATA = \
 	half-punct.svg \
 	tab-mode.svg \
 	py-mode.svg \
+	onechar.svg \
+	phrase.svg \
 	$(NULL)
 
 iconsdir = $(pkgdatadir)/icons
