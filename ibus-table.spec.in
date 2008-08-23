@@ -40,7 +40,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_datadir}/ibus-table
 %{_datadir}/ibus-table/*
 %{_bindir}/ibus-engine-table
-%{_bindir}/table-createdb
+%{_bindir}/ibus-table-createdb
 
 %changelog
 * Wed Aug 19 2008 Yu Yuwei <acevery@gmail.com> - @VERSION@-1
