@@ -1,7 +1,7 @@
 Name:       @PACKAGE_NAME@
 Version:    @PACKAGE_VERSION@
 Release:    1%{?dist}
-Summary:    The Tables engine for IBus platform
+Summary:    The Table engine for IBus platform
 License:    GPLv2+
 Group:      System Environment/Libraries
 URL:        http://code.google.com/p/ibus/
@@ -15,7 +15,7 @@ BuildRequires:  gettext-devel
 Requires:   ibus
 
 %description
-PinYin engine for IBus platform. It provides a Chinese PinYin input method.
+The package contains general Table engine for IBus platform.
 
 %prep
 %setup -q
