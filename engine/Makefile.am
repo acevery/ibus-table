@@ -31,7 +31,7 @@ engine_table_DATA = \
 engine_tabledir = $(datadir)/ibus-table/engine
 
 bin_SCRIPTS = ibus-engine-table \
-			  table-createdb \
+			  ibus-table-createdb \
 			  $(NULL)
 
 
