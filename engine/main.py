@@ -54,6 +54,7 @@ class IMApp:
 		self.__mainloop.run()
 
 	def __bus_destroy_cb(self, bus):
+		self.__engine.do_destroy()
 		self.__mainloop.quit()
 
 

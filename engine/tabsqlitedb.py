@@ -104,6 +104,7 @@ class tabsqlitedb:
 					  'def_full_width_letter':'FALSE',
 					  'user_can_define_phrase':'FALSE',
 					  'pinyin_mode':'FALSE',
+					  'no_check_chars':u'',
 					  'rules':''}
 					  #'rules':'ce2:p11+p12+p21+p22;ce3:p11+p21+p22+p31;ca4:p11+p21+p31+p41'}
 			# inital the attribute in ime table, which should be updated from mabiao
@@ -127,7 +128,7 @@ class tabsqlitedb:
 			print 'Could not find "user_can_define_phrase" entry from database, is it a outdated database?'
 			self.user_can_define_phrase = False
 		self.rules = self.get_rules ()
-		
+		self._no_check_chars = self.get_no_check_chars()	
 		if filename:
 			# since we just creating db, we do not need userdb and mudb
 			return
@@ -301,6 +302,15 @@ class tabsqlitedb:
 			return rules
 		else:
 			return ""
+	
+	def get_no_check_chars (self):
+		'''Get the characters which engine should not change freq'''
+		_chars= self.get_ime_property('no_check_chars')
+		try:
+			_chars = _chars.decode('utf-8')
+		except:
+			pass
+		return _chars
 
 	def add_phrases (self, phrases, database = 'main'):
 		'''Add phrases to database, phrases is a iterable object
@@ -717,6 +727,13 @@ class tabsqlitedb:
 		'''
 		if type(phrase) != type(u''):
 			phrase = phrase.decode('utf8')
+		try:
+			if phrase in self._no_check_chars:
+				# if the phrase is a single char, and in no_check_chars, we skip it.
+				print phrase , ' in no check chars'
+				return
+		except:
+			print 'you are using old format of database, please regenerate your database.'
 		if len(phrase) >=2:
 			wordattr = self.parse_phrase ( phrase )
 			_len = len (wordattr) -3
