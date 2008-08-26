@@ -83,13 +83,16 @@ if opts.binpath:
 		opts.binpath = os.path.join (opts.binpath, 'ibus-engine-table')
 else:
 	# we need to find the bin location
-	import subprocess as sp
-	p = sp.Popen(['which','ibus-engine-table'],stdout=sp.PIPE)
-	binpath = p.stdout.readline().strip()
-	if not binpath:
-		print 'Cannot find ibus-engine-table, please tell me the path of ibus-engine-table that I would use in the generated "table.engine"'
-		sys.exit(3)
-	opts.binpath = binpath
+	opts.binpath = os.path.join(os.getenv('IBUS_TABLE_BIN_PATH'), 'ibus-engine-table' )
+	if not opts.binpath:
+		# at last we use which to find it
+		import subprocess as sp
+		p = sp.Popen(['which','ibus-engine-table'],stdout=sp.PIPE)
+		binpath = p.stdout.readline().strip()
+		if not binpath:
+			print 'Cannot find ibus-engine-table, please tell me the path of ibus-engine-table that I would use in the generated "table.engine"'
+			sys.exit(3)
+		opts.binpath = binpath
 engine_language = ''
 engine_icon = 'ibus-table.svg'
 engine_author = 'Yu Yuwei <acevery@gmail.com>'
@@ -313,6 +316,7 @@ def main ():
 		debug_print ("We don't create index on database, you should only active this function only for distribution purpose")
 		db.drop_indexes ('main')
 	# at last, we create the *.engine file for this IM :)
+	debug_print('generating "%s" file' % opts.name.replace('.db','.engine'))
 	f = file ('%s' % opts.name.replace('.db','.engine'), 'w' )
 	eglines = ['Exec=%s -t %s\n' %(opts.binpath, opts.name), 
 			'Name=%s\n' % opts.name.replace('.db','').capitalize(),
