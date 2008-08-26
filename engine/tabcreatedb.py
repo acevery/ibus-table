@@ -64,6 +64,10 @@ opt_parser.add_option( '-d', '--debug',
 		action = 'store_true', dest='debug', default = False,
 		help = 'print extra debug messages')
 
+opt_parser.add_option( '-b', '--bin-path',
+		action = 'store', dest='binpath', default = '',
+		help = 'tell me where the ibus-engine-table is in your system, e.g. "/usr/bin/" or "/usr/bin/ibus-engine-table". If you have already installed ibus-table, I can use "which" to find it out.')
+
 opts,args = opt_parser.parse_args()
 if not opts.name and opts.only_index:
 	print 'Please give me the database you want to create index on'
@@ -71,6 +75,24 @@ if not opts.name and opts.only_index:
 
 if not opts.name:
 	opts.name = os.path.basename(opts.source).split('.')[0] + '.db'
+
+if opts.binpath:
+	# user give the path of ibus-engine-table
+	if opts.binpath.find('ibus-engine-table') == 0:
+		# It is a path, so add ibus-engine-table to it
+		opts.binpath = os.path.join (opts.binpath, 'ibus-engine-table')
+else:
+	# we need to find the bin location
+	import subprocess as sp
+	p = sp.Popen(['which','ibus-engine-table'],stdout=sp.PIPE)
+	binpath = p.stdout.readline().strip()
+	if not binpath:
+		print 'Cannot find ibus-engine-table, please tell me the path of ibus-engine-table that I would use in the generated "table.engine"'
+		sys.exit(3)
+	opts.binpath = binpath
+engine_language = ''
+engine_icon = 'ibus-table.svg'
+engine_author = 'Yu Yuwei <acevery@gmail.com>'
 
 def main ():
 	def debug_print ( message ):
@@ -163,6 +185,7 @@ def main ():
 			yield (zi, gcm)
 	
 	def attribute_parser (f):
+		global engine_language, engine_icon, engine_author
 		for l in f:
 			try:
 				attr,val = unicode (l,"utf-8").strip().split ('=')
@@ -171,6 +194,34 @@ def main ():
 
 			attr = attr.strip().lower()
 			val = val.strip()
+			if attr == 'languages':
+				# we need this for table.engine
+				# if we have more than one language, er, 
+				# this make a little complicated
+				if len(val) > 1:
+					debug_print('\t  we have more than one language in this IM: "%s"' % val)
+					# we will check whether these are all belong to a main one
+					langs={}
+					try:
+						# too lazy to write long one, just use map and "and or trick"
+						map (lambda x: langs.update( {x[:2]: langs.has_key( x[:2]) and langs[x[:2]]+1 or 1}),  val.split(',') )
+						
+						all_langs = langs.keys()
+						if len(all_langs) == 1:
+							debug_print ('\t    we use "%s" as Lang' % all_langs[0])
+							engine_language = all_langs[0]
+						else:
+							# too bad, more than one main language,
+							# we just leave lang to blank :'(
+							debug_print ('\t    we have more than one main language: %s' % all_langs )
+					except:
+						pass
+				else:
+					engine_language = val
+			elif attr == 'icon' and val:
+				engine_icon = os.path.basename(val)
+			elif attr == 'author':
+				engine_author = val
 			yield (attr,val)
 	
 	def extra_parser (f):
@@ -261,6 +312,17 @@ def main ():
 	else:
 		debug_print ("We don't create index on database, you should only active this function only for distribution purpose")
 		db.drop_indexes ('main')
+	# at last, we create the *.engine file for this IM :)
+	f = file ('%s' % opts.name.replace('.db','.engine'), 'w' )
+	eglines = ['Exec=%s -t %s\n' %(opts.binpath, opts.name), 
+			'Name=%s\n' % opts.name.replace('.db','').capitalize(),
+			'Lang=%s\n' % engine_language,
+			'Icon=%s\n' % engine_icon,
+			'Author=%s\n' % engine_author,
+			'Credits=\n'
+			]
+	f.writelines(eglines)
+	f.close()
 	debug_print ('Done! :D')
 	
 if __name__ == "__main__":
