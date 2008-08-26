@@ -104,6 +104,7 @@ class tabsqlitedb:
 					  'def_full_width_letter':'FALSE',
 					  'user_can_define_phrase':'FALSE',
 					  'pinyin_mode':'FALSE',
+					  'dynamic_adjust':'FALSE',
 					  'no_check_chars':u'',
 					  'rules':''}
 					  #'rules':'ce2:p11+p12+p21+p22;ce3:p11+p21+p22+p31;ca4:p11+p21+p31+p41'}
@@ -732,7 +733,6 @@ class tabsqlitedb:
 		try:
 			if phrase in self._no_check_chars:
 				# if the phrase is a single char, and in no_check_chars, we skip it.
-				print phrase , ' in no check chars'
 				return
 		except:
 			print 'you are using old format of database, please regenerate your database.'

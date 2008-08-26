@@ -697,6 +697,12 @@ class tabengine (ibus.EngineBase):
 			print 'We coult not find "pinyin_mode" entry in database, is it a outdated database?'
 			self._ime_py = False
 
+		self._dyn_adjust = self.db.get_ime_property ('dynamic_adjust')
+		if self._dyn_adjust and self._dyn_adjust.lower() == u'true':
+				self._dyn_adjust = True
+		else:
+			self._dyn_adjust = False
+
 		self._status = self.db.get_ime_property('status_prompt').encode('utf8')
 		# now we check and update the valid input characters
 		self._chars = self.db.get_ime_property('valid_input_chars')
@@ -1143,7 +1149,8 @@ class tabengine (ibus.EngineBase):
 			#return (KeyProcessResult,whethercommit,commitstring)
 			if sp_res[0]:
 				self.commit_string (sp_res[1])
-				self.db.check_phrase (sp_res[1])
+				if self._dyn_adjust:
+					self.db.check_phrase (sp_res[1])
 				self._refresh_properties ()
 			else:
 				self.commit_string ( cond_letter_translate(u" ") )
@@ -1169,7 +1176,8 @@ class tabengine (ibus.EngineBase):
 				#return (KeyProcessResult,whethercommit,commitstring)
 				if sp_res[0]:
 					self.commit_string (sp_res[1] + key_char)
-					self.db.check_phrase (sp_res[1])
+					if self._dyn_adjust:
+						self.db.check_phrase (sp_res[1])
 					self._refresh_properties ()
 				else:
 					self.commit_string ( key_char )
@@ -1194,7 +1202,8 @@ class tabengine (ibus.EngineBase):
 				self._editor.clear ()
 				self.commit_string (commit_string)
 				# modify freq info
-				self.db.check_phrase (commit_string)
+				if self._dyn_adjust:
+					self.db.check_phrase (commit_string)
 				self._refresh_properties ()
 			self._update_ui ()
 			return True
@@ -1205,7 +1214,8 @@ class tabengine (ibus.EngineBase):
 				commit_string = self._editor.get_preedit_strings ()
 				self._editor.clear ()
 				self.commit_string (commit_string)
-				self.db.check_phrase (commit_string)
+				if self._dyn_adjust:
+					self.db.check_phrase (commit_string)
 				self._refresh_properties ()
 			self._update_ui ()
 			return res
