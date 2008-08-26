@@ -18,5 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-export IBUS_TABLE_BIN_PATH=@prefix@/bin
-exec python @prefix@/share/ibus-table/engine/tabcreatedb.py $@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+export IBUS_TABLE_BIN_PATH=@bindir@
+exec python @datadir@/ibus-table/engine/tabcreatedb.py $@
