@@ -21,4 +21,4 @@
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 export IBUS_TABLE_BIN_PATH=@bindir@
-exec python @datadir@/ibus-table/engine/tabcreatedb.py $@
+exec python @datarootdir@/ibus-table/engine/tabcreatedb.py $@
