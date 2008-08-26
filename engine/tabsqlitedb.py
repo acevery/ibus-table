@@ -320,7 +320,7 @@ class tabsqlitedb:
 			map (self.add_phrase, phrases)
 		else:
 			map (self.add_phrase, phrases, [database]*len(phrases) )
-		#self.db.commit()	
+		self.db.commit()	
 	
 	def add_new_phrases (self, nphrases, database='main'):
 		'''Add new phrases into db, new phrases is a object
@@ -340,8 +340,9 @@ class tabsqlitedb:
 	def u_add_phrase (self,nphrase):
 		'''Add a phrase to userdb'''
 		self.add_phrase (nphrase,database='user_db')
+		self.db.commit()
 
-	def add_phrase (self, aphrase, database = 'main'):
+	def add_phrase (self, aphrase, database = 'main',commit=False):
 		'''Add phrase to database, phrase is a object of
 		(tabkeys, phrase, freq ,user_freq)
 		'''
@@ -377,7 +378,8 @@ class tabsqlitedb:
 			import traceback
 			traceback.print_exc()
 		#if database != 'mudb':
-		self.db.commit()	
+		if commit:
+			self.db.commit()	
 	
 	def add_goucima (self, gcms):
 		'''Add goucima into database, gcms is iterable object
