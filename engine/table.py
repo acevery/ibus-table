@@ -769,7 +769,10 @@ class tabengine (ibus.EngineBase):
 		'''Method used to update properties'''
 		# taken and modified from PinYin.py :)
 		if self._mode == 1: # refresh mode
-			self._status_property.set_label(  _(self._status) )
+			if self._status == u'CN':
+				self._status_property.set_label(  _(u'CN') )
+			else:
+				self._status_property.set_label(  self._status )
 			self._status_property.set_tooltip (  _(u'Switch to English mode') )
 		else:
 			self._status_property.set_label( _(u'EN') )
