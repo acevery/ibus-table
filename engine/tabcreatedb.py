@@ -82,7 +82,7 @@ if not opts.name:
 
 if opts.binpath:
 	# user give the path of ibus-engine-table
-	if opts.binpath.find('ibus-engine-table') == 0:
+	if not opts.binpath.endswith('ibus-engine-table'):
 		# It is a path, so add ibus-engine-table to it
 		opts.binpath = os.path.join (opts.binpath, 'ibus-engine-table')
 else:
