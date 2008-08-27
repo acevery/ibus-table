@@ -68,6 +68,10 @@ opt_parser.add_option( '-b', '--bin-path',
 		action = 'store', dest='binpath', default = '',
 		help = 'tell me where the ibus-engine-table is in your system, e.g. "/usr/bin/" or "/usr/bin/ibus-engine-table". If you have already installed ibus-table, I can use "which" to find it out.')
 
+opt_parser.add_option( '-d', '--pkgdata-path',
+		action = 'store', dest='pkgdata_path', default = '',
+		help = 'tell me where the ibus-engine-table where is pkgdatadir of ibus-table.')
+
 opts,args = opt_parser.parse_args()
 if not opts.name and opts.only_index:
 	print 'Please give me the database you want to create index on'
@@ -93,6 +97,11 @@ else:
 			print 'Cannot find ibus-engine-table, please tell me the path of ibus-engine-table that I would use in the generated "table.engine"'
 			sys.exit(3)
 		opts.binpath = binpath
+
+if not opts.pkgdata_path:
+	# we get pkgdata_path from env varible.
+	opts.pkgdata_path = os.path.join(os.getenv("IBUS_TABLE_DATA_DIR"), "ibus-table")
+
 engine_language = ''
 engine_icon = 'ibus-table.svg'
 engine_author = 'Yu Yuwei <acevery@gmail.com>'
@@ -321,7 +330,7 @@ def main ():
 	eglines = ['Exec=%s -t %s\n' %(opts.binpath, opts.name), 
 			'Name=%s\n' % opts.name.replace('.db','').capitalize(),
 			'Lang=%s\n' % engine_language,
-			'Icon=%s\n' % engine_icon,
+			'Icon=%s\n' % os.path.join(opts.pkgdata_path, "icons", engine_icon),
 			'Author=%s\n' % engine_author,
 			'Credits=\n'
 			]

@@ -20,5 +20,6 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 prefix=@prefix@
 exec_prefix=@exec_prefix@
+export IBUS_TABLE_DATA_DIR=@daatarootdir@
 export IBUS_TABLE_BIN_PATH=@bindir@
 exec python @datarootdir@/ibus-table/engine/tabcreatedb.py $@
