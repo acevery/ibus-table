@@ -68,7 +68,7 @@ opt_parser.add_option( '-b', '--bin-path',
 		action = 'store', dest='binpath', default = '',
 		help = 'tell me where the ibus-engine-table is in your system, e.g. "/usr/bin/" or "/usr/bin/ibus-engine-table". If you have already installed ibus-table, I can use "which" to find it out.')
 
-opt_parser.add_option( '-d', '--pkgdata-path',
+opt_parser.add_option( '-k', '--pkgdata-path',
 		action = 'store', dest='pkgdata_path', default = '',
 		help = 'tell me where the ibus-engine-table where is pkgdatadir of ibus-table.')
 
