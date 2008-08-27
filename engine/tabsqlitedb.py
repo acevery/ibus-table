@@ -557,7 +557,7 @@ class tabsqlitedb:
 		#		, result )
 		searchres = map ( lambda res: [ bool(res[-2]), bool(res[-1]), [(res[:-2],[res[:-1],res[-1:]])] ], result)
 		# for sysdb
-		reslist=filter( lambda x: x[0] and (not x[1]), searchres )
+		reslist=filter( lambda x: not x[1], searchres )
 		map (lambda x: sysdb.update(x[2]), reslist)
 		# for usrdb
 		reslist=filter( lambda x: (not x[0]) and x[1], searchres )
@@ -760,7 +760,7 @@ class tabsqlitedb:
 		mudb = {}
 		searchres = map ( lambda res: [ bool(res[-2]), bool(res[-1]), [(res[:-2],[res[:-1],res[-1]])] ], result)
 		# for sysdb
-		reslist=filter( lambda x: x[0] and (not x[1]), searchres )
+		reslist=filter( lambda x: not x[1], searchres )
 		map (lambda x: sysdb.update(x[2]), reslist)
 		# for usrdb
 		reslist=filter( lambda x: (not x[0]) and x[1], searchres )

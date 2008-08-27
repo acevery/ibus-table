@@ -23,6 +23,8 @@
 # $Id: $
 #
 
+SUBDIRS = zh
+
 install-data-local:
 	$(MKDIR_P) $(DESTDIR)$(pkgdatadir)/tables
 
