@@ -67,7 +67,7 @@ engine_DATA += $(NULL)
 
 tablesdir = $(pkgdatadir)/tables
 extra_tablesdir = $(pkgdatadir)/tables
-enginedir = $(datadir)/ibus/engine 
+enginedir = $(datadir)/ibus/engine
 
 EXTRA_DIST = \
 	zhengma.txt \
