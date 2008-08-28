@@ -74,8 +74,9 @@ DISTCLEANFILES = \
 	*.db \
 	$(NULL)
 
-.engine.txt.db:
+.txt.db:
 	$(createdb) -n $@ -s $<
+.engine.db:
 
 install-data-hook:
 	@(if test x"$$NO_INDEX" = x""; then \
