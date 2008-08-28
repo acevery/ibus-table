@@ -27,7 +27,7 @@ createdb = \
 	$(PYTHON) $(abs_top_srcdir)/engine/tabcreatedb.py -o -p $(abs_top_srcdir)/data/pinyin_table.txt.bz2 -k $(abs_top_srcdir)
 
 if IBUS_TABLE_EXTRA_PHRASES
-$(createdb) += -e $(srcdir)/extra_phrase.txt
+createdb += -e $(srcdir)/extra_phrase.txt
 endif
 
 createdb_index = \
@@ -36,23 +36,23 @@ createdb_index = \
 tables_DATA = extra_phrase.txt 
 
 if IBUS_TABLE_BUILD_ZHENGMA
-$(tables_DATA) += zhengma.db
+tables_DATA += zhengma.db
 endif
 
 if IBUS_TABLE_BUILD_WUBI86
-$(tables_DATA) += wubi86.db
+tables_DATA += wubi86.db
 endif
 
 if IBUS_TABLE_BUILD_WUBI98
-$(tables_DATA) += wubi98.db
+tables_DATA += wubi98.db
 endif
 
 if IBUS_TABLE_BUILD_CANGJIE5
-$(tables_DATA) += cangjie5.db
+tables_DATA += cangjie5.db
 endif
 
 if IBUS_TABLE_BUILD_ERBI_QS
-$(tables_DATA) += erbi-qs.db
+tables_DATA += erbi-qs.db
 endif
 
 
