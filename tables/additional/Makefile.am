@@ -52,6 +52,8 @@ DISTCLEANFILES = \
 	*.db \
 	$(NULL)
 
+%.engine:%.db
+
 .txt.db:
 	$(createdb) -n $@ -s $<
 
