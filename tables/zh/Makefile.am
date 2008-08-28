@@ -83,6 +83,7 @@ DISTCLEANFILES = \
 	$(NULL)
 
 %.engine:%.db
+	@echo "$@ is done:)"
 
 .txt.db:
 	$(createdb) -n $@ -s $< 
