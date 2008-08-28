@@ -33,7 +33,7 @@ endif
 createdb_index = \
 	$(PYTHON) $(abs_top_srcdir)/engine/tabcreatedb.py -i
 
-tables_DATA = extra_phrase.txt 
+extra_tables_DATA = extra_phrase.txt 
 
 if IBUS_TABLE_BUILD_ZHENGMA
 tables_DATA += zhengma.db
@@ -58,6 +58,7 @@ endif
 tables_DATA += $(NULL)
 
 tablesdir = $(pkgdatadir)/tables
+extra_tablesdir = $(pkgdatadir)/tables
 
 EXTRA_DIST = \
 	zhengma.txt \
