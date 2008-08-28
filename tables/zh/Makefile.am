@@ -24,7 +24,7 @@
 #
 
 createdb = \
-	$(PYTHON) $(abs_top_srcdir)/engine/tabcreatedb.py -o -p $(abs_top_srcdir)/data/pinyin_table.txt.bz2 -k $(abs_top_srcdir)
+	$(PYTHON) $(abs_top_srcdir)/engine/tabcreatedb.py -o -p $(abs_top_srcdir)/data/pinyin_table.txt.bz2 -k $(datadir) -b $(bindir)
 
 if IBUS_TABLE_EXTRA_PHRASES
 createdb += -e $(srcdir)/extra_phrase.txt
