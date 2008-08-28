@@ -22,10 +22,10 @@
 icons_DATA = 
 
 if IBUS_TABLE_BUILD_ADDITIONAL
-$(icons_DATA) += latex.svg compose.svg
+icons_DATA += latex.svg compose.svg
 endif
 
-$(icons_DATA) += $(NULL)
+icons_DATA += $(NULL)
 
 iconsdir = $(pkgdatadir)/icons
 

@@ -29,12 +29,12 @@ createdb = \
 createdb_index = \
 	$(PYTHON) $(abs_top_srcdir)/engine/tabcreatedb.py -i
 
-table_DATA = 
+tables_DATA = 
 if IBUS_TABLE_BUILD_ADDITIONAL
-$(table_DATA) += latex.db compose.db 
+tables_DATA += latex.db compose.db 
 endif
 
-$(table_DATA) += $(NULL)
+tables_DATA += $(NULL)
 
 
 tablesdir = $(pkgdatadir)/tables

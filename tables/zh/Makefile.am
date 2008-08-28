@@ -55,6 +55,7 @@ if IBUS_TABLE_BUILD_ERBI_QS
 tables_DATA += erbi-qs.db
 endif
 
+tables_DATA += $(NULL)
 
 tablesdir = $(pkgdatadir)/tables
 

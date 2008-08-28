@@ -22,26 +22,26 @@
 icons_DATA = 
 
 if IBUS_TABLE_BUILD_ZHENGMA
-$(icons_DATA) += zhengma.svg
+icons_DATA += zhengma.svg
 endif
 
 if IBUS_TABLE_BUILD_WUBI86
-$(icons_DATA) += wubi86.svg
+icons_DATA += wubi86.svg
 endif
 
 if IBUS_TABLE_BUILD_WUBI98
-$(icons_DATA) += wubi98.svg
+icons_DATA += wubi98.svg
 endif
 
 if IBUS_TABLE_BUILD_CANGJIE5
-$(icons_DATA) += cangjie5.svg
+icons_DATA += cangjie5.svg
 endif
 
 if IBUS_TABLE_BUILD_ERBI_QS
-$(icons_DATA) += erbi-qs.svg
+icons_DATA += erbi-qs.svg
 endif
 
-$(icons_DATA) += $(NULL)
+icons_DATA += $(NULL)
 
 iconsdir = $(pkgdatadir)/icons
 
