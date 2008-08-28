@@ -24,7 +24,7 @@
 #
 
 createdb = \
-	$(PYTHON) $(abs_top_srcdir)/engine/tabcreatedb.py -o -k $(datadir) -b $(bindir)
+	$(PYTHON) $(abs_top_srcdir)/engine/tabcreatedb.py -o -k $(datadir) -b $(pkgdatadir)
 
 createdb_index = \
 	$(PYTHON) $(abs_top_srcdir)/engine/tabcreatedb.py -i
