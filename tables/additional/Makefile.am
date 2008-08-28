@@ -30,14 +30,18 @@ createdb_index = \
 	$(PYTHON) $(abs_top_srcdir)/engine/tabcreatedb.py -i
 
 tables_DATA = 
+engine_DATA =
 if IBUS_TABLE_BUILD_ADDITIONAL
 tables_DATA += latex.db compose.db 
+engine_DATA += latex.engine compose.engine
 endif
 
 tables_DATA += $(NULL)
+engine_DATA += $(NULL)
 
 
 tablesdir = $(pkgdatadir)/tables
+enginedir = $(datadir)/ibus/engine
 
 EXTRA_DIST = \
 	latex.txt

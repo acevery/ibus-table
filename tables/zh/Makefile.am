@@ -36,30 +36,38 @@ createdb_index = \
 extra_tables_DATA = extra_phrase.txt 
 
 tables_DATA = 
+engine_DATA =
 if IBUS_TABLE_BUILD_ZHENGMA
-tables_DATA += zhengma.db zhengma.engine
+tables_DATA += zhengma.db
+engine_DATA += zhengma.engine
 endif
 
 if IBUS_TABLE_BUILD_WUBI86
-tables_DATA += wubi86.db wubi86.engine
+tables_DATA += wubi86.db 
+engine_DATA += wubi86.engine
 endif
 
 if IBUS_TABLE_BUILD_WUBI98
-tables_DATA += wubi98.db wubi98.engine
+tables_DATA += wubi98.db 
+engine_DATA += wubi98.engine
 endif
 
 if IBUS_TABLE_BUILD_CANGJIE5
-tables_DATA += cangjie5.db cangjie5.engine
+tables_DATA += cangjie5.db 
+engine_DATA += cangjie5.engine
 endif
 
 if IBUS_TABLE_BUILD_ERBI_QS
-tables_DATA += erbi-qs.db erbi-qs.engine
+tables_DATA += erbi-qs.db 
+engine_DATA += erbi-qs.engine
 endif
 
 tables_DATA += $(NULL)
+engine_DATA += $(NULL)
 
 tablesdir = $(pkgdatadir)/tables
 extra_tablesdir = $(pkgdatadir)/tables
+enginedir = $(datadir)/ibus/engine 
 
 EXTRA_DIST = \
 	zhengma.txt \
@@ -74,8 +82,9 @@ DISTCLEANFILES = \
 	*.db \
 	$(NULL)
 
-%.db %.engine: %.txt
-	$(createdb) -n %.db -s %.txt
+%.engine:%.db
+.txt.db:
+	$(createdb) -n $@ -s $< 
 
 install-data-hook:
 	@(if test x"$$NO_INDEX" = x""; then \
