@@ -74,7 +74,7 @@ DISTCLEANFILES = \
 	*.db \
 	$(NULL)
 
-%.txt %.engine: %.db
+%.db %.engine: %.txt
 	$(createdb) -n %.db -s %.txt
 
 install-data-hook:
