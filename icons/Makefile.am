@@ -18,6 +18,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+SUBDIRS = \
+	zh \
+	additional \
+	$(NULL)
+
 icons_DATA = \
 	ibus-table.svg \
 	full-letter.svg \

@@ -20,6 +20,8 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 prefix=@prefix@
+datarootdir=@datarootdir@
+datadir=@datadir@
 export IBUS_TABLE_LOCATION=@datarootdir@/ibus-table
 exec python @datarootdir@/ibus-table/engine/main.py $@
 
