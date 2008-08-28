@@ -36,26 +36,25 @@ createdb_index = \
 tables_DATA = extra_phrase.txt 
 
 if IBUS_TABLE_BUILD_ZHENGMA
-$(table_DATA) += zhengma.db
+$(tables_DATA) += zhengma.db
 endif
 
 if IBUS_TABLE_BUILD_WUBI86
-$(table_DATA) += wubi86.db
+$(tables_DATA) += wubi86.db
 endif
 
 if IBUS_TABLE_BUILD_WUBI98
-$(table_DATA) += wubi98.db
+$(tables_DATA) += wubi98.db
 endif
 
 if IBUS_TABLE_BUILD_CANGJIE5
-$(table_DATA) += cangjie5.db
+$(tables_DATA) += cangjie5.db
 endif
 
 if IBUS_TABLE_BUILD_ERBI_QS
-$(table_DATA) += erbi-qs.db
+$(tables_DATA) += erbi-qs.db
 endif
 
-$(table_DATA) += $(NULL)
 
 tablesdir = $(pkgdatadir)/tables
 

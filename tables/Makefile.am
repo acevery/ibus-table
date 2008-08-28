@@ -30,7 +30,7 @@ SUBDIRS = \
 
 template_DATA = template.txt 
 
-template_dir = $(datadir)/ibus-table/tables
+templatedir = $(datadir)/ibus-table/tables
 
 install-data-local:
 	$(MKDIR_P) $(DESTDIR)$(pkgdatadir)/tables
