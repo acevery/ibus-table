@@ -35,24 +35,25 @@ createdb_index = \
 
 extra_tables_DATA = extra_phrase.txt 
 
+tables_DATA = 
 if IBUS_TABLE_BUILD_ZHENGMA
-tables_DATA += zhengma.db
+tables_DATA += zhengma.db zhengma.engine
 endif
 
 if IBUS_TABLE_BUILD_WUBI86
-tables_DATA += wubi86.db
+tables_DATA += wubi86.db wubi86.engine
 endif
 
 if IBUS_TABLE_BUILD_WUBI98
-tables_DATA += wubi98.db
+tables_DATA += wubi98.db wubi98.engine
 endif
 
 if IBUS_TABLE_BUILD_CANGJIE5
-tables_DATA += cangjie5.db
+tables_DATA += cangjie5.db cangjie5.engine
 endif
 
 if IBUS_TABLE_BUILD_ERBI_QS
-tables_DATA += erbi-qs.db
+tables_DATA += erbi-qs.db erbi-qs.engine
 endif
 
 tables_DATA += $(NULL)
@@ -73,7 +74,7 @@ DISTCLEANFILES = \
 	*.db \
 	$(NULL)
 
-.txt.db:
+.engine.txt.db:
 	$(createdb) -n $@ -s $<
 
 install-data-hook:
