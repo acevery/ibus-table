@@ -302,7 +302,7 @@ def main ():
 	db.optimize_database ()
 	
 	if opts.extra:
-		print '\tPreparing for adding extra words'
+		debug_print( '\tPreparing for adding extra words' )
 		db.create_indexes ('main')
 		debug_print ('\tLoad extra words source \"%s\"' % opts.extra)
 		_bz2p = patt_s.match(opts.extra)
