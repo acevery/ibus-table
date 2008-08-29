@@ -17,12 +17,35 @@ Requires:   ibus
 %description
 The package contains general Table engine for IBus platform.
 
+%package chinese
+Summary:    Chinese tables for general table engine of IBus.
+Group:      System Environment/Libraries
+Requires:   %{name} = %{version}-%{release}
+
+%description chinese
+This package contains Chineses tables.
+
+%package additional
+Summary:    Additional tables for general table engine of IBus.
+Group:      System Environment/Libraries
+Requires:   %{name} = %{version}-%{release}
+
+%description additional
+This package contains additional tables.
+
 %prep
 %setup -q
 
 %build
-%configure --disable-static
-# make -C po update-gmo
+%configure \
+	--disable-static \
+	--enable-zhengma \
+	--enable-wubi86 \
+	--enable-wubi98 \
+	--enable-cangjie5 \
+	--enable-erbi-qs \
+	--enable-additional
+
 make %{?_smp_mflags}
 
 %install
@@ -34,6 +57,17 @@ make DESTDIR=${RPM_BUILD_ROOT} NO_INDEX=true install
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%post chinese
+ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/wubi86.db
+ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/wubi98.db
+ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/cangjie5.db
+ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/erbi-qs.db
+ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/zhengma.db
+
+%post additional
+ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/compose.db
+ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/latex.db
+
 %files -f %{name}.lang
 %defattr(-,root,root,-)
 %doc AUTHORS COPYING README
@@ -41,6 +75,33 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/ibus-table/*
 %{_bindir}/ibus-engine-table
 %{_bindir}/ibus-table-createdb
+
+%files chinese
+%defattr(-,root,root,-)
+%{_datadir}/ibus-table/tables/wubi86.db
+%{_datadir}/ibus-table/tables/wubi98.db
+%{_datadir}/ibus-table/tables/cangjie5.db
+%{_datadir}/ibus-table/tables/erbi-qs.db
+%{_datadir}/ibus-table/tables/zhengma.db
+%{_datadir}/ibus-table/icons/wubi86.svg
+%{_datadir}/ibus-table/icons/wubi98.svg
+%{_datadir}/ibus-table/icons/cangjie5.svg
+%{_datadir}/ibus-table/icons/erbi-qs.svg
+%{_datadir}/ibus-table/icons/zhengma.svg
+%{_datadir}/ibus/engine/wubi86.engine
+%{_datadir}/ibus/engine/wubi98.engine
+%{_datadir}/ibus/engine/cangjie5.engine
+%{_datadir}/ibus/engine/erbi-qs.engine
+%{_datadir}/ibus/engine/zhengma.engine
+
+%files additional
+%defattr(-,root,root,-)
+%{_datadir}/ibus-table/tables/compose.db
+%{_datadir}/ibus-table/tables/latex.db
+%{_datadir}/ibus-table/icons/compose.svg
+%{_datadir}/ibus-table/icons/latex.svg
+%{_datadir}/ibus/engine/compose.engine
+%{_datadir}/ibus/engine/latex.engine
 
 %changelog
 * Wed Aug 19 2008 Yu Yuwei <acevery@gmail.com> - @VERSION@-1
