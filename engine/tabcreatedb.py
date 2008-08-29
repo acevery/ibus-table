@@ -309,7 +309,7 @@ def main ():
 	debug_print ("Optimizing database ")
 	db.optimize_database ()
 	
-	if opts.extra:
+	if db.get_ime_property ('user_can_define_phrase').lower() == u'true' and opts.extra:
 		debug_print( '\tPreparing for adding extra words' )
 		db.create_indexes ('main')
 		debug_print ('\tLoad extra words source \"%s\"' % opts.extra)
