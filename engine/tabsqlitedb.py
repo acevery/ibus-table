@@ -52,22 +52,12 @@ class tabsqlitedb:
 			# now we are creating db
 			self.db = sqlite3.connect( filename )
 		else:
-			# we are using db
-			# we try to copy the system db to /dev/shm
-			tmpname = '/dev/shm/ibus/tables/%s' % path.basename(name)
-			if not path.exists( tmpname ):
-				if not path.exists ('/dev/shm'):
-					# no /dev/shm, so we still use the disk db :'(
-					tmpname = name
-				else:
-					if not path.exists ('/dev/shm/ibus/tables'):
-						# we need to mkdir first
-						os.system('mkdir -p /dev/shm/ibus/tables')
-					# then we just copy the disk db to the dir :)
-					os.system('cp %s %s' % (name, tmpname ) )
-					
+			try:
+				os.system('cat %s > /dev/null' % name)
+			except:
+				pass
 			# open system phrase db
-			self.db = sqlite3.connect(  tmpname )
+			self.db = sqlite3.connect(  name )
 		try:
 			self.db.execute( 'PRAGMA page_size = 8192; ' )
 			self.db.execute( 'PRAGMA cache_size = 20000; ' )

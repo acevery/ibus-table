@@ -742,7 +742,7 @@ class tabengine (ibus.EngineBase):
 		self._double_quotation_state = False
 		self._single_quotation_state = False
 		self._prev_key = None
-		self._editor._onechar = False	
+		#self._editor._onechar = False	
 		self._init_properties ()
 		self._update_ui ()
 
@@ -770,11 +770,14 @@ class tabengine (ibus.EngineBase):
 		# taken and modified from PinYin.py :)
 		if self._mode == 1: # refresh mode
 			if self._status == u'CN':
+				self._status_property.set_icon( u'%s%s' % (self._icon_dir, 'chinese.svg') )
 				self._status_property.set_label(  _(u'CN') )
 			else:
+				self._status_property.set_icon( u'%s%s' % (self._icon_dir, 'ibus-table.svg') )
 				self._status_property.set_label(  self._status )
 			self._status_property.set_tooltip (  _(u'Switch to English mode') )
 		else:
+			self._status_property.set_icon( u'%s%s' % (self._icon_dir, 'english.svg') )
 			self._status_property.set_label( _(u'EN') )
 			self._status_property.set_tooltip (  _(u'Switch to Table mode') )
 
