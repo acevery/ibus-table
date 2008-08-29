@@ -61,7 +61,7 @@ rm -rf $RPM_BUILD_ROOT
 ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/wubi86.db
 ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/wubi98.db
 ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/cangjie5.db
-ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/erbi-qs.db
+ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/erbi_qs.db
 ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/zhengma.db
 
 %post additional
@@ -81,7 +81,7 @@ ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/latex.db
 %{_datadir}/ibus-table/tables/wubi86.db
 %{_datadir}/ibus-table/tables/wubi98.db
 %{_datadir}/ibus-table/tables/cangjie5.db
-%{_datadir}/ibus-table/tables/erbi-qs.db
+%{_datadir}/ibus-table/tables/erbi_qs.db
 %{_datadir}/ibus-table/tables/zhengma.db
 %{_datadir}/ibus-table/icons/wubi86.svg
 %{_datadir}/ibus-table/icons/wubi98.svg
@@ -91,7 +91,7 @@ ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/latex.db
 %{_datadir}/ibus/engine/wubi86.engine
 %{_datadir}/ibus/engine/wubi98.engine
 %{_datadir}/ibus/engine/cangjie5.engine
-%{_datadir}/ibus/engine/erbi-qs.engine
+%{_datadir}/ibus/engine/erbi_qs.engine
 %{_datadir}/ibus/engine/zhengma.engine
 
 %files additional

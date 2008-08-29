@@ -61,8 +61,8 @@ engine_DATA += cangjie5.engine
 endif
 
 if IBUS_TABLE_BUILD_ERBI_QS
-tables_DATA += erbi-qs.db
-engine_DATA += erbi-qs.engine
+tables_DATA += erbi_qs.db
+engine_DATA += erbi_qs.engine
 endif
 
 tables_DATA += $(NULL)
@@ -77,7 +77,7 @@ EXTRA_DIST = \
 	wubi86.txt \
 	wubi98.txt \
 	cangjie5.txt \
-	erbi-qs.txt \
+	erbi_qs.txt \
 	extra_phrase.txt \
 	$(NULL)
 
