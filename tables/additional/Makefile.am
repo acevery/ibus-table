@@ -24,13 +24,16 @@
 #
 
 createdb = \
-	$(PYTHON) $(abs_top_srcdir)/engine/tabcreatedb.py -o -k $(pkgdatadir) -b $(bindir)
+	$(PYTHON) $(abs_top_srcdir)/engine/tabcreatedb.py \
+		-k $(pkgdatadir) \
+		-b $(bindir)
 
 createdb_index = \
 	$(PYTHON) $(abs_top_srcdir)/engine/tabcreatedb.py -i
 
 tables_DATA =
 engine_DATA =
+
 if IBUS_TABLE_BUILD_ADDITIONAL
 tables_DATA += latex.db compose.db
 engine_DATA += latex.engine compose.engine
@@ -44,12 +47,13 @@ tablesdir = $(pkgdatadir)/tables
 enginedir = $(datadir)/ibus/engine
 
 EXTRA_DIST = \
-	latex.txt
+	latex.txt \
 	compose.txt \
 	$(NULL)
 
 DISTCLEANFILES = \
 	*.db \
+	*.engine \
 	$(NULL)
 
 .db.engine:
