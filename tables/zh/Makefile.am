@@ -33,9 +33,9 @@ endif
 createdb_index = \
 	$(PYTHON) $(abs_top_srcdir)/engine/tabcreatedb.py -i
 
-extra_tables_DATA = extra_phrase.txt 
+extra_tables_DATA = extra_phrase.txt
 
-tables_DATA = 
+tables_DATA =
 engine_DATA =
 if IBUS_TABLE_BUILD_ZHENGMA
 tables_DATA += zhengma.db
@@ -43,22 +43,22 @@ engine_DATA += zhengma.engine
 endif
 
 if IBUS_TABLE_BUILD_WUBI86
-tables_DATA += wubi86.db 
+tables_DATA += wubi86.db
 engine_DATA += wubi86.engine
 endif
 
 if IBUS_TABLE_BUILD_WUBI98
-tables_DATA += wubi98.db 
+tables_DATA += wubi98.db
 engine_DATA += wubi98.engine
 endif
 
 if IBUS_TABLE_BUILD_CANGJIE5
-tables_DATA += cangjie5.db 
+tables_DATA += cangjie5.db
 engine_DATA += cangjie5.engine
 endif
 
 if IBUS_TABLE_BUILD_ERBI_QS
-tables_DATA += erbi-qs.db 
+tables_DATA += erbi-qs.db
 engine_DATA += erbi-qs.engine
 endif
 
@@ -82,11 +82,11 @@ DISTCLEANFILES = \
 	*.db \
 	$(NULL)
 
-%.engine:%.db
+.db.engine:
 	@echo "$@ is done:)"
 
 .txt.db:
-	$(createdb) -n $@ -s $< 
+	$(createdb) -n $@ -s $<
 
 install-data-hook:
 	@(if test x"$$NO_INDEX" = x""; then \

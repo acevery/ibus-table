@@ -29,10 +29,10 @@ createdb = \
 createdb_index = \
 	$(PYTHON) $(abs_top_srcdir)/engine/tabcreatedb.py -i
 
-tables_DATA = 
+tables_DATA =
 engine_DATA =
 if IBUS_TABLE_BUILD_ADDITIONAL
-tables_DATA += latex.db compose.db 
+tables_DATA += latex.db compose.db
 engine_DATA += latex.engine compose.engine
 endif
 
@@ -52,7 +52,7 @@ DISTCLEANFILES = \
 	*.db \
 	$(NULL)
 
-%.engine:%.db
+.db.engine:
 	@echo "$@ is done :)"
 
 .txt.db:
