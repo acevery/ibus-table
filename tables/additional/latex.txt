@@ -26,7 +26,7 @@ NAME = Latex
 ### AUTHOR =
 
 ### Supported locales of this table
-LANGUAGES = other
+LANGUAGES = 
 
 ### Prompt string to be displayed in the status area.
 STATUS_PROMPT = Σ

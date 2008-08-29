@@ -132,3 +132,16 @@ m4/Makefile
 )
 
 AC_OUTPUT
+
+AC_MSG_RESULT([
+Build options:
+  Version					$VERSION
+  Install prefix			$prefix
+  Build ZhengMa				$enable_zhengma
+  Build WuBi98				$enable_wubi98
+  Build WuBi86				$enable_wubi86
+  Build CangJie5			$enable_cangjie5
+  Build ErBi-QS				$enable_erbi-qs
+  Build Additional			$enable_additional
+  Integrate Extra Phrases	$enable_extra_phrases
+])
