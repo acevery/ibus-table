@@ -188,9 +188,11 @@ def main ():
 			yield (_pinyin, _zi, _freq)
 
 	def phrase_parser (f):
+		list=[]
 		for l in f:
 			xingma, phrase, freq = unicode (l, "utf-8").strip ().split ('\t')
-			yield (xingma, phrase, int(freq), 0)
+			list.append ( (xingma, phrase, int(freq), 0) )
+		return list
 
 	def goucima_parser (f):
 		for l in f:
@@ -238,9 +240,15 @@ def main ():
 			yield (attr,val)
 	
 	def extra_parser (f):
+		list = []
 		for l in f:
 			phrase, freq = unicode (l, "utf-8").strip ().split ()
-			yield (phrase,freq)
+			try:
+				_tabkey = db.parse_phrase_to_tabkeys(phrase)
+				list.append( (_tabkey,phrase,freq,0) )
+			except:
+				print '\"%s\" would not been added' % phrase
+		return list
 
 	if opts.only_index:
 		debug_print ('Only create Indexes')
@@ -314,8 +322,21 @@ def main ():
 		extraline = parse_extra (extra_s)
 		debug_print ('\tPreparing extra words lines')
 		extrawds = extra_parser (extraline)
+		debug_print( '\t  we have %d extra phrases from source' % len(extrawds))
+		# first get the entry of original phrases from
+		# phrases-[(xingma, phrase, int(freq), 0)]
+		orig_phrases = {}
+		map (lambda x: orig_phrases.update({"%s\t%s"%(x[0],x[1]):x}), phrases )
+		debug_print( '\t  the len of orig_phrases is: %d' % len(orig_phrases) )
+		extra_phrases = {}
+		map (lambda x: extra_phrases.update({"%s\t%s" %(x[0],x[1]):x}), extrawds )
+		debug_print ( '\t  the len of extra_phrases is: %d' % len(extra_phrases) )
+		# pop duplicated keys
+		map (lambda x: extra_phrases.pop(x) if orig_phrases.has_key(x) else 0, extra_phrases.keys() )
+		debug_print( '\t  %d extra phrases will be added' % len(extra_phrases))
+		new_phrases = extra_phrases.values()
 		debug_print ('\tAdding extra words into DB ')
-		db.add_new_phrases (extrawds)
+		db.add_phrases (new_phrases)
 		debug_print ("Optimizing database ")
 		db.optimize_database ()
 	
