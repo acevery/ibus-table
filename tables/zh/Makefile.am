@@ -80,6 +80,7 @@ EXTRA_DIST = \
 
 DISTCLEANFILES = \
 	*.db \
+	*.engine \
 	$(NULL)
 
 .db.engine:
