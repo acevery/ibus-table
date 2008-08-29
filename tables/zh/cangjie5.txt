@@ -16,7 +16,7 @@ UUID = f4cac4c1-e314-4be1-8567-a6357857519e
 ### This number must be less than 2^32.
 SERIAL_NUMBER = 20080828
 
-ICON = cangjie.png
+ICON = cangjie5.svg
 
 ### The default name of this table
 NAME = CangJie 5

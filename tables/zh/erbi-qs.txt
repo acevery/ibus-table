@@ -18,7 +18,7 @@ UUID = cc952910-be17-4342-9638-3759623b94a9
 ### This number must be less than 2^32.
 SERIAL_NUMBER = 20040425
 
-ICON = erbi-qs.png
+ICON = erbi-qs.svg
 
 ### The default name of this table
 NAME = Erbi-QS
