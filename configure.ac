@@ -108,9 +108,9 @@ AM_CONDITIONAL([IBUS_TABLE_EXTRA_PHRASES],[test x"$enable_extra_phrases" = x"yes
 AC_ARG_ENABLE([additional],
     [AC_HELP_STRING([--disable-additional],
         [Don't generate additional Engine])], ,
-    [enable_aditional=yes])
+    [enable_additional=yes])
 
-AM_CONDITIONAL([IBUS_TABLE_BUILD_ADDITIONAL],[test x"$enable_aditional" = x"yes"])
+AM_CONDITIONAL([IBUS_TABLE_BUILD_ADDITIONAL],[test x"$enable_additional" = x"yes"])
 
 # OUTPUT files
 AC_CONFIG_FILES(po/Makefile.in
