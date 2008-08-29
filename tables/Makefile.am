@@ -28,9 +28,15 @@ SUBDIRS = \
 	additional \
 	$(NULL)
 
-template_DATA = template.txt 
+template_DATA = \
+	template.txt \
+	$(NULL)
 
 templatedir = $(datadir)/ibus-table/tables
+
+EXTRA_DIST = \
+	template.txt \
+	$(NULL)
 
 install-data-local:
 	$(MKDIR_P) $(DESTDIR)$(pkgdatadir)/tables
