@@ -885,14 +885,14 @@ class tabengine (ibus.EngineBase):
 			self.update_aux_string (_ic, attrs, True)
 		else:
 			self.hide_aux_string ()
-			self.update_aux_string (u'', None, False)
+			#self.update_aux_string (u'', None, False)
 
 	def _update_lookup_table (self):
 		'''Update Lookup Table in UI'''
-		
-		self.update_lookup_table ( self._editor.get_lookup_table(), True, True )	
 		if self._editor.is_empty ():
 			self.hide_lookup_table()
+			return
+		self.update_lookup_table ( self._editor.get_lookup_table(), True, True )	
 
 	def _update_ui (self):
 		'''Update User Interface'''
@@ -1055,40 +1055,38 @@ class tabengine (ibus.EngineBase):
 		if self._editor.is_empty ():
 			# we have not input anything
 			if key.code <= 127 and (not key.mask & modifier.ALT_MASK + modifier.CONTROL_MASK):
+				if key.code == keysyms.space:
+					self.commit_string (cond_letter_translate (unichr (key.code)))
+					return True
 				if ascii.ispunct (key.code) and ( unichr(key.code) not in self._valid_input_chars ) :
 					self.commit_string (cond_punct_translate (unichr (key.code)))
 					return True
 				if ascii.isdigit (key.code):
 					self.commit_string (cond_letter_translate (unichr (key.code)))
 					return True
+			elif key.code > 127 and (not self._editor._py_mode):
+				return False
 
-		if key.code in (keysyms.Return, keysyms.KP_Enter):
-			if self._editor.is_empty ():
-				return False
-			else:
-				commit_string = self._editor.get_all_input_strings ()
-				self._editor.clear ()
-				self._update_ui ()
-				self.commit_string (commit_string)
-				self._refresh_properties ()
-				return True
+		if key.code == keysyms.Escape:
+			self.reset ()
+			self._update_ui ()
+			return True
 		
-		elif key.code == keysyms.Escape:
-			if self._editor.is_empty () and (not self._editor._py_mode) :
-				return False
-			else:
-				self.reset ()
-				self._update_ui ()
-				return True
+		elif key.code in (keysyms.Return, keysyms.KP_Enter):
+			commit_string = self._editor.get_all_input_strings ()
+			self.commit_string (commit_string)
+			self._editor.clear ()
+			self._update_ui ()
+			return True
 		
 		elif key.code in (keysyms.Down, keysyms.KP_Down) :
 			res = self._editor.arrow_down ()
-			self._update_ui ()
+			self._update_lookup_table ()
 			return res
 		
 		elif key.code in (keysyms.Up, keysyms.KP_Up):
 			res = self._editor.arrow_up ()
-			self._update_ui ()
+			self._update_lookup_table ()
 			return res
 		
 		elif key.code in (keysyms.Left, keysyms.KP_Left) and key.mask & modifier.CONTROL_MASK:
@@ -1121,12 +1119,12 @@ class tabengine (ibus.EngineBase):
 			self._update_ui ()
 			return res
 		
-		elif key.code in (keysyms.Delete, keysyms.KP_Delete) and key.mask & modifier.CONTROL_MASK:
+		elif key.code == keysyms.Delete  and key.mask & modifier.CONTROL_MASK:
 			res = self._editor.control_delete ()
 			self._update_ui ()
 			return res
 		
-		elif key.code in (keysyms.Delete, keysyms.KP_Delete):
+		elif key.code == keysyms.Delete:
 			res = self._editor.delete ()
 			self._update_ui ()
 			return res
@@ -1135,21 +1133,13 @@ class tabengine (ibus.EngineBase):
 			res = self._editor.number (key.code - keysyms._1)
 			self._update_ui ()
 			return res
-		elif key.code >= keysyms.KP_1 and key.code <= keysyms.KP_9 and self._editor._candidates[0] and key.mask & modifier.CONTROL_MASK:
-			res = self._editor.number (key.code - keysyms.KP_1)
-			self._update_ui ()
-			return res
 
 		elif key.code >= keysyms._1 and key.code <= keysyms._9 and self._editor._candidates[0] and key.mask & modifier.ALT_MASK:
 			res = self._editor.alt_number (key.code - keysyms._1)
 			self._update_ui ()
 			return res
-		elif key.code >= keysyms.KP_1 and key.code <= keysyms.KP_9 and self._editor._candidates[0] and key.mask & modifier.ALT_MASK:
-			res = self._editor.alt_number (key.code - keysyms.KP_1)
-			self._update_ui ()
-			return res
 
-		elif key.code in (keysyms.KP_Space, keysyms.space):
+		elif key.code == keysyms.space:
 			sp_res = self._editor.space ()
 			self._update_ui ()
 			#return (KeyProcessResult,whethercommit,commitstring)
@@ -1157,7 +1147,6 @@ class tabengine (ibus.EngineBase):
 				self.commit_string (sp_res[1])
 				if self._dyn_adjust:
 					self.db.check_phrase (sp_res[1])
-				self._refresh_properties ()
 			else:
 				self.commit_string ( cond_letter_translate(u" ") )
 			return True
@@ -1184,7 +1173,6 @@ class tabengine (ibus.EngineBase):
 					self.commit_string (sp_res[1] + key_char)
 					if self._dyn_adjust:
 						self.db.check_phrase (sp_res[1])
-					self._refresh_properties ()
 				else:
 					self.commit_string ( key_char )
 
@@ -1193,12 +1181,12 @@ class tabengine (ibus.EngineBase):
 		
 		elif key.code in (keysyms.equal, keysyms.Page_Down, keysyms.KP_Page_Down) and self._editor._candidates[0]:
 			res = self._editor.page_down()
-			self._update_ui ()
+			self._update_lookup_table ()
 			return res
 
 		elif key.code in (keysyms.minus, keysyms.Page_Up, keysyms.KP_Page_Up) and self._editor._candidates[0]:
 			res = self._editor.page_up ()
-			self._update_ui ()
+			self._update_lookup_table ()
 			return res
 		
 		elif key.code >= keysyms._1 and key.code <= keysyms._9 and self._editor._candidates[0]:
@@ -1207,30 +1195,16 @@ class tabengine (ibus.EngineBase):
 				commit_string = self._editor.get_preedit_strings ()
 				self._editor.clear ()
 				self.commit_string (commit_string)
+				self._update_ui ()
 				# modify freq info
 				if self._dyn_adjust:
 					self.db.check_phrase (commit_string)
-				self._refresh_properties ()
-			self._update_ui ()
 			return True
-		
-		elif key.code >= keysyms.KP_1 and key.code <= keysyms.KP_9 and self._editor._candidates[0]:
-			res = self._editor.number (key.code - keysyms.KP_1)
-			if res:
-				commit_string = self._editor.get_preedit_strings ()
-				self._editor.clear ()
-				self.commit_string (commit_string)
-				if self._dyn_adjust:
-					self.db.check_phrase (commit_string)
-				self._refresh_properties ()
-			self._update_ui ()
-			return res
 		
 		elif key.code <= 127:
 			self._editor.commit_to_preedit ()
 			commit_string = self._editor.get_preedit_strings ()
 			self._editor.clear ()
-			self._refresh_properties ()
 			self._update_ui ()
 			if ascii.ispunct (key.code):
 				self.commit_string ( commit_string + cond_punct_translate (unichr (key.code)))
