@@ -243,7 +243,7 @@ def main ():
 			elif attr == 'name':
 				engine_name = val
 			elif attr.startswith("name."):
-				engine_local_names.append("%s=%s\n" % (origin_attr, val))
+				engine_local_names.append("Name.%s=%s\n" % (origin_attr[5:], val))
 			yield (attr,val)
 	
 	def extra_parser (f):
