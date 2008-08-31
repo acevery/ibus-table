@@ -328,6 +328,8 @@ def main ():
 		debug_print ('\tParsing extra words source file ')
 		extraline = parse_extra (extra_s)
 		debug_print ('\tPreparing extra words lines')
+		db.cache_goucima()
+		debug_print ('\t  Goucima has been cache to memory')
 		extrawds = extra_parser (extraline)
 		debug_print( '\t  we have %d extra phrases from source' % len(extrawds))
 		# first get the entry of original phrases from
