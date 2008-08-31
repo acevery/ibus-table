@@ -19,7 +19,7 @@ SERIAL_NUMBER = 20040227
 ICON = wubi86.svg
 
 ### The default name of this table
-NAME = Wubi86
+NAME = WuBi86
 
 ### The local names of this table 
 NAME.zh_CN = 五笔86
