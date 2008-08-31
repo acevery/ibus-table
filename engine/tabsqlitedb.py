@@ -119,7 +119,9 @@ class tabsqlitedb:
 			print 'Could not find "user_can_define_phrase" entry from database, is it a outdated database?'
 			self.user_can_define_phrase = False
 		self.rules = self.get_rules ()
-		self._no_check_chars = self.get_no_check_chars()	
+		self._no_check_chars = self.get_no_check_chars()
+		# for fast gouci
+		self._goucima={}
 		if filename:
 			# since we just creating db, we do not need userdb and mudb
 			return
@@ -660,8 +662,22 @@ class tabsqlitedb:
 		except:
 			return None
 	
+	def cache_goucima (self):
+		self._goucima = {}
+		goucima = self.db.execute('SELECT * FROM main.goucima;').fetchall()
+		map(lambda x: self._goucima.update({x[0]:x[1:]}), goucima)
+	
 	def get_gcm_id (self, zi):
 		'''Get goucima of given character'''
+		if self._goucima:
+			# we already cache the goucima
+			if not isinstance(zi,unicode):
+				zi = zi.decode('utf-8')
+			try:
+				gcds = self._goucima[zi]
+				return gcds
+			except:
+				pass
 		sqlstr = 'SELECT %s FROM main.goucima WHERE zi =?;' % ','.join( map (lambda x: 'g%d' % x, range(self._mlen) ) )
 		return self.db.execute(sqlstr,(zi,)).fetchall()[0]
 
