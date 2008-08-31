@@ -106,6 +106,8 @@ if not opts.only_index:
 engine_language = ''
 engine_icon = 'ibus-table.svg'
 engine_author = ''
+engine_name = ''
+engine_local_names = []
 
 def main ():
 	def debug_print ( message ):
@@ -200,14 +202,15 @@ def main ():
 			yield (zi, gcm)
 	
 	def attribute_parser (f):
-		global engine_language, engine_icon, engine_author
+		global engine_language, engine_icon, engine_author, engine_name, engine_local_names
 		for l in f:
 			try:
 				attr,val = unicode (l,"utf-8").strip().split ('=')
 			except:
 				attr,val = unicode (l,"utf-8").strip().split ('==')
-
-			attr = attr.strip().lower()
+			attr = attr.strip()
+			origin_attr = attr
+			attr = attr.lower()
 			val = val.strip()
 			if attr == 'languages':
 				# we need this for table.engine
@@ -237,6 +240,10 @@ def main ():
 				engine_icon = os.path.basename(val)
 			elif attr == 'author':
 				engine_author = val
+			elif attr == 'name':
+				engine_name = val
+			elif attr.startswith("name."):
+				engine_local_names.append("%s=%s\n" % (origin_attr, val))
 			yield (attr,val)
 	
 	def extra_parser (f):
@@ -350,7 +357,9 @@ def main ():
 	debug_print('generating "%s" file' % opts.name.replace('.db','.engine'))
 	f = file ('%s' % opts.name.replace('.db','.engine'), 'w' )
 	eglines = ['Exec=%s -t %s\n' %(opts.binpath, opts.name), 
-			'Name=%s\n' % opts.name.replace('.db','').capitalize(),
+			'Name=%s\n' % (engine_name if engine_name else opts.name.replace('.db','').capitalize())] + \
+			engine_local_names + \
+			[
 			'Lang=%s\n' % engine_language,
 			'Icon=%s\n' % os.path.join(opts.pkgdata_path, "icons", engine_icon),
 			'Author=%s\n' % engine_author,
