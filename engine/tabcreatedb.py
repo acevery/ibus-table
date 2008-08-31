@@ -254,7 +254,7 @@ def main ():
 				_tabkey = db.parse_phrase_to_tabkeys(phrase)
 				list.append( (_tabkey,phrase,freq,0) )
 			except:
-				print '\"%s\" would not been added' % phrase
+				print '\"%s\" would not been added' % phrase.encode('utf-8')
 		return list
 
 	if opts.only_index:
