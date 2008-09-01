@@ -45,6 +45,7 @@ This package contains additional tables.
 	--enable-cangjie5 \
 	--enable-erbi-qs \
 	--enable-additional
+#	--enable-extra-phrases
 
 make %{?_smp_mflags}
 
@@ -71,13 +72,24 @@ ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/latex.db
 %files -f %{name}.lang
 %defattr(-,root,root,-)
 %doc AUTHORS COPYING README
-%dir %{_datadir}/ibus-table
-%{_datadir}/ibus-table/*
+%{_datadir}/ibus-table/engine/*
+%{_datadir}/ibus-table/tables/template.txt
+%{_datadir}/ibus-table/icons/ibus-table.svg
+%{_datadir}/ibus-table/icons/full-letter.svg
+%{_datadir}/ibus-table/icons/full-punct.svg
+%{_datadir}/ibus-table/icons/half-letter.svg
+%{_datadir}/ibus-table/icons/half-punct.svg
+%{_datadir}/ibus-table/icons/onechar.svg
+%{_datadir}/ibus-table/icons/phrase.svg
+%{_datadir}/ibus-table/icons/py-mode.svg
+%{_datadir}/ibus-table/icons/tab-mode.svg
 %{_bindir}/ibus-engine-table
 %{_bindir}/ibus-table-createdb
 
 %files chinese
 %defattr(-,root,root,-)
+%{_datadir}/ibus-table/data/pinyin_table.txt.bz2
+%{_datadir}/ibus-table/tables/extra_phrase.txt
 %{_datadir}/ibus-table/tables/wubi86.db
 %{_datadir}/ibus-table/tables/wubi98.db
 %{_datadir}/ibus-table/tables/cangjie5.db
