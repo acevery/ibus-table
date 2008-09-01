@@ -18,8 +18,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-enginedoc_DATA = table.engine
-enginedocdir = $(datadir)/ibus-table/ibus/engine
+# enginedoc_DATA = table.engine
+# enginedocdir = $(datadir)/ibus-table/ibus/engine
 
 EXTRA_DIST = \
 	table.engine.in \
