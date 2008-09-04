@@ -818,7 +818,7 @@ class tabengine (ibus.EngineBase):
 			self._onechar_property.set_tooltip ( _(u'Switch to sigle char mode') )
 		if self._direct_commit:
 			self._direct_commit_property.set_icon ( u'%s%s' % (self._icon_dir, 'dcommit.svg' ) ) 
-			self._direct_commit_property.set_tooltip ( _(u'Switch to normal commit mode') ) 
+			self._direct_commit_property.set_tooltip ( _(u'Switch to normal commit mode, which use space to commit') ) 
 		else:
 			self._direct_commit_property.set_icon ( u'%s%s' % (self._icon_dir, 'ncommit.svg' ) ) 
 			self._direct_commit_property.set_tooltip ( _(u'Switch to direct commit mode') ) 
