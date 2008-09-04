@@ -33,6 +33,8 @@ icons_DATA = \
 	py-mode.svg \
 	onechar.svg \
 	phrase.svg \
+	chinese.svg \
+	english.svg \
 	$(NULL)
 
 iconsdir = $(pkgdatadir)/icons
