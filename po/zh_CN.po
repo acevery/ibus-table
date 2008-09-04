@@ -53,8 +53,8 @@ msgstr "切换到拼音反查模式"
 
 #: engine/table.py:808
 msgid "Switch to phrase mode"
-msgstr "切换到形码模式"
+msgstr "切换到词组模式"
 
 #: engine/table.py:811
 msgid "Switch to sigle char mode"
-msgstr "切换到英文模式"
+msgstr "切换到单字模式"
