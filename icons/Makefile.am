@@ -35,6 +35,8 @@ icons_DATA = \
 	phrase.svg \
 	chinese.svg \
 	english.svg \
+	dcommit.svg \
+	ncommit.svg \
 	$(NULL)
 
 iconsdir = $(pkgdatadir)/icons

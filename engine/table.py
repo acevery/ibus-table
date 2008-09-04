@@ -659,6 +659,10 @@ class editor:
 			return (True,pstr)
 		else:
 			return (False,u'')
+	
+	def one_candidate (self):
+		'''Return true if there is only one candidate'''
+		return len(self._candidates[0]) == 1
 
 class tabengine (ibus.EngineBase):
 	'''The IM Engine for Tables'''
@@ -734,6 +738,7 @@ class tabengine (ibus.EngineBase):
 				]
 		# some properties we will involved, Property is taken from scim.
 		#self._setup_property = Property ("setup", _("Setup"))
+		self._direct_commit = False
 		self.reset ()
 		
 
@@ -753,11 +758,13 @@ class tabengine (ibus.EngineBase):
 		self._punct_property = ibus.Property(u'punct')
 		self._py_property = ibus.Property(u'py_mode')
 		self._onechar_property = ibus.Property(u'onechar')
+		self._direct_commit_property = ibus.Property(u'dcommit')
 		for prop in (self._status_property,
 			self._letter_property,
 			self._punct_property,
 			self._py_property,
-			self._onechar_property
+			self._onechar_property,
+			self._direct_commit_property
 			#self._setup_property
 			):
 			self.properties.append(prop)
@@ -809,6 +816,12 @@ class tabengine (ibus.EngineBase):
 		else:
 			self._onechar_property.set_icon ( u'%s%s' % (self._icon_dir, 'phrase.svg' ))
 			self._onechar_property.set_tooltip ( _(u'Switch to sigle char mode') )
+		if self._direct_commit:
+			self._direct_commit_property.set_icon ( u'%s%s' % (self._icon_dir, 'dcommit.svg' ) ) 
+			self._direct_commit_property.set_tooltip ( _(u'Switch to normal commit mode') ) 
+		else:
+			self._direct_commit_property.set_icon ( u'%s%s' % (self._icon_dir, 'ncommit.svg' ) ) 
+			self._direct_commit_property.set_tooltip ( _(u'Switch to direct commit mode') ) 
 
 		# use buildin method to update properties :)
 		map (self.update_property, self.properties)
@@ -832,6 +845,8 @@ class tabengine (ibus.EngineBase):
 			self._editor.r_shift ()
 		elif property == u'onechar':
 			self._editor._onechar = not self._editor._onechar
+		elif property == u'dcommit':
+			self._direct_commit = not self._direct_commit
 		self._refresh_properties ()
 	#	elif property == "setup":
 			# Need implementation
@@ -1047,6 +1062,10 @@ class tabengine (ibus.EngineBase):
 		if self._match_hotkey (key, keysyms.comma, modifier.CONTROL_MASK):
 			self.property_activate ( u"onechar" )
 			return True
+		# Match direct commit mode switch hotkey
+		if self._match_hotkey (key, keysyms.slash, modifier.CONTROL_MASK):
+			self.property_activate ( u"dcommit" )
+			return True
 		
 		# Ignore key release event now :)
 		if key.mask & modifier.RELEASE_MASK:
@@ -1140,8 +1159,8 @@ class tabengine (ibus.EngineBase):
 			return res
 
 		elif key.code == keysyms.space:
+			o_py = self._editor._py_mode
 			sp_res = self._editor.space ()
-			self._update_ui ()
 			#return (KeyProcessResult,whethercommit,commitstring)
 			if sp_res[0]:
 				self.commit_string (sp_res[1])
@@ -1149,6 +1168,9 @@ class tabengine (ibus.EngineBase):
 					self.db.check_phrase (sp_res[1])
 			else:
 				self.commit_string ( cond_letter_translate(u" ") )
+			if o_py != self._editor._py_mode:
+				self._refresh_properties ()
+			self._update_ui ()
 			return True
 		# now we ignore all else hotkeys
 		elif key.mask & modifier.CONTROL_MASK+modifier.ALT_MASK:
@@ -1167,7 +1189,6 @@ class tabengine (ibus.EngineBase):
 				else:
 					key_char = cond_letter_translate (unichr (key.code))
 				sp_res = self._editor.space ()
-				self._update_ui ()
 				#return (KeyProcessResult,whethercommit,commitstring)
 				if sp_res[0]:
 					self.commit_string (sp_res[1] + key_char)
@@ -1175,6 +1196,15 @@ class tabengine (ibus.EngineBase):
 						self.db.check_phrase (sp_res[1])
 				else:
 					self.commit_string ( key_char )
+			else:
+				if self._direct_commit and self._editor.one_candidate ():
+					# it is time to direct commit
+					sp_res = self._editor.space ()
+					#return (whethercommit,commitstring)
+					if sp_res[0]:
+						self.commit_string (sp_res[1])
+						if self._dyn_adjust:
+							self.db.check_phrase (sp_res[1])
 
 			self._update_ui ()
 			return True
@@ -1205,11 +1235,11 @@ class tabengine (ibus.EngineBase):
 			self._editor.commit_to_preedit ()
 			commit_string = self._editor.get_preedit_strings ()
 			self._editor.clear ()
-			self._update_ui ()
 			if ascii.ispunct (key.code):
 				self.commit_string ( commit_string + cond_punct_translate (unichr (key.code)))
 			else:
 				self.commit_string ( commit_string + cond_letter_translate (unichr (key.code)))
+			self._update_ui ()
 			return True
 		return False
 	
