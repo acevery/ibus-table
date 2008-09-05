@@ -973,6 +973,9 @@ class tabengine (ibus.EngineBase):
 		modifier means Key Pressed
 		'''
 		key = KeyEvent (keyval, is_press, state)
+		# ignore NumLock mask
+		key.mask &= ~modifier.MOD2_MASK
+
 		result = self._process_key_event (key)
 		self._prev_key = key
 		return result
