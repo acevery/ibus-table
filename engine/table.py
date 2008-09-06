@@ -1225,9 +1225,12 @@ class tabengine (ibus.EngineBase):
 		elif key.code >= keysyms._1 and key.code <= keysyms._9 and self._editor._candidates[0]:
 			res = self._editor.number (key.code - keysyms._1)
 			if res:
+				o_py = self._editor._py_mode
 				commit_string = self._editor.get_preedit_strings ()
 				self._editor.clear ()
 				self.commit_string (commit_string)
+				if o_py != self._editor._py_mode:
+					self._refresh_properties ()
 				self._update_ui ()
 				# modify freq info
 				if self._dyn_adjust:
