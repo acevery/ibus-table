@@ -56,7 +56,7 @@ msgid "Switch to phrase mode"
 msgstr "切换到词组模式"
 
 #: ../engine/table.py:818
-msgid "Switch to sigle char mode"
+msgid "Switch to single char mode"
 msgstr "切换到单字模式"
 
 #: ../engine/table.py:821

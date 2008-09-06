@@ -815,7 +815,7 @@ class tabengine (ibus.EngineBase):
 			self._onechar_property.set_tooltip ( _(u'Switch to phrase mode') )
 		else:
 			self._onechar_property.set_icon ( u'%s%s' % (self._icon_dir, 'phrase.svg' ))
-			self._onechar_property.set_tooltip ( _(u'Switch to sigle char mode') )
+			self._onechar_property.set_tooltip ( _(u'Switch to single char mode') )
 		if self._direct_commit:
 			self._direct_commit_property.set_icon ( u'%s%s' % (self._icon_dir, 'dcommit.svg' ) ) 
 			self._direct_commit_property.set_tooltip ( _(u'Switch to normal commit mode, which use space to commit') ) 
@@ -1061,7 +1061,7 @@ class tabengine (ibus.EngineBase):
 			self._update_ui ()
 			return res
 		
-		# Match sigle char mode switch hotkey
+		# Match single char mode switch hotkey
 		if self._match_hotkey (key, keysyms.comma, modifier.CONTROL_MASK):
 			self.property_activate ( u"onechar" )
 			return True
