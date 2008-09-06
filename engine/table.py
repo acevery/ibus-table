@@ -182,7 +182,8 @@ class editor:
 
 	def get_all_input_strings (self):
 		'''Get all uncommit input characters, used in English mode or direct commit'''
-		return  u''.join( map(u''.join, self._u_chars + [self._chars[0]]) )
+		return  u''.join( map(u''.join, self._u_chars + [self._chars[0]] \
+			+ [self._chars[1]]) )
 	
 	def get_index(self,key):
 		'''Get the index of key in database table'''
@@ -418,8 +419,10 @@ class editor:
 
 	def update_candidates (self):
 		'''Update lookuptable'''
-		if self._chars[0] == self._chars[2] and self._candidates[0]:
-			# if no change in valid input char, we do not do sql enquery
+		if (self._chars[0] == self._chars[2] and self._candidates[0]) \
+				or self._chars[1]:
+			# if no change in valid input char or we have invalid input,
+			# we do not do sql enquery
 			pass
 		else:
 			# do enquiry
@@ -440,20 +443,30 @@ class editor:
 				map ( self.ap_candidate, self._candidates[0])
 			else:
 				if self._chars[0]:
-					if self._candidates[1]:
-						#print self._candidates[1]
-						self._candidates[0] = self._candidates[1]
-						self._candidates[1] = []
-						last_input = self.pop_input ()
-						self.auto_commit_to_preedit ()
-						res = self.add_input( last_input )
-						return res
+					## old manner:
+					#if self._candidates[1]:
+					#	#print self._candidates[1]
+					#	self._candidates[0] = self._candidates[1]
+					#	self._candidates[1] = []
+					#	last_input = self.pop_input ()
+					#	self.auto_commit_to_preedit ()
+					#	res = self.add_input( last_input )
+					#	return res
+					#else:
+					#	self.pop_input ()
+					#	self._lookup_table.clear()
+					#	self._lookup_table.show_cursor (False)
+					#	return False
+					###################
+					## new manner, we add new char to invalid input
+					## chars
+					if not self._chars[1]:
+						# we don't have invalid input chars
+						self._chars[1].append( self._chars[0].pop() )
+						self._xmkey_list.pop()
 					else:
-						self.pop_input ()
-						self._lookup_table.clean()
-						self._lookup_table.show_cursor (False)
-						return False
-						
+						pass
+					self._candidates[0] =[]
 				else:
 					self._lookup_table.clean()
 					self._lookup_table.show_cursor (False)
@@ -1185,6 +1198,15 @@ class tabengine (ibus.EngineBase):
 		elif unichr(key.code) in self._valid_input_chars or \
 				( self._editor._py_mode and \
 					unichr(key.code) in u'abcdefghijklmnopqrstuvwxyz' ):
+			if self._direct_commit and len(self._editor._chars[0]) == self._ml:
+				# it is time to direct commit
+				sp_res = self._editor.space ()
+				#return (whethercommit,commitstring)
+				if sp_res[0]:
+					self.commit_string (sp_res[1])
+					if self._dyn_adjust:
+						self.db.check_phrase (sp_res[1])
+			
 			res = self._editor.add_input ( unichr(key.code) )
 			if not res:
 				if ascii.ispunct (key.code):
@@ -1238,8 +1260,11 @@ class tabengine (ibus.EngineBase):
 			return True
 		
 		elif key.code <= 127:
-			self._editor.commit_to_preedit ()
-			commit_string = self._editor.get_preedit_strings ()
+			if not self._editor._candidates[0]:
+				commit_string = self._editor.get_all_input_strings ()
+			else:
+				self._editor.commit_to_preedit ()
+				commit_string = self._editor.get_preedit_strings ()
 			self._editor.clear ()
 			if ascii.ispunct (key.code):
 				self.commit_string ( commit_string + cond_punct_translate (unichr (key.code)))
