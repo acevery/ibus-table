@@ -463,7 +463,7 @@ class editor:
 					if not self._chars[1]:
 						# we don't have invalid input chars
 						self._chars[1].append( self._chars[0].pop() )
-						self._xmkey_list.pop()
+						self._tabkey_list.pop()
 					else:
 						pass
 					self._candidates[0] =[]
@@ -664,6 +664,9 @@ class editor:
 	def space (self):
 		'''Process space Key Event
 		return (KeyProcessResult,whethercommit,commitstring)'''
+		if self._chars[1]:
+			# we have invalid input, so do not commit 
+			return (False,u'')
 		if self._t_chars :
 			# user has input sth
 			self.commit_to_preedit ()
@@ -1183,7 +1186,8 @@ class tabengine (ibus.EngineBase):
 				if self._dyn_adjust:
 					self.db.check_phrase (sp_res[1])
 			else:
-				self.commit_string ( cond_letter_translate(u" ") )
+				if sp_res[1] == u' ':
+					self.commit_string (cond_letter_translate (u" "))
 			if o_py != self._editor._py_mode:
 				self._refresh_properties ()
 			self._update_ui ()
