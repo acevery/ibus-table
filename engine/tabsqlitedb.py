@@ -118,6 +118,17 @@ class tabsqlitedb:
 		else:
 			print 'Could not find "user_can_define_phrase" entry from database, is it a outdated database?'
 			self.user_can_define_phrase = False
+		
+		self.dynamic_adjust = self.get_ime_property('dynamic_adjust')
+		if self.dynamic_adjust:
+			if self.dynamic_adjust.lower() == u'true' :
+				self.dynamic_adjust = True
+			else:
+				self.dynamic_adjust = False
+		else:
+			print 'Could not find "dynamic_adjust" entry from database, is it a outdated database?'
+			self.dynamic_adjust = False
+
 		self.rules = self.get_rules ()
 		self._no_check_chars = self.get_no_check_chars()
 		# for fast gouci
@@ -168,7 +179,7 @@ class tabsqlitedb:
 		self.create_tables ("mudb")
 	
 	def update_phrase (self, entry, database='user_db'):
-		'''update'''
+		'''update phrase freqs'''
 		#print entry
 		_con = [ entry[-1] ] + list(entry[0:2+entry[0]]) + [entry[-3]]
 		#print _con
@@ -177,15 +188,16 @@ class tabsqlitedb:
 		sqlstr = 'UPDATE %s.phrases SET user_freq = ? WHERE mlen = ? AND clen = ? %s AND phrase = ?;' % (database, _condition)
 		#print sqlstr
 		self.db.execute ( sqlstr , _con )
+		# because we may update different db, we'd better commit every time.
 		self.db.commit()
 
 	def sync_usrdb (self):
 		# we need to update the user_db
 		#print 'sync userdb'
 		mudata = self.db.execute ('SELECT * FROM mudb.phrases;').fetchall()
-		data_u = filter ( lambda x: x[-2]==1, mudata)
+		data_u = filter ( lambda x: x[-2] in [1,-3], mudata)
 		data_a = filter ( lambda x: x[-2]==2, mudata)
-		data_n = filter ( lambda x: x[-2]==-1, mudata)
+		data_n = filter ( lambda x: x[-2]==-2, mudata)
 		#print data_a
 		data_a = map (lambda x: (u''.join ( map(self.deparse, x[2:2+x[0]])),x[-3],0,x[-1] ), data_a)
 		data_n = map (lambda x: (u''.join ( map(self.deparse, x[2:2+x[0]])),x[-3],-1,x[-1] ), data_n)
@@ -263,7 +275,7 @@ class tabsqlitedb:
 			self.user_can_define_phrase = False
 		self.rules = self.get_rules ()
 
-		#self.db.commit()
+		self.db.commit()
 
 	def get_rules (self):
 		'''Get phrase construct rules'''
@@ -312,7 +324,7 @@ class tabsqlitedb:
 		if database == 'main':
 			map (self.add_phrase, phrases)
 		else:
-			map (self.add_phrase, phrases, [database]*len(phrases) )
+			map (self.add_phrase, phrases, [database]*len(phrases),[False]*len(phrases) )
 		self.db.commit()	
 	
 	def add_new_phrases (self, nphrases, database='main'):
@@ -333,9 +345,8 @@ class tabsqlitedb:
 	def u_add_phrase (self,nphrase):
 		'''Add a phrase to userdb'''
 		self.add_phrase (nphrase,database='user_db')
-		self.db.commit()
 
-	def add_phrase (self, aphrase, database = 'main',commit=False):
+	def add_phrase (self, aphrase, database = 'main',commit=True):
 		'''Add phrase to database, phrase is a object of
 		(tabkeys, phrase, freq ,user_freq)
 		'''
@@ -367,12 +378,11 @@ class tabsqlitedb:
 			record [2+self._mlen+1] = freq
 			record [2+self._mlen+2] = user_freq
 			self.db.execute (sqlstr % database, record)
+			if commit:
+				self.db.commit()	
 		except Exception:
 			import traceback
 			traceback.print_exc()
-		#if database != 'mudb':
-		if commit:
-			self.db.commit()	
 	
 	def add_goucima (self, gcms):
 		'''Add goucima into database, gcms is iterable object
@@ -547,15 +557,15 @@ class tabsqlitedb:
 		#searchres = map ( lambda res: res[-2] and [ True, [(res[:-2],[res[:-1],res[-1:]])] ]\
 		#		or [ False, [(res[:-2] , [res[:-1],res[-1:]])] ] \
 		#		, result )
-		searchres = map ( lambda res: [ bool(res[-2]), bool(res[-1]), [(res[:-2],[res[:-1],res[-1:]])] ], result)
+		searchres = map ( lambda res: [ int(res[-2]), int(res[-1]), [(res[:-2],[res[:-1],res[-1:]])] ], result)
 		# for sysdb
 		reslist=filter( lambda x: not x[1], searchres )
 		map (lambda x: sysdb.update(x[2]), reslist)
 		# for usrdb
-		reslist=filter( lambda x: (not x[0]) and x[1], searchres )
+		reslist=filter( lambda x: ( x[0] in [0,-1] ) and x[1], searchres )
 		map (lambda x: usrdb.update(x[2]), reslist)
 		# for mudb
-		reslist=filter( lambda x: x[0] and x[1], searchres )
+		reslist=filter( lambda x: ( x[0] not in [0,-1] ) and x[1], searchres )
 		map (lambda x: mudb.update(x[2]), reslist)
 
 		# first process mudb
@@ -764,15 +774,15 @@ class tabsqlitedb:
 		sysdb = {}
 		usrdb = {}
 		mudb = {}
-		searchres = map ( lambda res: [ bool(res[-2]), bool(res[-1]), [(res[:-2],[res[:-1],res[-1]])] ], result)
+		searchres = map ( lambda res: [ int(res[-2]), int(res[-1]), [(res[:-2],[res[:-1],res[-1]])] ], result)
 		# for sysdb
 		reslist=filter( lambda x: not x[1], searchres )
 		map (lambda x: sysdb.update(x[2]), reslist)
 		# for usrdb
-		reslist=filter( lambda x: (not x[0]) and x[1], searchres )
+		reslist=filter( lambda x: ( x[0] in [0,-1] ) and x[1], searchres )
 		map (lambda x: usrdb.update(x[2]), reslist)
 		# for mudb
-		reslist=filter( lambda x: x[0] and x[1], searchres )
+		reslist=filter( lambda x: (x[0] not in [0,-1])  and x[1], searchres )
 		map (lambda x: mudb.update(x[2]), reslist)
 		
 		tabkey = ''
@@ -786,6 +796,9 @@ class tabsqlitedb:
 		try:
 			if len(phrase) == 1:
 				# this is a character
+				if not self.dynamic_adjust:
+					# we should change the frequency of words
+					return
 				# we remove the keys contained in mudb from usrdb
 				keyout = filter (lambda k: mudb.has_key(k), usrdb.keys() )
 				map (usrdb.pop, keyout)
@@ -794,6 +807,7 @@ class tabsqlitedb:
 				map (sysdb.pop, keyout)
 				# first mudb
 				map (lambda res: self.db.execute ( sqlstr % ''.join( map(lambda x: 'AND m%d = ? ' % x, range(res[0])) ) ,  [ mudb[res][1] + 1 ] + list( res[:2+res[0]]) + list (res[2+self._mlen:]) ) , mudb.keys())
+				self.db.commit()
 				# -----original for loop of above map: 
 				#for res in mudb.keys ():
 				#	_con = [ mudb[res][1] + 1 ] + list( res[:2+res[0]]) + list (res[2+self._mlen:])
@@ -820,8 +834,11 @@ class tabsqlitedb:
 				# this is a phrase
 				if len (result) == 0 and self.user_can_define_phrase:
 					# this is a new phrase, we add it into user_db
-					self.add_phrase ( (tabkey,phrase,-1,1), database = 'mudb')
+					self.add_phrase ( (tabkey,phrase,-2,1), database = 'mudb')
 				elif len (result) > 0:
+					if not self.dynamic_adjust:
+						# we should change the frequency of words
+						return
 					# we remove the keys contained in mudb from usrdb
 					keyout = filter (lambda k: mudb.has_key(k), usrdb.keys() )
 					map (usrdb.pop, keyout)
@@ -832,8 +849,9 @@ class tabsqlitedb:
 					# first we process mudb
 					# the original for loop can be found above in 'len==1'
 					map (lambda res: self.db.execute ( sqlstr % ''.join( map(lambda x: 'AND m%d = ? ' % x, range(res[0])) ) ,  [ mudb[res][1] + 1 ] + list( res[:2+res[0]]) + list (res[2+self._mlen:]) ) , mudb.keys())
+					self.db.commit()
 					# then usrdb
-					map ( lambda res: self.add_phrase ( (''.join ( map(self.deparse,res[2:2+int(res[0])] ) ),phrase,1,usrdb[res][1]+1  ), database = 'mudb') , usrdb.keys() )				
+					map ( lambda res: self.add_phrase ( (''.join ( map(self.deparse,res[2:2+int(res[0])] ) ),phrase,(-3 if usrdb[res][0][-1] == -1 else 1),usrdb[res][1]+1  ), database = 'mudb') , usrdb.keys() )				
 					# last sysdb
 					map ( lambda res: self.add_phrase ( ( ''.join ( map(self.deparse,res[2:2+int(res[0])]) ),phrase,2,1 ), database = 'mudb'), sysdb.keys() )
 
@@ -841,7 +859,7 @@ class tabsqlitedb:
 					# we come to here when the ime dosen't support user phrase define
 					pass
 			
-			self.db.commit()
+			#self.db.commit()
 		except:
 			import traceback
 			traceback.print_exc ()
@@ -885,10 +903,11 @@ class tabsqlitedb:
 		if self.db.execute(msqlstr, _ph).fetchall():
 			sqlstr = 'DELETE FROM %(database)s.phrases WHERE mlen = ? AND clen =? %(condition)s AND phrase = ?  ;' % { 'database':database, 'condition':_condition }
 			self.db.execute(sqlstr,_ph)
+			self.db.commit()
 
 		msqlstr= 'SELECT * FROM mudb.phrases WHERE mlen = ? and clen = ? %(condition)s AND phrase = ? ;' % { 'condition':_condition }
 		if self.db.execute(msqlstr, _ph).fetchall():
 			sqlstr = 'DELETE FROM mudb.phrases WHERE mlen = ? AND clen =? %(condition)s AND phrase = ?  ;' % {  'condition':_condition }
 			self.db.execute(sqlstr,_ph)
+			self.db.commit()
 
-		self.db.commit()
