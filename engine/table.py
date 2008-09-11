@@ -130,7 +130,7 @@ class editor:
 	def add_input (self,c):
 		'''add input character'''
 		if len (self._t_chars) == self._max_length:
-			return
+			return True
 		self._zi = u''
 		if self._cursor[1]:
 			self.split_phrase()
