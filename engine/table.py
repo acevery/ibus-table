@@ -403,7 +403,7 @@ class editor:
 		# here -2 is the pos of num, -1 is the pos of . 0 is the pos of string
 		#attrs = ibus.AttrList ([ibus.AttributeForeground (0x8e2626, -2, 1)])
 		attrs = ibus.AttrList ()
-		if candi[-2] == -1:
+		if candi[-2] < 0:
 			# this is a user defined phrase:
 			attrs.append ( ibus.AttributeForeground (0x7700c3, 0, len(_phrase)) )
 		elif candi[-1] > 0:
@@ -577,7 +577,7 @@ class editor:
 		if  len (self._candidates[0]) > pos:
 			# this index is valid
 			can = self._candidates[0][pos]
-			if can[-2] == -1:
+			if can[-2] < 0:
 				# freq of this candidate is -1, means this a user phrase
 				self.db.remove_phrase (can)
 				# make update_candidates do sql enquiry
@@ -716,12 +716,6 @@ class tabengine (ibus.EngineBase):
 		else:
 			print 'We coult not find "pinyin_mode" entry in database, is it a outdated database?'
 			self._ime_py = False
-
-		self._dyn_adjust = self.db.get_ime_property ('dynamic_adjust')
-		if self._dyn_adjust and self._dyn_adjust.lower() == u'true':
-				self._dyn_adjust = True
-		else:
-			self._dyn_adjust = False
 
 		self._status = self.db.get_ime_property('status_prompt').encode('utf8')
 		# now we check and update the valid input characters
@@ -1183,8 +1177,7 @@ class tabengine (ibus.EngineBase):
 			#return (KeyProcessResult,whethercommit,commitstring)
 			if sp_res[0]:
 				self.commit_string (sp_res[1])
-				if self._dyn_adjust:
-					self.db.check_phrase (sp_res[1])
+				self.db.check_phrase (sp_res[1])
 			else:
 				if sp_res[1] == u' ':
 					self.commit_string (cond_letter_translate (u" "))
@@ -1208,8 +1201,7 @@ class tabengine (ibus.EngineBase):
 				#return (whethercommit,commitstring)
 				if sp_res[0]:
 					self.commit_string (sp_res[1])
-					if self._dyn_adjust:
-						self.db.check_phrase (sp_res[1])
+					self.db.check_phrase (sp_res[1])
 			
 			res = self._editor.add_input ( unichr(key.code) )
 			if not res:
@@ -1221,8 +1213,7 @@ class tabengine (ibus.EngineBase):
 				#return (KeyProcessResult,whethercommit,commitstring)
 				if sp_res[0]:
 					self.commit_string (sp_res[1] + key_char)
-					if self._dyn_adjust:
-						self.db.check_phrase (sp_res[1])
+					self.db.check_phrase (sp_res[1])
 				else:
 					self.commit_string ( key_char )
 			else:
@@ -1232,8 +1223,7 @@ class tabengine (ibus.EngineBase):
 					#return (whethercommit,commitstring)
 					if sp_res[0]:
 						self.commit_string (sp_res[1])
-						if self._dyn_adjust:
-							self.db.check_phrase (sp_res[1])
+						self.db.check_phrase (sp_res[1])
 
 			self._update_ui ()
 			return True
@@ -1259,8 +1249,7 @@ class tabengine (ibus.EngineBase):
 					self._refresh_properties ()
 				self._update_ui ()
 				# modify freq info
-				if self._dyn_adjust:
-					self.db.check_phrase (commit_string)
+				self.db.check_phrase (commit_string)
 			return True
 		
 		elif key.code <= 127:
