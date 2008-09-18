@@ -1,0 +1,13 @@
+Source: ibus-table
+Section: unknown
+Priority: extra
+Maintainer: oneleaf <oneleaf@gmail.com>
+Build-Depends: debhelper (>= 5), autotools-dev
+Standards-Version: 3.7.2
+
+Package: ibus-table
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ibus
+Description: IBus-Table
+ IBus-Table is the IM Engine framework for table-based input methods, such as ZhengMa, WuBi, ErBi, ChangJie and so on.
+ This package only provide the framwork and the specific input engine database need be install from ibus-table-zhengma, ibus-table-wubi and etc.
