@@ -1217,7 +1217,8 @@ class tabengine (ibus.EngineBase):
 				else:
 					self.commit_string ( key_char )
 			else:
-				if self._direct_commit and self._editor.one_candidate ():
+				if self._direct_commit and self._editor.one_candidate () \
+						len(self._editor._chars[0]) == self._ml:
 					# it is time to direct commit
 					sp_res = self._editor.space ()
 					#return (whethercommit,commitstring)
