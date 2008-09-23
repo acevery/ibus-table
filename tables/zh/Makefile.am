@@ -30,13 +30,13 @@ createdb = \
 		-b $(bindir)
 
 if IBUS_TABLE_EXTRA_PHRASES
-createdb += -e $(srcdir)/extra_phrase.txt
+createdb += -e $(srcdir)/extra_phrase.txt.bz2
 endif
 
 createdb_index = \
 	$(PYTHON) $(abs_top_srcdir)/engine/tabcreatedb.py -i
 
-extra_tables_DATA = extra_phrase.txt
+extra_tables_DATA = extra_phrase.txt.bz2
 
 tables_DATA =
 engine_DATA =
@@ -78,7 +78,7 @@ EXTRA_DIST = \
 	wubi98.txt \
 	cangjie5.txt \
 	erbi_qs.txt \
-	extra_phrase.txt \
+	extra_phrase.txt.bz2 \
 	$(NULL)
 
 DISTCLEANFILES = \
