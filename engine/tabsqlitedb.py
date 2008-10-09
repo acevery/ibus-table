@@ -47,6 +47,7 @@ class tabsqlitedb:
 		# first we use the Parse in tabdict, which transform the char(a,b,c,...) to int(1,2,3,...) to fasten the sql enquiry
 		self.parse = tabdict.parse
 		self.deparse = tabdict.deparse
+		self._add_phrase_sqlstr = ''
 		
 		if filename:
 			# now we are creating db
@@ -104,6 +105,7 @@ class tabsqlitedb:
 				self.db.execute( sqlstr, (_name,ime_keys[_name]) )
 		# share variables in this class:
 		self._mlen = int ( self.get_ime_property ("max_key_length") )
+		self._set_add_phrase_sqlstr()
 		#(MLEN, CLEN, M0, M1, M2, M3, M4, PHRASE, FREQ, USER_FREQ) = range (0,10)
 		self._pt_index = ['mlen','clen']
 		for i in range(self._mlen):
@@ -260,6 +262,7 @@ class tabsqlitedb:
 				pass
 		# we need to update some self variables now.
 		self._mlen = int (self.get_ime_property ('max_key_length' ))
+		self._set_add_phrase_sqlstr()
 		self._pt_index = ['mlen','clen']
 		for i in range(self._mlen):
 			self._pt_index.append ('m%d' %i)
@@ -346,10 +349,8 @@ class tabsqlitedb:
 		'''Add a phrase to userdb'''
 		self.add_phrase (nphrase,database='user_db')
 
-	def add_phrase (self, aphrase, database = 'main',commit=True):
-		'''Add phrase to database, phrase is a object of
-		(tabkeys, phrase, freq ,user_freq)
-		'''
+	def _set_add_phrase_sqlstr(self):
+		'''Create the sqlstr for add phrase according to self._mlen.'''
 		sqlstr = 'INSERT INTO %s.phrases ( mlen, clen, '
 		sql_suffix = 'VALUES ( ?, ?, '
 		mmlen = range(self._mlen)
@@ -358,7 +359,13 @@ class tabsqlitedb:
 		sqlstr += 'phrase, freq, user_freq) '
 		sql_suffix += '?, ?, ? );'
 		sqlstr += sql_suffix
-		
+		self._add_phrase_sqlstr = sqlstr
+
+	def add_phrase (self, aphrase, database = 'main',commit=True):
+		'''Add phrase to database, phrase is a object of
+		(tabkeys, phrase, freq ,user_freq)
+		'''
+		sqlstr = self._add_phrase_sqlstr
 		try:
 			tabkeys,phrase,freq,user_freq = aphrase
 		except:
@@ -369,14 +376,11 @@ class tabsqlitedb:
 			if len(tbks) != len(tabkeys):
 				print 'In %s %s: we parse tabkeys fail' % (phrase, tabkeys )
 				return
-			record = [None, None, None, None, None]
-			map( lambda x: record.append(None), range(self._mlen))
+			record = [None] * (5 + self._mlen)
 			record [0] = len (tabkeys)
 			record [1] = len (phrase)
 			record [2: 2+len(tabkeys)] = map (lambda x: tbks[x].get_key_id(), range(0,len(tabkeys)))
-			record [2+self._mlen] = phrase
-			record [2+self._mlen+1] = freq
-			record [2+self._mlen+2] = user_freq
+			record[2+self._mlen:] = phrase, freq, user_freq
 			self.db.execute (sqlstr % database, record)
 			if commit:
 				self.db.commit()	

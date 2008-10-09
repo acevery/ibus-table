@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+ -*- coding: utf-8 -*-
 # vim: set noet ts=4:
 #
 # scim-python
@@ -59,16 +59,16 @@ for key,id in tab_dict.items():
 class tab_key(object):
 	'''The class store'''
 	def __init__(self, xm_key):
+		self._key = xm_key
 		try:
-			if xm_key not in tab_key_list:
-				error_m = u'%s is not in tab_dict' % xm_key
-				raise Exception ( error_m.encode('utf8') )
-		except Exception, e:
-			print e
+			self._key_id = tab_dict[xm_key]
+		except KeyError, e:
+			# give a false value
+			self._key_id = -1
+			error_m = u'%s is not in tab_dict' % xm_key
+			print error_m.encode('utf8')
 			import traceback
 			traceback.print_exc ()
-		self._key = xm_key
-		self._key_id = tab_dict[xm_key]
 	
 	def get_key_id(self):
 		return self._key_id
