@@ -324,11 +324,8 @@ class tabsqlitedb:
 		'''Add phrases to database, phrases is a iterable object
 		Like: [(tabkeys, phrase, freq ,user_freq), (tabkeys, phrase, freq, user_freq), ...]
 		'''
-		if database == 'main':
-			map (self.add_phrase, phrases)
-		else:
-			map (self.add_phrase, phrases, [database]*len(phrases),[False]*len(phrases) )
-		self.db.commit()	
+		map (self.add_phrase, phrases, [database]*len(phrases),[False]*len(phrases) )
+		self.db.commit()
 	
 	def add_new_phrases (self, nphrases, database='main'):
 		'''Add new phrases into db, new phrases is a object
@@ -355,7 +352,7 @@ class tabsqlitedb:
 		sql_suffix = 'VALUES ( ?, ?, '
 		mmlen = range(self._mlen)
 		sqlstr += ''.join ( map(lambda x: 'm%d, ' %x , mmlen) )
-		sql_suffix += ''.join ( map (lambda x: '?, ' , mmlen) )   
+		sql_suffix += ''.join ( map (lambda x: '?, ' , mmlen) )
 		sqlstr += 'phrase, freq, user_freq) '
 		sql_suffix += '?, ?, ? );'
 		sqlstr += sql_suffix
