@@ -83,13 +83,17 @@ ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/latex.db
 %{_datadir}/ibus-table/icons/phrase.svg
 %{_datadir}/ibus-table/icons/py-mode.svg
 %{_datadir}/ibus-table/icons/tab-mode.svg
+%{_datadir}/ibus-table/icons/chinese.svg
+%{_datadir}/ibus-table/icons/dcommit.svg
+%{_datadir}/ibus-table/icons/english.svg
+%{_datadir}/ibus-table/icons/ncommit.svg
 %{_bindir}/ibus-engine-table
 %{_bindir}/ibus-table-createdb
 
 %files chinese
 %defattr(-,root,root,-)
 %{_datadir}/ibus-table/data/pinyin_table.txt.bz2
-%{_datadir}/ibus-table/tables/extra_phrase.txt
+%{_datadir}/ibus-table/tables/extra_phrase.txt.bz2
 %{_datadir}/ibus-table/tables/wubi86.db
 %{_datadir}/ibus-table/tables/wubi98.db
 %{_datadir}/ibus-table/tables/cangjie5.db
