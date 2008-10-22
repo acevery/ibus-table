@@ -451,10 +451,11 @@ class editor:
 					#	last_input = self.pop_input ()
 					#	self.auto_commit_to_preedit ()
 					#	res = self.add_input( last_input )
+					#	print res
 					#	return res
 					#else:
 					#	self.pop_input ()
-					#	self._lookup_table.clear()
+					#	self._lookup_table.clean()
 					#	self._lookup_table.show_cursor (False)
 					#	return False
 					###################
@@ -462,8 +463,28 @@ class editor:
 					## chars
 					if not self._chars[1]:
 						# we don't have invalid input chars
-						self._chars[1].append( self._chars[0].pop() )
-						self._tabkey_list.pop()
+						# here we need to check the last input
+						# is a punctuation or not, if is a punct,
+						# then we use old maner to summit the former valid
+						# candidate
+						if ascii.ispunct (self._chars[0][-1].encode('ascii')):
+							## old manner:
+							if self._candidates[1]:
+								self._candidates[0] = self._candidates[1]
+								self._candidates[1] = []
+								last_input = self.pop_input ()
+								self.auto_commit_to_preedit ()
+								res = self.add_input( last_input )
+								return res
+							else:
+								self.pop_input ()
+								self._lookup_table.clean()
+								self._lookup_table.show_cursor (False)
+								return False
+						else:	
+							# this is not a punct
+							self._chars[1].append( self._chars[0].pop() )
+							self._tabkey_list.pop()
 					else:
 						pass
 					self._candidates[0] =[]
