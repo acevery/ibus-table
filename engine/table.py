@@ -1298,6 +1298,9 @@ class tabengine (ibus.EngineBase):
 	def focus_out (self):
 		pass
 
+	def disable (self):
+		self.reset()
+
 	def lookup_table_page_up (self):
 		if self._editor.page_up ():
 			self._update_lookup_table ()
