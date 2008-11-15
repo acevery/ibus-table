@@ -722,8 +722,9 @@ class tabsqlitedb:
 			return [len( tabkeylist)] + [p_len]  + tabkeylist[:] + [phrase]
 
 		except Exception:
-			import traceback
-			traceback.print_exc ()
+			print "pharse pharse \"%s\" fail." % phrase.encode("utf-8")
+			#import traceback
+			#traceback.print_exc ()
 
 	def parse_phrase_to_tabkeys (self,phrase):
 		'''Get the Table encoding of the phrase in string form'''
@@ -754,8 +755,12 @@ class tabsqlitedb:
 		except:
 			print 'you are using old format of database, please regenerate your database.'
 		if len(phrase) >=2:
-			wordattr = self.parse_phrase ( phrase )
-			_len = len (wordattr) -3
+			try:
+				wordattr = self.parse_phrase ( phrase )
+				_len = len (wordattr) -3
+			except:
+				# if we don't have goucima:
+				return
 		if tabkey == None:
 			sqlstr = '''SELECT * FROM (SELECT * FROM main.phrases WHERE phrase = ?
 			UNION ALL SELECT * FROM user_db.phrases WHERE phrase = ?
