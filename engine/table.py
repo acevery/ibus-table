@@ -467,7 +467,9 @@ class editor:
 						# is a punctuation or not, if is a punct,
 						# then we use old maner to summit the former valid
 						# candidate
-						if ascii.ispunct (self._chars[0][-1].encode('ascii')):
+						if ascii.ispunct (self._chars[0][-1].encode('ascii')) \
+								or len (self._chars[0][:-1]) \
+									in self.db.pkeylens:
 							## old manner:
 							if self._candidates[1]:
 								self._candidates[0] = self._candidates[1]
@@ -482,7 +484,8 @@ class editor:
 								self._lookup_table.show_cursor (False)
 								return False
 						else:	
-							# this is not a punct
+							# this is not a punct or not a valid phrase
+							# last time
 							self._chars[1].append( self._chars[0].pop() )
 							self._tabkey_list.pop()
 					else:
@@ -1216,7 +1219,8 @@ class tabengine (ibus.EngineBase):
 		elif unichr(key.code) in self._valid_input_chars or \
 				( self._editor._py_mode and \
 					unichr(key.code) in u'abcdefghijklmnopqrstuvwxyz' ):
-			if self._direct_commit and len(self._editor._chars[0]) == self._ml:
+			if self._direct_commit and ( len(self._editor._chars[0]) == self._ml \
+					or len (self._editor._chars[0]) in self.db.pkeylens ):
 				# it is time to direct commit
 				sp_res = self._editor.space ()
 				#return (whethercommit,commitstring)

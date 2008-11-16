@@ -130,8 +130,12 @@ class tabsqlitedb:
 		else:
 			print 'Could not find "dynamic_adjust" entry from database, is it a outdated database?'
 			self.dynamic_adjust = False
-
+		
 		self.rules = self.get_rules ()
+		self.pkeylens = []
+		if self.rules:
+			self.pkeylens = self.phrase_keys_len ()
+		
 		self._no_check_chars = self.get_no_check_chars()
 		# for fast gouci
 		self._goucima={}
@@ -310,6 +314,11 @@ class tabsqlitedb:
 			return rules
 		else:
 			return ""
+
+	def phrase_keys_len (self):
+		'''Return the phrase possible key length'''
+		max_len = self.rules["above"]
+		return map ( lambda x: len(self.rules[x]), range(2, max_len+1) )[:]
 	
 	def get_no_check_chars (self):
 		'''Get the characters which engine should not change freq'''
