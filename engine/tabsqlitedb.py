@@ -105,6 +105,9 @@ class tabsqlitedb:
                 self.db.execute( sqlstr, (_name,ime_keys[_name]) )
         # share variables in this class:
         self._mlen = int ( self.get_ime_property ("max_key_length") )
+        # for chinese
+        self._is_chinese = self.is_chinese()
+        # for fast add word
         self._set_add_phrase_sqlstr()
         #(MLEN, CLEN, M0, M1, M2, M3, M4, PHRASE, FREQ, USER_FREQ) = range (0,10)
         self._pt_index = ['mlen','clen']
@@ -154,7 +157,7 @@ class tabsqlitedb:
                 desc = self.get_database_desc (user_db)
                 if desc == None :
                     self.init_user_db (user_db)
-                elif desc["version"] != "0.1":
+                elif desc["version"] != "0.2":
                     new_name = "%s.%d" %(user_db, os.getpid())
                     print >> sys.stderr, "Can not support the user db. We will rename it to %s" % new_name
                     os.rename (user_db, new_name)
@@ -212,6 +215,16 @@ class tabsqlitedb:
         #print self.db.execute('select * from user_db.phrases;').fetchall()
         map (self.u_add_phrase,data_a)
         map (self.u_add_phrase,data_n)
+    
+    def is_chinese (self):
+        __lang = self.get_ime_property ('languages')
+        if __lang:
+            __langs = __lang.split(',')
+            for _l in __langs:
+                if _l.lower().find('zh') != -1:
+                    return True
+        return False
+
 
     def create_tables (self, database):
         '''Create tables that contain all phrase'''
@@ -247,6 +260,8 @@ class tabsqlitedb:
         #for i in range(self._mlen):
         #    sqlstr += 'm%d INTEGER, ' % i 
         sqlstr += ''.join ( map (lambda x: 'm%d INTEGER, ' % x, range(self._mlen)) )
+        if self._is_chinese:
+            sqlstr += 'category INTEGER, '
         sqlstr += 'phrase TEXT, freq INTEGER, user_freq INTEGER);'
         self.db.execute ( sqlstr )
         self.db.commit()
@@ -266,10 +281,13 @@ class tabsqlitedb:
                 pass
         # we need to update some self variables now.
         self._mlen = int (self.get_ime_property ('max_key_length' ))
+        self._is_chinese = self.is_chinese()
         self._set_add_phrase_sqlstr()
         self._pt_index = ['mlen','clen']
         for i in range(self._mlen):
             self._pt_index.append ('m%d' %i)
+        if self._is_chinese:
+            self._pt_index += ['category']
         self._pt_index += ['phrase','freq','user_freq']
         self.user_can_define_phrase = self.get_ime_property('user_can_define_phrase')
         if self.user_can_define_phrase:
@@ -362,6 +380,9 @@ class tabsqlitedb:
         mmlen = range(self._mlen)
         sqlstr += ''.join ( map(lambda x: 'm%d, ' %x , mmlen) )
         sql_suffix += ''.join ( map (lambda x: '?, ' , mmlen) )
+        if self._is_chinese:
+            sqlstr += 'category, '
+            sql_suffix += '?, '
         sqlstr += 'phrase, freq, user_freq) '
         sql_suffix += '?, ?, ? );'
         sqlstr += sql_suffix
@@ -377,6 +398,39 @@ class tabsqlitedb:
         except:
             tabkeys,phrase,freq = aphrase
             user_freq = 0
+        # now we will set the category bits if this is chinese
+        if self._is_chinese:
+            # this is the bitmask we will use,
+            # from low to high, 1st bit is simplify Chinese,
+            # 2nd bit is traditional Chinese,
+            category = 0
+            # make sure that we got a unicode string
+            if type(phrase) != type(u''):
+                phrase = phrase.decode('utf8')
+            # first whether in gb2312
+            try:
+                phrase.encode('gb2312')
+                category |= 1
+            except:
+                pass
+            # second check big5-hkscs
+            try:
+                phrase.encode('big5hkscs')
+                category |= 1 << 1
+            except:
+                # then check whether in gbk,
+                # because gbk include big5
+                if category & 1:
+                    # already know in SC
+                    pass
+                else:
+                    # need to check
+                    try:
+                        phrase.encode('gbk')
+                        category |= 1
+                    except:
+                        # not in gbk
+                        pass
         try:
             tbks = self.parse(tabkeys)
             if len(tbks) != len(tabkeys):
@@ -386,7 +440,10 @@ class tabsqlitedb:
             record [0] = len (tabkeys)
             record [1] = len (phrase)
             record [2: 2+len(tabkeys)] = map (lambda x: tbks[x].get_key_id(), range(0,len(tabkeys)))
-            record[2+self._mlen:] = phrase, freq, user_freq
+            if self._is_chinese:
+                record +=[None]
+                record[-4] = category
+            record[-3:] = phrase, freq, user_freq
             self.db.execute (sqlstr % database, record)
             if commit:
                 self.db.commit()    

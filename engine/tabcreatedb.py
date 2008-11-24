@@ -65,11 +65,11 @@ opt_parser.add_option( '-d', '--debug',
         help = 'print extra debug messages')
 
 opt_parser.add_option( '-b', '--bin-path',
-        action = 'store', dest='binpath', default = '',
+        action = 'store', dest='binpath', default = '/usr/bin',
         help = 'tell me where the ibus-engine-table is in your system, e.g. "/usr/bin/" or "/usr/bin/ibus-engine-table". If you have already installed ibus-table, I can use "which" to find it out.')
 
 opt_parser.add_option( '-k', '--pkgdata-path',
-        action = 'store', dest='pkgdata_path', default = '',
+        action = 'store', dest='pkgdata_path', default = '/usr/share',
         help = 'tell me where the ibus-engine-table where is pkgdatadir of ibus-table.')
 
 opts,args = opt_parser.parse_args()
