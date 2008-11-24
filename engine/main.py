@@ -31,41 +31,41 @@ opt = optparse.OptionParser()
 
 opt.set_usage ('%prog --table a_table.db')
 opt.add_option('--table', '-t',
-		action = 'store',type = 'string',dest = 'db',default = '',
-		help = 'Set the configuration file, default: %default')
+        action = 'store',type = 'string',dest = 'db',default = '',
+        help = 'Set the configuration file, default: %default')
 opt.add_option('--daemon','-d',
-		action = 'store_true',dest = 'daemon',default=False,
-		help = 'Run as daemon, default: %default')
+        action = 'store_true',dest = 'daemon',default=False,
+        help = 'Run as daemon, default: %default')
 
 
 (options, args) = opt.parse_args()
 if not options.db:
-	opt.error('no db found!')
+    opt.error('no db found!')
 
 class IMApp:
-	def __init__(self,dbfile):
-		self.__mainloop = gobject.MainLoop()
-		self.__bus = ibus.Bus()
-		self.__bus.connect("destroy", self.__bus_destroy_cb)
-		self.__engine = factory.EngineFactory(self.__bus, dbfile)
-		self.__engine.register()
+    def __init__(self,dbfile):
+        self.__mainloop = gobject.MainLoop()
+        self.__bus = ibus.Bus()
+        self.__bus.connect("destroy", self.__bus_destroy_cb)
+        self.__engine = factory.EngineFactory(self.__bus, dbfile)
+        self.__engine.register()
 
-	def run(self):
-		self.__mainloop.run()
+    def run(self):
+        self.__mainloop.run()
 
-	def __bus_destroy_cb(self, bus):
-		self.__engine.do_destroy()
-		self.__mainloop.quit()
+    def __bus_destroy_cb(self, bus):
+        self.__engine.do_destroy()
+        self.__mainloop.quit()
 
 
 def main():
-	if options.daemon :
-		if os.fork():
-				sys.exit()
-	db = '%s%s%s' % (db_dir,os.path.sep, os.path.basename(options.db) )
-	ima=IMApp(db)
-	ima.run()
+    if options.daemon :
+        if os.fork():
+                sys.exit()
+    db = '%s%s%s' % (db_dir,os.path.sep, os.path.basename(options.db) )
+    ima=IMApp(db)
+    ima.run()
 
 if __name__ == "__main__":
-	main()
+    main()
 
