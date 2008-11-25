@@ -26,6 +26,7 @@
 
 import os
 import os.path as path
+from sys import stderr
 import sqlite3
 import tabdict
 import uuid
@@ -113,6 +114,8 @@ class tabsqlitedb:
         self._pt_index = ['mlen','clen']
         for i in range(self._mlen):
             self._pt_index.append ('m%d' %i)
+        if self._is_chinese:
+            self._pt_index += ['category']
         self._pt_index += ['phrase','freq','user_freq']
         self.user_can_define_phrase = self.get_ime_property('user_can_define_phrase')
         if self.user_can_define_phrase:
@@ -159,7 +162,7 @@ class tabsqlitedb:
                     self.init_user_db (user_db)
                 elif desc["version"] != "0.2":
                     new_name = "%s.%d" %(user_db, os.getpid())
-                    print >> sys.stderr, "Can not support the user db. We will rename it to %s" % new_name
+                    print >> stderr, "Can not support the user db. We will rename it to %s" % new_name
                     os.rename (user_db, new_name)
                     self.init_user_db (user_db)
             except:
@@ -172,7 +175,7 @@ class tabsqlitedb:
         try:
             self.db.execute ('ATTACH DATABASE "%s" AS user_db;' % user_db)
         except:
-            print >> sys.stderr, "The user database was damaged. We will recreate it!"
+            print >> stderr, "The user database was damaged. We will recreate it!"
             os.rename (user_db, "%s.%d" % (user_db, os.getpid ()))
             self.init_user_db (user_db)
             self.db.execute ('ATTACH DATABASE "%s" AS user_db;' % user_db)
@@ -403,6 +406,7 @@ class tabsqlitedb:
             # this is the bitmask we will use,
             # from low to high, 1st bit is simplify Chinese,
             # 2nd bit is traditional Chinese,
+            # 3rd bit means out of gbk
             category = 0
             # make sure that we got a unicode string
             if type(phrase) != type(u''):
@@ -419,7 +423,6 @@ class tabsqlitedb:
                 category |= 1 << 1
             except:
                 # then check whether in gbk,
-                # because gbk include big5
                 if category & 1:
                     # already know in SC
                     pass
@@ -431,6 +434,9 @@ class tabsqlitedb:
                     except:
                         # not in gbk
                         pass
+            # then set for 3rd bit, if not in SC and TC
+            if not ( category & (1 | 1 << 1) ):
+                category |= (1 << 2)
         try:
             tbks = self.parse(tabkeys)
             if len(tbks) != len(tabkeys):
@@ -704,7 +710,7 @@ class tabsqlitedb:
             sqlstring = 'CREATE TABLE IF NOT EXISTS user_db.desc (name PRIMARY KEY, value);'
             self.db.executescript (sqlstring)
             sqlstring = 'INSERT OR IGNORE INTO user_db.desc  VALUES (?, ?);'
-            self.db.execute (sqlstring, ('version', '0.1'))
+            self.db.execute (sqlstring, ('version', '0.2'))
             self.db.execute (sqlstring, ('id', str(uuid.uuid4 ())))
             sqlstring = 'INSERT OR IGNORE INTO user_db.desc  VALUES (?, DATETIME("now", "localtime"));'
             self.db.execute (sqlstring, ("create-time", ))

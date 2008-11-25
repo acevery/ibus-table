@@ -397,12 +397,18 @@ class editor:
         else:
             _p_index = 7
             _fkey = 1
+        if self.db._is_chinese:
+            _tbks = u''.join( map(self._deparser , candi[_fkey + len(self._tabkey_list) : _p_index-1 ] ) )
+        else:
+            _tbks = u''.join( map(self._deparser , candi[_fkey + len(self._tabkey_list) : _p_index ] ) )
         _phrase = candi[_p_index]
-        _tbks = u''.join( map(self._deparser , candi[_fkey + len(self._tabkey_list) : _p_index ] ) )
         # further color implementation needed :)
         # here -2 is the pos of num, -1 is the pos of . 0 is the pos of string
         #attrs = ibus.AttrList ([ibus.AttributeForeground (0x8e2626, -2, 1)])
         attrs = ibus.AttrList ()
+        # this is the part of tabkey
+        attrs.append( ibus.AttributeForeground ( 0x1973a2, 0, \
+            len(_phrase) + len(_tbks)))
         if candi[-2] < 0:
             # this is a user defined phrase:
             attrs.append ( ibus.AttributeForeground (0x7700c3, 0, len(_phrase)) )
@@ -412,8 +418,6 @@ class editor:
         else:
             # this is a system phrase haven't been used:
             attrs.append ( ibus.AttributeForeground (0x000000, 0, len(_phrase)) )
-        # this is the part of tabkey
-        attrs.append( ibus.AttributeForeground ( 0x1973a2, len(_phrase), len(_tbks)) )
         self._lookup_table.append_candidate ( _phrase + _tbks, attrs )
         self._lookup_table.show_cursor (True)
 
@@ -703,7 +707,9 @@ class editor:
     def one_candidate (self):
         '''Return true if there is only one candidate'''
         return len(self._candidates[0]) == 1
-
+########################
+### Engine Class #####
+####################
 class tabengine (ibus.EngineBase):
     '''The IM Engine for Tables'''
     
@@ -788,6 +794,8 @@ class tabengine (ibus.EngineBase):
     def _init_properties (self):
         self.properties= ibus.PropList ()
         self._status_property = ibus.Property(u'status')
+        if self.db._is_chinese:
+            self._category_property = ibus.Property(u'category')
         self._letter_property = ibus.Property(u'letter')
         self._punct_property = ibus.Property(u'punct')
         self._py_property = ibus.Property(u'py_mode')
@@ -802,7 +810,8 @@ class tabengine (ibus.EngineBase):
             #self._setup_property
             ):
             self.properties.append(prop)
-
+        if self.db._is_chinese:
+            self.properties.insert( 1, self._category_property )
         self.register_properties (self.properties)
         self._refresh_properties ()
     
