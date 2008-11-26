@@ -498,8 +498,8 @@ class editor:
             else:
                 self._candidates[0] =[]
             if self._candidates[0]:
-                map ( self.ap_candidate,\
-                        self.filter_candidates (self._candidates[0]) )
+                self._candidates[0] = self.filter_candidates (self._candidates[0])
+                map ( self.ap_candidate,self._candidates[0] )
             else:
                 if self._chars[0]:
                     ## old manner:
@@ -964,6 +964,7 @@ class tabengine (ibus.EngineBase):
             self._full_width_punct [self._mode] = not self._full_width_punct [self._mode]
         elif property == u'cmode':
             self._editor.change_chinese_mode()
+            self.reset()
         self._refresh_properties ()
     #    elif property == "setup":
             # Need implementation
