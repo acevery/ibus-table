@@ -91,6 +91,37 @@ class editor:
         self._caret = 0
         # self._onechar: whether we only select single character
         self._onechar = False
+        # self._chinese_mode: the candidate filter mode,
+        #   0 is simplify Chinese
+        #   1 is traditional Chinese
+        #   2 is All display, but simplify Chinese first
+        #   3 is All display, but traditional Chinese first
+        # we use LC_CTYPE to determine which one to use
+        self._chinese_mode = self.get_chinese_mode()
+
+    def get_chinese_mode (self):
+        '''Use LC_CTYPE in your box to determine the _chinese_mode'''
+        try:
+            __lc = os.environ['LC_CTYPE'].split('.')[0].lower()
+            if __lc.find('zh_') == 0:
+                # this is a zh_XX
+                __place =__lc.split('_')[1]
+                if __place == 'cn':
+                    return 0
+                else:
+                    return 1
+            else:
+                if self.db._is_chinese():
+                    # if IME declare as Chinese IME
+                    return 0
+                else:
+                    return -1
+        except:
+            return -1
+                
+    def change_chinese_mode (self):
+        if self._chinese_mode != -1:
+            self._chinese_mode = (self._chinese_mode +1 ) % 4
 
     def clear (self):
         '''Remove data holded'''
@@ -421,6 +452,27 @@ class editor:
         self._lookup_table.append_candidate ( _phrase + _tbks, attrs )
         self._lookup_table.show_cursor (True)
 
+    def filter_candidates (self, candidates):
+        '''Filter candidates if IME is Chinese'''
+        if self.db._is_chinese:
+            bm_index = self._pt.index('category')
+            if self._chinese_mode == 0:
+                # simplify Chinese mode
+                return filter (lambda x: x[bm_index] & 1, candidates)
+            elif self._chinese_mode == 1:
+                # traditional Chinese mode
+                return filter (lambda x: x[bm_index] & (1 << 1), candidates)
+            elif self._chinese_mode == 2:
+                # big charset with SC first
+                return  filter (lambda x: x[bm_index] & 1, candidates)\
+                        + filter (lambda x: x[bm_index] & (1 << 2), candidates)
+            elif self._chinese_mode == 3:
+                # big charset with SC first
+                return  filter (lambda x: x[bm_index] & (1 << 1), candidates)\
+                        + filter (lambda x: x[bm_index] & (1 << 2), candidates)
+        else:
+            return candidates[:]
+
     def update_candidates (self):
         '''Update lookuptable'''
         if (self._chars[0] == self._chars[2] and self._candidates[0]) \
@@ -444,7 +496,8 @@ class editor:
             else:
                 self._candidates[0] =[]
             if self._candidates[0]:
-                map ( self.ap_candidate, self._candidates[0])
+                map ( self.ap_candidate,\
+                        self.filter_candidates (self._candidates[0]) )
             else:
                 if self._chars[0]:
                     ## old manner:
@@ -795,7 +848,7 @@ class tabengine (ibus.EngineBase):
         self.properties= ibus.PropList ()
         self._status_property = ibus.Property(u'status')
         if self.db._is_chinese:
-            self._category_property = ibus.Property(u'category')
+            self._cmode_property = ibus.Property(u'cmode')
         self._letter_property = ibus.Property(u'letter')
         self._punct_property = ibus.Property(u'punct')
         self._py_property = ibus.Property(u'py_mode')
@@ -811,7 +864,7 @@ class tabengine (ibus.EngineBase):
             ):
             self.properties.append(prop)
         if self.db._is_chinese:
-            self.properties.insert( 1, self._category_property )
+            self.properties.insert( 1, self._cmode_property )
         self.register_properties (self.properties)
         self._refresh_properties ()
     
@@ -865,6 +918,23 @@ class tabengine (ibus.EngineBase):
         else:
             self._direct_commit_property.set_icon ( u'%s%s' % (self._icon_dir, 'ncommit.svg' ) ) 
             self._direct_commit_property.set_tooltip ( _(u'Switch to direct commit mode') ) 
+        # the chinese_mode:
+        if self._editor._chinese_mode == 0:
+            self._cmode_property.set_icon ( u'%s%s' % (self._icon_dir,\
+                    'sc-mode.svg' ) ) 
+            self._cmode_property.set_tooltip ( _(u'Switch to Traditional Chinese mode') ) 
+        elif self._editor._chinese_mode == 1:
+            self._cmode_property.set_icon ( u'%s%s' % (self._icon_dir,\
+                    'tc-mode.svg' ) ) 
+            self._cmode_property.set_tooltip ( _(u'Switch to Simplify Chinese first Big Charset Mode') ) 
+        elif self._editor._chinese_mode == 2:
+            self._cmode_property.set_icon ( u'%s%s' % (self._icon_dir,\
+                    'scb-mode.svg' ) ) 
+            self._cmode_property.set_tooltip ( _(u'Switch to Traditional Chinese first Big Charset Mode') ) 
+        elif self._editor._chinese_mode == 3:
+            self._cmode_property.set_icon ( u'%s%s' % (self._icon_dir,\
+                    'tcb-mode.svg' ) ) 
+            self._cmode_property.set_tooltip ( _(u'Switch to Simplify Chinese mode') ) 
 
         # use buildin method to update properties :)
         map (self.update_property, self.properties)
@@ -880,16 +950,18 @@ class tabengine (ibus.EngineBase):
         '''Shift property'''
         if property == u"status":
             self._change_mode ()
-        elif property == u'letter':
-            self._full_width_letter [self._mode] = not self._full_width_letter [self._mode]
-        elif property == u'punct':
-            self._full_width_punct [self._mode] = not self._full_width_punct [self._mode]
         elif property == u'py_mode' and self._ime_py:
             self._editor.r_shift ()
         elif property == u'onechar':
             self._editor._onechar = not self._editor._onechar
         elif property == u'dcommit':
             self._direct_commit = not self._direct_commit
+        elif property == u'letter':
+            self._full_width_letter [self._mode] = not self._full_width_letter [self._mode]
+        elif property == u'punct':
+            self._full_width_punct [self._mode] = not self._full_width_punct [self._mode]
+        elif property == u'cmode':
+            self._editor.change_chinese_mode()
         self._refresh_properties ()
     #    elif property == "setup":
             # Need implementation
