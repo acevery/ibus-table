@@ -94,8 +94,9 @@ class editor:
         # self._chinese_mode: the candidate filter mode,
         #   0 is simplify Chinese
         #   1 is traditional Chinese
-        #   2 is All display, but simplify Chinese first
-        #   3 is All display, but traditional Chinese first
+        #   2 is Big charset mode, but simplify Chinese first
+        #   3 is Big charset mode, but traditional Chinese first
+        #   4 is Big charset mode.
         # we use LC_CTYPE to determine which one to use
         self._chinese_mode = self.get_chinese_mode()
 
@@ -121,7 +122,7 @@ class editor:
                 
     def change_chinese_mode (self):
         if self._chinese_mode != -1:
-            self._chinese_mode = (self._chinese_mode +1 ) % 4
+            self._chinese_mode = (self._chinese_mode +1 ) % 5
 
     def clear (self):
         '''Remove data holded'''
@@ -472,8 +473,7 @@ class editor:
                 return  filter (lambda x: x[bm_index] & (1 << 1), candidates)\
                         +filter (lambda x: x[bm_index] & 1, candidates)\
                         + filter (lambda x: x[bm_index] & (1 << 2), candidates)
-        else:
-            return candidates[:]
+        return candidates[:]
 
     def update_candidates (self):
         '''Update lookuptable'''
@@ -936,7 +936,11 @@ class tabengine (ibus.EngineBase):
         elif self._editor._chinese_mode == 3:
             self._cmode_property.set_icon ( u'%s%s' % (self._icon_dir,\
                     'tcb-mode.svg' ) ) 
-            self._cmode_property.set_tooltip ( _(u'Switch to Simplify Chinese mode') ) 
+            self._cmode_property.set_tooltip ( _(u'Switch to Big Charset Mode') ) 
+        elif self._editor._chinese_mode == 4:
+            self._cmode_property.set_icon ( u'%s%s' % (self._icon_dir,\
+                    'cb-mode.svg' ) ) 
+            self._cmode_property.set_tooltip ( _(u'Switch to Simplify Chinese Mode') ) 
 
         # use buildin method to update properties :)
         map (self.update_property, self.properties)

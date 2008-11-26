@@ -869,7 +869,10 @@ class tabsqlitedb:
             #for k in wordattr[2:2+_len]:
             #    tabkey += self.deparse (k)
         
-        sqlstr = 'UPDATE mudb.phrases SET user_freq = ? WHERE mlen = ? AND clen = ? %s AND phrase = ?;'
+        if self._is_chinese:
+            sqlstr = 'UPDATE mudb.phrases SET user_freq = ? WHERE mlen = ? AND clen = ? %s AND category = ? AND phrase = ?;'
+        else:
+            sqlstr = 'UPDATE mudb.phrases SET user_freq = ? WHERE mlen = ? AND clen = ? %s AND phrase = ?;'
         
         try:
             if len(phrase) == 1:
