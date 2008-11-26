@@ -465,10 +465,12 @@ class editor:
             elif self._chinese_mode == 2:
                 # big charset with SC first
                 return  filter (lambda x: x[bm_index] & 1, candidates)\
+                        +filter (lambda x: x[bm_index] & (1 << 1), candidates)\
                         + filter (lambda x: x[bm_index] & (1 << 2), candidates)
             elif self._chinese_mode == 3:
                 # big charset with SC first
                 return  filter (lambda x: x[bm_index] & (1 << 1), candidates)\
+                        +filter (lambda x: x[bm_index] & 1, candidates)\
                         + filter (lambda x: x[bm_index] & (1 << 2), candidates)
         else:
             return candidates[:]
