@@ -97,7 +97,7 @@ class tabsqlitedb:
                       'user_can_define_phrase':'FALSE',
                       'pinyin_mode':'FALSE',
                       'dynamic_adjust':'FALSE',
-                      'no_check_chars':u'',
+                      #'no_check_chars':u'',
                       'rules':''}
                       #'rules':'ce2:p11+p12+p21+p22;ce3:p11+p21+p22+p31;ca4:p11+p21+p31+p41'}
             # inital the attribute in ime table, which should be updated from mabiao
@@ -142,7 +142,7 @@ class tabsqlitedb:
         if self.rules:
             self.pkeylens = self.phrase_keys_len ()
         
-        self._no_check_chars = self.get_no_check_chars()
+        #self._no_check_chars = self.get_no_check_chars()
         # for fast gouci
         self._goucima={}
         if filename:
@@ -822,12 +822,9 @@ class tabsqlitedb:
         '''
         if type(phrase) != type(u''):
             phrase = phrase.decode('utf8')
-        try:
-            if phrase in self._no_check_chars:
-                # if the phrase is a single char, and in no_check_chars, we skip it.
+        if self._is_chinese:
+            if phrase in tabdict.chinese_nocheck_chars:
                 return
-        except:
-            print 'you are using old format of database, please regenerate your database.'
         if len(phrase) >=2:
             try:
                 wordattr = self.parse_phrase ( phrase )
