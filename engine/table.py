@@ -455,7 +455,7 @@ class editor:
 
     def filter_candidates (self, candidates):
         '''Filter candidates if IME is Chinese'''
-        if self.db._is_chinese:
+        if self.db._is_chinese and (not self._py_mode):
             bm_index = self._pt.index('category')
             if self._chinese_mode == 0:
                 # simplify Chinese mode
@@ -1039,6 +1039,8 @@ class tabengine (ibus.EngineBase):
         self._update_aux ()
     
     def commit_string (self,string):
+        self._editor.clear ()
+        self._update_ui ()
         super(tabengine,self).commit_string ( string )
         self._prev_char = string[-1]
 
@@ -1220,8 +1222,6 @@ class tabengine (ibus.EngineBase):
         elif key.code in (keysyms.Return, keysyms.KP_Enter):
             commit_string = self._editor.get_all_input_strings ()
             self.commit_string (commit_string)
-            self._editor.clear ()
-            self._update_ui ()
             return True
         
         elif key.code in (keysyms.Down, keysyms.KP_Down) :
@@ -1296,7 +1296,7 @@ class tabengine (ibus.EngineBase):
                     self.commit_string (cond_letter_translate (u" "))
             if o_py != self._editor._py_mode:
                 self._refresh_properties ()
-            self._update_ui ()
+                self._update_ui ()
             return True
         # now we ignore all else hotkeys
         elif key.mask & modifier.CONTROL_MASK+modifier.ALT_MASK:
@@ -1316,6 +1316,7 @@ class tabengine (ibus.EngineBase):
                 if sp_res[0]:
                     self.commit_string (sp_res[1])
                     self.db.check_phrase (sp_res[1])
+                    return True
             
             res = self._editor.add_input ( unichr(key.code) )
             if not res:
@@ -1328,8 +1329,10 @@ class tabengine (ibus.EngineBase):
                 if sp_res[0]:
                     self.commit_string (sp_res[1] + key_char)
                     self.db.check_phrase (sp_res[1])
+                    return True
                 else:
                     self.commit_string ( key_char )
+                    return True
             else:
                 if self._direct_commit and self._editor.one_candidate () and \
                         len(self._editor._chars[0]) == self._ml:
@@ -1339,6 +1342,7 @@ class tabengine (ibus.EngineBase):
                     if sp_res[0]:
                         self.commit_string (sp_res[1])
                         self.db.check_phrase (sp_res[1])
+                        return True
 
             self._update_ui ()
             return True
@@ -1362,7 +1366,7 @@ class tabengine (ibus.EngineBase):
                 self.commit_string (commit_string)
                 if o_py != self._editor._py_mode:
                     self._refresh_properties ()
-                self._update_ui ()
+                    self._update_ui ()
                 # modify freq info
                 self.db.check_phrase (commit_string)
             return True
@@ -1378,7 +1382,6 @@ class tabengine (ibus.EngineBase):
                 self.commit_string ( commit_string + cond_punct_translate (unichr (key.code)))
             else:
                 self.commit_string ( commit_string + cond_letter_translate (unichr (key.code)))
-            self._update_ui ()
             return True
         return False
     
