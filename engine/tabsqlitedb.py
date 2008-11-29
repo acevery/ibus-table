@@ -416,7 +416,9 @@ class tabsqlitedb:
                 phrase.encode('gb2312')
                 category |= 1
             except:
-                pass
+                if '〇'.decode('utf8') in phrase:
+                    # we add '〇' into SC as well
+                    category |= 1
             # second check big5-hkscs
             try:
                 phrase.encode('big5hkscs')
