@@ -499,6 +499,7 @@ class editor:
                 self._candidates[0] =[]
             if self._candidates[0]:
                 self._candidates[0] = self.filter_candidates (self._candidates[0])
+            if self._candidates[0]:
                 map ( self.ap_candidate,self._candidates[0] )
             else:
                 if self._chars[0]:
