@@ -922,26 +922,27 @@ class tabengine (ibus.EngineBase):
             self._direct_commit_property.set_icon ( u'%s%s' % (self._icon_dir, 'ncommit.svg' ) ) 
             self._direct_commit_property.set_tooltip ( _(u'Switch to direct commit mode') ) 
         # the chinese_mode:
-        if self._editor._chinese_mode == 0:
-            self._cmode_property.set_icon ( u'%s%s' % (self._icon_dir,\
-                    'sc-mode.svg' ) ) 
-            self._cmode_property.set_tooltip ( _(u'Switch to Traditional Chinese mode') ) 
-        elif self._editor._chinese_mode == 1:
-            self._cmode_property.set_icon ( u'%s%s' % (self._icon_dir,\
-                    'tc-mode.svg' ) ) 
-            self._cmode_property.set_tooltip ( _(u'Switch to Simplify Chinese first Big Charset Mode') ) 
-        elif self._editor._chinese_mode == 2:
-            self._cmode_property.set_icon ( u'%s%s' % (self._icon_dir,\
-                    'scb-mode.svg' ) ) 
-            self._cmode_property.set_tooltip ( _(u'Switch to Traditional Chinese first Big Charset Mode') ) 
-        elif self._editor._chinese_mode == 3:
-            self._cmode_property.set_icon ( u'%s%s' % (self._icon_dir,\
-                    'tcb-mode.svg' ) ) 
-            self._cmode_property.set_tooltip ( _(u'Switch to Big Charset Mode') ) 
-        elif self._editor._chinese_mode == 4:
-            self._cmode_property.set_icon ( u'%s%s' % (self._icon_dir,\
-                    'cb-mode.svg' ) ) 
-            self._cmode_property.set_tooltip ( _(u'Switch to Simplify Chinese Mode') ) 
+        if self.db._is_chinese:
+            if self._editor._chinese_mode == 0:
+                self._cmode_property.set_icon ( u'%s%s' % (self._icon_dir,\
+                        'sc-mode.svg' ) ) 
+                self._cmode_property.set_tooltip ( _(u'Switch to Traditional Chinese mode') ) 
+            elif self._editor._chinese_mode == 1:
+                self._cmode_property.set_icon ( u'%s%s' % (self._icon_dir,\
+                        'tc-mode.svg' ) ) 
+                self._cmode_property.set_tooltip ( _(u'Switch to Simplify Chinese first Big Charset Mode') ) 
+            elif self._editor._chinese_mode == 2:
+                self._cmode_property.set_icon ( u'%s%s' % (self._icon_dir,\
+                        'scb-mode.svg' ) ) 
+                self._cmode_property.set_tooltip ( _(u'Switch to Traditional Chinese first Big Charset Mode') ) 
+            elif self._editor._chinese_mode == 3:
+                self._cmode_property.set_icon ( u'%s%s' % (self._icon_dir,\
+                        'tcb-mode.svg' ) ) 
+                self._cmode_property.set_tooltip ( _(u'Switch to Big Charset Mode') ) 
+            elif self._editor._chinese_mode == 4:
+                self._cmode_property.set_icon ( u'%s%s' % (self._icon_dir,\
+                        'cb-mode.svg' ) ) 
+                self._cmode_property.set_tooltip ( _(u'Switch to Simplify Chinese Mode') ) 
 
         # use buildin method to update properties :)
         map (self.update_property, self.properties)
