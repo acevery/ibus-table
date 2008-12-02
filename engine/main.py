@@ -62,7 +62,10 @@ def main():
     if options.daemon :
         if os.fork():
                 sys.exit()
-    db = '%s%s%s' % (db_dir,os.path.sep, os.path.basename(options.db) )
+    if os.access( options.db, os.F_OK):
+        db = options.db
+    else:
+        db = '%s%s%s' % (db_dir,os.path.sep, os.path.basename(options.db) )
     ima=IMApp(db)
     ima.run()
 
