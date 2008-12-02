@@ -38,7 +38,7 @@ engine_base_path = "/com/redhat/IBus/engines/table/%s/engine/"
 
 class EngineFactory (ibus.EngineFactoryBase):
     """Table IM Engine Factory"""
-    def __init__ (self, bus, db):
+    def __init__ (self, bus, db, icon):
         import locale
         # here the db should be the abs path to sql db
         # this is the backend sql db we need for our IME
@@ -57,7 +57,10 @@ class EngineFactory (ibus.EngineFactoryBase):
             self.name         = _( self.db.get_ime_property ('name') )
         self.uuid        = self.db.get_ime_property ('uuid')
         self.authors    = self.db.get_ime_property ('author')
-        self.icon        = '%s%s%s%s%s' % ( os.getenv("IBUS_TABLE_LOCATION") ,
+        if icon:
+            self.icon = icon
+        else:
+            self.icon = '%s%s%s%s%s' % ( os.getenv("IBUS_TABLE_LOCATION") ,
                 os.path.sep,'icons',os.path.sep, self.db.get_ime_property ('icon') )
         self.credits    = self.db.get_ime_property ('credit')
         self.lang        = self.db.get_ime_property ('languages') 

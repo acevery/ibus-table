@@ -32,10 +32,13 @@ opt = optparse.OptionParser()
 opt.set_usage ('%prog --table a_table.db')
 opt.add_option('--table', '-t',
         action = 'store',type = 'string',dest = 'db',default = '',
-        help = 'Set the configuration file, default: %default')
+        help = 'Set the IME table file, default: %default')
 opt.add_option('--daemon','-d',
         action = 'store_true',dest = 'daemon',default=False,
         help = 'Run as daemon, default: %default')
+opt.add_option('--icon', '-i',
+        action = 'store',type = 'string',dest = 'icon',default = '',
+        help = 'Set the IME icon file, default: %default')
 
 
 (options, args) = opt.parse_args()
@@ -43,11 +46,12 @@ if not options.db:
     opt.error('no db found!')
 
 class IMApp:
-    def __init__(self,dbfile):
+    def __init__(self, dbfile, iconfile=''):
         self.__mainloop = gobject.MainLoop()
         self.__bus = ibus.Bus()
         self.__bus.connect("destroy", self.__bus_destroy_cb)
-        self.__engine = factory.EngineFactory(self.__bus, dbfile)
+        self.__engine = factory.EngineFactory(self.__bus, dbfile,\
+                iconfile)
         self.__engine.register()
 
     def run(self):
@@ -66,7 +70,11 @@ def main():
         db = options.db
     else:
         db = '%s%s%s' % (db_dir,os.path.sep, os.path.basename(options.db) )
-    ima=IMApp(db)
+    if os.access( options.icon, os.F_OK):
+        icon = options.icon
+    else:
+        icon = ''
+    ima=IMApp(db, icon)
     ima.run()
 
 if __name__ == "__main__":
