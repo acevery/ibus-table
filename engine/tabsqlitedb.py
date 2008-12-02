@@ -795,7 +795,7 @@ class tabsqlitedb:
             tabkeylist = map (lambda x: self.get_gcm_id ( phrase[x[0]-1] )[ x[1]-1 ], rule )
             return [len( tabkeylist)] + [p_len]  + tabkeylist[:] + [phrase]
 
-        except Exception:
+        except:
             print "pharse pharse \"%s\" fail." % phrase.encode("utf-8")
             #import traceback
             #traceback.print_exc ()

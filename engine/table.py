@@ -1227,12 +1227,12 @@ class tabengine (ibus.EngineBase):
         
         elif key.code in (keysyms.Down, keysyms.KP_Down) :
             res = self._editor.arrow_down ()
-            self._update_lookup_table ()
+            self._update_ui ()
             return res
         
         elif key.code in (keysyms.Up, keysyms.KP_Up):
             res = self._editor.arrow_up ()
-            self._update_lookup_table ()
+            self._update_ui ()
             return res
         
         elif key.code in (keysyms.Left, keysyms.KP_Left) and key.mask & modifier.CONTROL_MASK:
