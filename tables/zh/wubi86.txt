@@ -12,11 +12,11 @@
 ### Begin Table definition.
 BEGIN_DEFINITION
 ### Original table author
-AUTHOR = Wozi <wozy-in@gmail.com>
+AUTHOR = Wozy <wozy.in@gmail.com>
 
 ### An unique id to distinguish this table among others.
 ### Use uuidgen to generate this kind of id.
-UUID = 3a69fa44-b978-4281-816f-2339ea462c26
+UUID = 3a69fbf4-b978-4281-816f-2339ea462c26
 
 ### A unique number indicates the version of this file.
 ### For example the last modified date of this file.
@@ -86,8 +86,8 @@ h	上	4250000000
 h	目	324000000
 i	不	2140000000
 i	水	752000000
-j	日	2380000000
 j	是	2210000000
+j	日	2180000000
 k	中	2720000000
 k	口	279000000
 l	国	526000000

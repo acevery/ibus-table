@@ -37,6 +37,11 @@ icons_DATA = \
 	english.svg \
 	dcommit.svg \
 	ncommit.svg \
+	cb-mode.svg \
+	sc-mode.svg \
+	tc-mode.svg \
+	scb-mode.svg \
+	tcb-mode.svg \
 	$(NULL)
 
 iconsdir = $(pkgdatadir)/icons
