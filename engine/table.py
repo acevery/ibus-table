@@ -451,7 +451,7 @@ class editor:
             # this is a system phrase haven't been used:
             attrs.append ( ibus.AttributeForeground (0x000000, 0, len(_phrase)) )
         self._lookup_table.append_candidate ( _phrase + _tbks, attrs )
-        self._lookup_table.show_cursor (True)
+        self._lookup_table.show_cursor (False)
 
     def filter_candidates (self, candidates):
         '''Filter candidates if IME is Chinese'''
@@ -1225,15 +1225,15 @@ class tabengine (ibus.EngineBase):
             self.commit_string (commit_string)
             return True
         
-        elif key.code in (keysyms.Down, keysyms.KP_Down) :
-            res = self._editor.arrow_down ()
-            self._update_ui ()
-            return res
+        #elif key.code in (keysyms.Down, keysyms.KP_Down) :
+        #    res = self._editor.arrow_down ()
+        #    self._update_ui ()
+        #    return res
         
-        elif key.code in (keysyms.Up, keysyms.KP_Up):
-            res = self._editor.arrow_up ()
-            self._update_ui ()
-            return res
+        #elif key.code in (keysyms.Up, keysyms.KP_Up):
+        #    res = self._editor.arrow_up ()
+        #    self._update_ui ()
+        #    return res
         
         elif key.code in (keysyms.Left, keysyms.KP_Left) and key.mask & modifier.CONTROL_MASK:
             res = self._editor.control_arrow_left ()
@@ -1317,7 +1317,6 @@ class tabengine (ibus.EngineBase):
                 if sp_res[0]:
                     self.commit_string (sp_res[1])
                     self.db.check_phrase (sp_res[1])
-                    return True
             
             res = self._editor.add_input ( unichr(key.code) )
             if not res:
