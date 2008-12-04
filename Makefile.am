@@ -38,6 +38,12 @@ SUBDIRS = \
 
 ACLOCAL_AMFLAGS = -I m4
 
+pkgconfig_DATA = \
+	ibus-table.pc \
+	$(NULL)
+
+pkgconfigdir = $(libdir)/pkgconfig
+
 EXTRA_DIST = \
 	autogen.sh \
 	@PACKAGE_NAME@.spec.in \

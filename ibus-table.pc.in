@@ -1,0 +1,19 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+datarootdir=@datarootdir@
+datadir=@datadir@
+
+tabledir=@datadir@/ibus-table/tables
+icondir=@datadir@/ibus-table/icons
+enginedir=@datadir@/ibus/engine
+
+ibus_table_version=@PACKAGE_VERSION@
+
+Name: IBus-Table
+Description: Table Based Input Method Framework for Intelligent Input Bus for Linux / Unix OS
+Version: @PACKAGE_VERSION@
+Requires: 
+Libs: 
+Cflags: 
+

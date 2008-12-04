@@ -113,22 +113,23 @@ AC_ARG_ENABLE([additional],
 AM_CONDITIONAL([IBUS_TABLE_BUILD_ADDITIONAL],[test x"$enable_additional" = x"yes"])
 
 # OUTPUT files
-AC_CONFIG_FILES(po/Makefile.in
-Makefile
-ibus-table.spec
-engine/Makefile
-engine/ibus-engine-table
-engine/ibus-table-createdb
-data/Makefile
-doc/Makefile
-doc/table.engine
-icons/Makefile
-icons/zh/Makefile
-icons/additional/Makefile
-tables/Makefile
-tables/zh/Makefile
-tables/additional/Makefile
-m4/Makefile
+AC_CONFIG_FILES([po/Makefile.in
+    Makefile
+    engine/Makefile
+    engine/ibus-engine-table
+    engine/ibus-table-createdb
+    data/Makefile
+    doc/Makefile
+    doc/table.engine
+    icons/Makefile
+    icons/zh/Makefile
+    icons/additional/Makefile
+    tables/Makefile
+    tables/zh/Makefile
+    tables/additional/Makefile
+    m4/Makefile
+    ibus-table.spec
+    ibus-table.pc]
 )
 
 AC_OUTPUT
