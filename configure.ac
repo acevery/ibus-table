@@ -69,7 +69,6 @@ AC_CONFIG_FILES([po/Makefile.in
     doc/Makefile
     doc/table.engine
     icons/Makefile
-    icons/zh/Makefile
     icons/additional/Makefile
     tables/Makefile
     tables/additional/Makefile
