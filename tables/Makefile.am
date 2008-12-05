@@ -1,4 +1,4 @@
-# vim:set noet ts=4:
+# vim:set ts=4
 #
 # ibus-table
 #
@@ -24,7 +24,6 @@
 #
 
 SUBDIRS = \
-	zh \
 	additional \
 	$(NULL)
 
