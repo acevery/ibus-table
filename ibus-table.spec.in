@@ -17,14 +17,6 @@ Requires:   ibus
 %description
 The package contains general Table engine for IBus platform.
 
-%package chinese
-Summary:    Chinese tables for general table engine of IBus.
-Group:      System Environment/Libraries
-Requires:   %{name} = %{version}-%{release}
-
-%description chinese
-This package contains Chineses tables.
-
 %package additional
 Summary:    Additional tables for general table engine of IBus.
 Group:      System Environment/Libraries
@@ -39,13 +31,7 @@ This package contains additional tables.
 %build
 %configure \
 	--disable-static \
-	--enable-zhengma \
-	--enable-wubi86 \
-	--enable-wubi98 \
-	--enable-cangjie5 \
-	--enable-erbi-qs \
 	--enable-additional
-#	--enable-extra-phrases
 
 make %{?_smp_mflags}
 
@@ -58,13 +44,6 @@ make DESTDIR=${RPM_BUILD_ROOT} NO_INDEX=true install
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post chinese
-ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/wubi86.db
-ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/wubi98.db
-ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/cangjie5.db
-ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/erbi_qs.db
-ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/zhengma.db
-
 %post additional
 ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/compose.db
 ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/latex.db
@@ -72,8 +51,11 @@ ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/latex.db
 %files -f %{name}.lang
 %defattr(-,root,root,-)
 %doc AUTHORS COPYING README
-%{_datadir}/ibus-table/engine/*
+%{_libdir}/pkgconfig/ibus-table.pc
+%{_datadir}/ibus-table/engine
+%{_datadir}/ibus-table/data
 %{_datadir}/ibus-table/tables/template.txt
+%dir %{_datadir}/ibus-table/tables
 %{_datadir}/ibus-table/icons/ibus-table.svg
 %{_datadir}/ibus-table/icons/full-letter.svg
 %{_datadir}/ibus-table/icons/full-punct.svg
@@ -87,28 +69,14 @@ ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/latex.db
 %{_datadir}/ibus-table/icons/dcommit.svg
 %{_datadir}/ibus-table/icons/english.svg
 %{_datadir}/ibus-table/icons/ncommit.svg
+%{_datadir}/ibus-table/icons/cb-mode.svg
+%{_datadir}/ibus-table/icons/sc-mode.svg
+%{_datadir}/ibus-table/icons/scb-mode.svg
+%{_datadir}/ibus-table/icons/tc-mode.svg
+%{_datadir}/ibus-table/icons/tcb-mode.svg
+%dir %{_datadir}/ibus-table/icons
 %{_bindir}/ibus-engine-table
 %{_bindir}/ibus-table-createdb
-
-%files chinese
-%defattr(-,root,root,-)
-%{_datadir}/ibus-table/data/pinyin_table.txt.bz2
-%{_datadir}/ibus-table/tables/extra_phrase.txt.bz2
-%{_datadir}/ibus-table/tables/wubi86.db
-%{_datadir}/ibus-table/tables/wubi98.db
-%{_datadir}/ibus-table/tables/cangjie5.db
-%{_datadir}/ibus-table/tables/erbi_qs.db
-%{_datadir}/ibus-table/tables/zhengma.db
-%{_datadir}/ibus-table/icons/wubi86.svg
-%{_datadir}/ibus-table/icons/wubi98.svg
-%{_datadir}/ibus-table/icons/cangjie5.svg
-%{_datadir}/ibus-table/icons/erbi-qs.svg
-%{_datadir}/ibus-table/icons/zhengma.svg
-%{_datadir}/ibus/engine/wubi86.engine
-%{_datadir}/ibus/engine/wubi98.engine
-%{_datadir}/ibus/engine/cangjie5.engine
-%{_datadir}/ibus/engine/erbi_qs.engine
-%{_datadir}/ibus/engine/zhengma.engine
 
 %files additional
 %defattr(-,root,root,-)
