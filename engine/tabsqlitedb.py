@@ -49,6 +49,7 @@ class tabsqlitedb:
         self.parse = tabdict.parse
         self.deparse = tabdict.deparse
         self._add_phrase_sqlstr = ''
+        self.old_phrases=[]
         
         if filename:
             # now we are creating db
@@ -163,6 +164,14 @@ class tabsqlitedb:
                 elif desc["version"] != "0.2":
                     new_name = "%s.%d" %(user_db, os.getpid())
                     print >> stderr, "Can not support the user db. We will rename it to %s" % new_name
+                    self.old_phrases = self.extra_user_phrases( user_db )
+                    os.rename (user_db, new_name)
+                    self.init_user_db (user_db)
+                elif self.get_table_phrase_len(user_db) != len(self._pt_index):
+                    print >> stderr, "user db format outdated."
+                    # store old user phrases
+                    self.old_phrases = self.extra_user_phrases( user_db )
+                    new_name = "%s.%d" %(user_db, os.getpid())
                     os.rename (user_db, new_name)
                     self.init_user_db (user_db)
             except:
@@ -179,9 +188,14 @@ class tabsqlitedb:
             os.rename (user_db, "%s.%d" % (user_db, os.getpid ()))
             self.init_user_db (user_db)
             self.db.execute ('ATTACH DATABASE "%s" AS user_db;' % user_db)
+        self.create_tables ("user_db")
+        if self.old_phrases:
+            self.old_phrases =\
+                    map(lambda x: [self.parse_phrase_to_tabkeys(x[0])]\
+                    + list(x) , self.old_phrases)
+            self.add_phrases (self.old_phrases, 'user_db')
 
         # try create all tables in user database
-        self.create_tables ("user_db")
         self.create_indexes ("user_db")
         self.generate_userdb_desc ()
         
@@ -746,6 +760,24 @@ class tabsqlitedb:
             return desc
         except:
             return None
+
+    def get_table_phrase_len(self, db_file):
+        table_patt = re.compile(r'.*\((.*)\)')
+        if not path.exists (db_file):
+            return 0
+        try:
+            db = sqlite3.connect (db_file)
+            tp_res = db.execute("select sql from sqlite_master\
+                    where name='phrases';").fetchall()
+            self.db.commit()
+            res = table_patt.match(tp_res[0][0])
+            if res:
+                tp = res.group(1).split(',')
+                return len(tp)
+            else:
+                return 0
+        except:
+            return 0
     
     def cache_goucima (self):
         self._goucima = {}
@@ -1003,3 +1035,17 @@ class tabsqlitedb:
             self.db.execute(sqlstr,_ph)
             self.db.commit()
 
+    def extra_user_phrases(self, udb, only_defined=False):
+        '''extract user phrases from database'''
+        try:
+            db = sqlite3.connect(udb)
+        except:
+            return None
+        if only_defined:
+            _phrases = db.execute("select phrase, freq, user_freq\
+                    from phrases where freq=-1;").fetchall()
+        else:
+            _phrases = db.execute("select phrase, freq, user_freq\
+                    from phrases;").fetchall()
+        db.commit()
+        return _phrases[:]
