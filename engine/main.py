@@ -24,8 +24,10 @@ import optparse
 import ibus
 import gobject
 import factory
-
-db_dir = os.path.join (os.getenv('IBUS_TABLE_LOCATION'),'tables')
+try:
+    db_dir = os.path.join (os.getenv('IBUS_TABLE_LOCATION'),'tables')
+except:
+    db_dir = "/usr/share/ibus-table/tables"
 
 opt = optparse.OptionParser()
 
@@ -57,7 +59,10 @@ class IMApp:
     def run(self):
         self.__mainloop.run()
 
-    def __bus_destroy_cb(self, bus):
+    def quit(self):
+        self.__bus_destroy_cb()
+
+    def __bus_destroy_cb(self, bus=None):
         self.__engine.do_destroy()
         self.__mainloop.quit()
 
@@ -75,7 +80,10 @@ def main():
     else:
         icon = ''
     ima=IMApp(db, icon)
-    ima.run()
+    try:
+        ima.run()
+    except KeyboardInterrupt:
+        ima.quit()
 
 if __name__ == "__main__":
     main()

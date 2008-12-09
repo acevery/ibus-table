@@ -28,6 +28,7 @@ import ibus
 import table
 import tabsqlitedb
 import os
+import dbus
 
 from gettext import dgettext
 _  = lambda a : dgettext ("ibus-table", a)
@@ -78,6 +79,16 @@ class EngineFactory (ibus.EngineFactoryBase):
         super(EngineFactory,self).__init__(self.info, table.tabengine, self.engine_path, bus, self.factory_path)
         self.engine_id=1
         self.db.db.commit()
+        try:
+            bus = dbus.Bus()
+            user = os.path.basename( os.path.expanduser('~') )
+            self._sm_bus = bus.get_object ("org.ibus.table.SpeedMeter.%s"\
+                    % user, "/org/ibus/table/SpeedMeter")
+            self._sm =  dbus.Interface(self._sm_bus,\
+                    "org.ibus.table.SpeedMeter") 
+            self._sm.Regist()
+        except:
+            self._sm = None
     
     def create_engine(self):
         # because we need db to be past to Engine
@@ -89,6 +100,10 @@ class EngineFactory (ibus.EngineFactoryBase):
         '''Destructor, which finish some task for IME'''
         # we need to sync the temp userdb in memory to the user_db on disk
         self.db.sync_usrdb ()
+        try:
+            self._sm.Exit()
+        except:
+            pass
         super(EngineFactory,self).do_destroy()
 
 

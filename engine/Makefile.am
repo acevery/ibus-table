@@ -25,6 +25,7 @@ engine_table_PYTHON = \
 	tabcreatedb.py \
 	tabdict.py \
 	tabsqlitedb.py \
+	speedmeter.py \
 	$(NULL)
 engine_table_DATA = \
 	$(NULL)

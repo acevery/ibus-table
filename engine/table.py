@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# vim: set noet ts=4:
+# vim: set et ts=4 sts=4
 #
 # ibus-table
 #
@@ -43,6 +43,7 @@ from gettext import dgettext
 _  = lambda a : dgettext ("ibus-table", a)
 N_ = lambda a : a
 
+import dbus
 
 class KeyEvent:
     def __init__(self, keyval, is_press, state):
@@ -54,7 +55,7 @@ class KeyEvent:
         return "%s 0x%08x" % (keysyms.keycode_to_name(self.code), self.mask)
 
 
-class editor:
+class editor(object):
     '''Hold user inputs chars and preedit string'''
     def __init__ (self,phrase_table_index,valid_input_chars, max_key_length, database, parser = tabdict.parse, deparser = tabdict.deparse, max_length = 64):
         self.db = database
@@ -763,6 +764,8 @@ class editor:
     def one_candidate (self):
         '''Return true if there is only one candidate'''
         return len(self._candidates[0]) == 1
+
+
 ########################
 ### Engine Class #####
 ####################
@@ -835,8 +838,19 @@ class tabengine (ibus.EngineBase):
         # some properties we will involved, Property is taken from scim.
         #self._setup_property = Property ("setup", _("Setup"))
         self._direct_commit = False
+        # the commit phrases length
+        self._len_list = [0]
+        # connect to SpeedMeter
+        try:
+            bus = dbus.SessionBus()
+            user = os.path.basename( os.path.expanduser('~') )
+            self._sm_bus = bus.get_object ("org.ibus.table.SpeedMeter.%s"\
+                    % user, "/org/ibus/table/SpeedMeter")
+            self._sm =  dbus.Interface(self._sm_bus,\
+                    "org.ibus.table.SpeedMeter") 
+        except:
+            self._sm = None
         self.reset ()
-        
 
     def reset (self):
         self._editor.clear ()
@@ -846,6 +860,9 @@ class tabengine (ibus.EngineBase):
         #self._editor._onechar = False    
         self._init_properties ()
         self._update_ui ()
+    
+    def do_destroy(self):
+        super(tabengine,self).do_destroy()
 
     def _init_properties (self):
         self.properties= ibus.PropList ()
@@ -1038,6 +1055,12 @@ class tabengine (ibus.EngineBase):
         self._update_lookup_table ()
         self._update_preedit ()
         self._update_aux ()
+
+    def add_string_len(self, astring):
+        try:
+            self._sm.Accumulate(len(astring))
+        except:
+            pass
     
     def commit_string (self,string):
         self._editor.clear ()
@@ -1291,6 +1314,7 @@ class tabengine (ibus.EngineBase):
             #return (KeyProcessResult,whethercommit,commitstring)
             if sp_res[0]:
                 self.commit_string (sp_res[1])
+                self.add_string_len(sp_res[1])
                 self.db.check_phrase (sp_res[1])
             else:
                 if sp_res[1] == u' ':
@@ -1316,6 +1340,7 @@ class tabengine (ibus.EngineBase):
                 #return (whethercommit,commitstring)
                 if sp_res[0]:
                     self.commit_string (sp_res[1])
+                    self.add_string_len(sp_res[1])
                     self.db.check_phrase (sp_res[1])
             
             res = self._editor.add_input ( unichr(key.code) )
@@ -1328,6 +1353,7 @@ class tabengine (ibus.EngineBase):
                 #return (KeyProcessResult,whethercommit,commitstring)
                 if sp_res[0]:
                     self.commit_string (sp_res[1] + key_char)
+                    self.add_string_len(sp_res[1])
                     self.db.check_phrase (sp_res[1])
                     return True
                 else:
@@ -1341,6 +1367,7 @@ class tabengine (ibus.EngineBase):
                     #return (whethercommit,commitstring)
                     if sp_res[0]:
                         self.commit_string (sp_res[1])
+                        self.add_string_len(sp_res[1])
                         self.db.check_phrase (sp_res[1])
                         return True
 
@@ -1362,8 +1389,8 @@ class tabengine (ibus.EngineBase):
             if res:
                 o_py = self._editor._py_mode
                 commit_string = self._editor.get_preedit_strings ()
-                self._editor.clear ()
                 self.commit_string (commit_string)
+                self.add_string_len(commit_string)
                 if o_py != self._editor._py_mode:
                     self._refresh_properties ()
                     self._update_ui ()
@@ -1390,12 +1417,24 @@ class tabengine (ibus.EngineBase):
         self.register_properties (self.properties)
         self._refresh_properties ()
         self._update_ui ()
+        try:
+            self._sm.Show()
+        except:
+            pass
     
     def focus_out (self):
-        pass
+        try:
+            self._sm.Hide()
+        except:
+            pass
 
     def disable (self):
         self.reset()
+        try:
+            self._sm.Hide()
+            self._sm.Reset()
+        except:
+            pass
 
     def lookup_table_page_up (self):
         if self._editor.page_up ():

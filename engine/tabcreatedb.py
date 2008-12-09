@@ -363,7 +363,8 @@ def main ():
             engine_local_names + \
             [
             'Lang=%s\n' % engine_language,
-            'Icon=%s\n' % os.path.join(opts.pkgdata_path, "icons", engine_icon),
+            'Icon=%s\n' % os.path.join(opts.pkgdata_path,\
+                "ibus-table/icons", engine_icon),
             'Author=%s\n' % engine_author,
             'Credits=\n'
             ]
