@@ -181,10 +181,12 @@ class SpeedMeter(dbus.service.Object):
 
     @method()
     def Show(self):
+        self.window.move(*self.pos)
         self.window.show()
 
     @method()
     def Hide(self):
+        self.pos = self.window.get_position()
         self.window.hide()
 
     def create_ui(self):
