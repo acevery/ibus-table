@@ -232,7 +232,7 @@ class SpeedMeter(dbus.service.Object):
         self.speed_label.show()
         self.vbox.pack_start(self.speed_label)
         #self.window.set_resizable(False)
-        self.window.show()
+        #self.window.show()
     def run (self):
         gdk.threads_enter()
         gtk.main()
