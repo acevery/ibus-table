@@ -311,14 +311,13 @@ class SpeedMeter(dbus.service.Object):
         self.timer.tlock.acquire()
         self.list.append( (phrase_len, now) ) 
         self.list = map (lambda x: (x[0], x[1], now - x[1]), self.list )
-        self.list = filter (lambda x: x[2] < 31, self.list)
+        self.list = filter (lambda x: x[2] < 61, self.list)
         # unlock here
         self.timer.tlock.release()
         if not self.full:
             self.c_time = self.list[-1][1] - self.list[0][1] 
             self.c_time = (self.c_time > 1 and self.c_time or 1 )
-            self.c_time = (self.c_time < 30 and self.c_time or 30 )
-            self.full = (self.c_time ==30)
+            self.full = (self.c_time >=60)
         speed = ( sum( map( lambda x: x[0], self.list) ) * 60\
                 / self.c_time )
         speed = int(speed)
@@ -371,16 +370,16 @@ class SpeedMeter(dbus.service.Object):
         return False
 
 if __name__ == '__main__':
-    if options.daemon:
-        daemonize( '/dev/null', None, '/dev/null' )
     dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
     bus = dbus.Bus()
     user = path.basename( path.expanduser('~') )
     name = "org.ibus.table.SpeedMeter.%s" % user
-    # check service name
+    # check service name first
     request = bus.request_name (name, dbus.bus.NAME_FLAG_DO_NOT_QUEUE)
     if request != dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
         sys.exit()
+    if options.daemon:
+        daemonize( '/dev/null', None, '/dev/null' )
     busname = dbus.service.BusName( name, bus )
     gdk.threads_init()
     SpeedMeter(bus)
