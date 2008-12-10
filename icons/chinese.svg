@@ -122,10 +122,10 @@
        inkscape:collect="always"
        xlink:href="#linearGradient3165"
        id="linearGradient3189"
-       x1="17.28125"
-       y1="29.756697"
-       x2="47.526787"
-       y2="0.7566964"
+       x1="11.699516"
+       y1="22.435373"
+       x2="36.009411"
+       y2="22.435373"
        gradientUnits="userSpaceOnUse"
        gradientTransform="matrix(1.4588402,0,0,1.4048982,-9.6613971,-9.2308213)" />
   </defs>
@@ -144,9 +144,9 @@
      inkscape:grid-bbox="true"
      inkscape:document-units="px"
      inkscape:window-width="1024"
-     inkscape:window-height="693"
-     inkscape:window-x="0"
-     inkscape:window-y="26" />
+     inkscape:window-height="720"
+     inkscape:window-x="248"
+     inkscape:window-y="0" />
   <metadata
      id="metadata2388">
     <rdf:RDF>
@@ -198,7 +198,7 @@
          y="16.714287"
          style="font-style:normal;font-weight:bold" /></text>
     <path
-       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:url(#linearGradient3189);fill-opacity:1;stroke:#0066f0;stroke-width:0.57264608;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;font-family:'微软雅黑';-inkscape-font-specification:'微软雅黑 Bold'"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:url(#linearGradient3189);fill-opacity:1;stroke:#0066f0;stroke-width:0.57264607999999995;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;font-family:'微软雅黑';-inkscape-font-specification:'微软雅黑 Bold'"
        d="M 21.658081,0.29614445 L 21.658081,7.1011198 L 6.7961448,7.1011198 L 6.7961448,28.745332 L 12.677096,28.745332 L 12.677096,25.979438 L 21.658081,25.979438 L 21.658081,38.360104 L 27.721385,38.360104 L 27.721385,25.979438 L 36.70237,25.979438 L 36.70237,28.657526 L 42.58332,28.657526 L 42.58332,7.1011198 L 27.721385,7.1011198 L 27.721385,0.29614445 L 21.658081,0.29614445 z M 12.677096,12.413391 L 21.658081,12.413391 L 21.658081,20.71107 L 12.677096,20.71107 L 12.677096,12.413391 z M 27.721385,12.413391 L 36.70237,12.413391 L 36.70237,20.71107 L 27.721385,20.71107 L 27.721385,12.413391 z"
        id="text2400" />
   </g>
