@@ -222,7 +222,7 @@ class SpeedMeter(dbus.service.Object):
         self.frame1.show()
         self.vbox.pack_start(self.frame1)
         # color of speed label
-        self.label_color = gdk.Color("#0000FF")
+        self.label_color = gdk.Color(0,0,0xffff)
         # speed label here
         self.speed_label = gtk.Label()
         self.speed_label.set_text('0')
