@@ -35,7 +35,68 @@ import dbus.mainloop.glib
 import time
 import threading
 import os.path as path
+import os 
 import sys
+import optparse
+
+opt = optparse.OptionParser()
+
+opt.add_option('--daemon','-d',
+        action = 'store_true',dest = 'daemon',default=False,
+        help = 'Run as daemon, default: %default')
+
+(options, args) = opt.parse_args()
+
+def daemonize(stdout='/dev/null', stderr=None, stdin='/dev/null',
+        pidfile=None ):
+    '''
+    This forks the current process into a daemon.
+    The stdin, stdout, and stderr arguments are file names that
+    will be opened and be used to replace the standard file descriptors
+    in sys.stdin, sys.stdout, and sys.stderr.
+    These arguments are optional and default to /dev/null.
+    Note that stderr is opened unbuffered, so
+    if it shares a file with stdout then interleaved output
+    may not appear in the order that you expect.
+    '''
+    # Do first fork.
+    try: 
+        pid = os.fork() 
+        if pid > 0: sys.exit(0) # Exit first parent.
+    except OSError, e: 
+        sys.stderr.write("fork #1 failed: (%d) %s\n" % (e.errno, e.strerror))
+        sys.exit(1)
+
+    # Decouple from parent environment.
+    os.chdir("/") 
+    os.umask(0) 
+    os.setsid() 
+
+    # Do second fork.
+    try: 
+        pid = os.fork()
+        if pid > 0: sys.exit(0) # Exit second parent.
+    except OSError, e: 
+        print 'second fork error'
+        sys.stderr.write("fork #2 failed: (%d) %s\n" % (e.errno, e.strerror))
+        sys.exit(1)
+
+    # Open file descriptors and print start message
+    if not stderr: stderr = stdout
+    si = file(stdin, 'r')
+    so = file(stdout, 'w+')
+    se = file(stderr, 'a+', 0)
+    pid = str(os.getpid())
+    print "Start SpeedMeter with Pid: %s\n"  % pid
+    sys.stderr.flush()
+    if pidfile: file(pidfile,'w+').write("%s\n" % pid)
+
+    # Redirect standard file descriptors.
+    sys.stdout.flush()
+    sys.stderr.flush()
+    os.dup2(si.fileno(), sys.stdin.fileno())
+    os.dup2(so.fileno(), sys.stdout.fileno())
+    os.dup2(se.fileno(), sys.stderr.fileno())
 
 class Timer(threading.Thread):
     '''add 0 to clist every second, clist must be a list of int'''
@@ -189,6 +250,10 @@ class SpeedMeter(dbus.service.Object):
         self.pos = self.window.get_position()
         self.window.hide()
 
+    @method(out_signature='i')
+    def report(self):
+        return self.counts
+
     def create_ui(self):
         self.window = gtk.Window(gtk.WINDOW_POPUP)
         #self.window.connect("destroy", lambda w: gtk.main_quit() )
@@ -306,6 +371,8 @@ class SpeedMeter(dbus.service.Object):
         return False
 
 if __name__ == '__main__':
+    if options.daemon:
+        daemonize( '/dev/null', None, '/dev/null' )
     dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
     bus = dbus.Bus()
     user = path.basename( path.expanduser('~') )

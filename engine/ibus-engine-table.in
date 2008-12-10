@@ -23,6 +23,8 @@ prefix=@prefix@
 datarootdir=@datarootdir@
 datadir=@datadir@
 export IBUS_TABLE_LOCATION=@datarootdir@/ibus-table
-exec python @datarootdir@/ibus-table/engine/speedmeter.py &
+# first running speedmeter as a daemon
+python @datarootdir@/ibus-table/engine/speedmeter.py -d
+# then start our IME
 exec python @datarootdir@/ibus-table/engine/main.py $@
 
