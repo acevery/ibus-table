@@ -601,7 +601,7 @@ class tabsqlitedb:
     def compare (self,x,y):
         return cmp (x[0],y[0]) or -(cmp (x[-1],y[-1])) or -(cmp (x[-2],y[-2]))
 
-    def select_words( self, tabkeys, onechar=False ):
+    def select_words( self, tabkeys, onechar=False, bitmask=0 ):
         '''
         Get phrases from database by tab_key objects
         ( which should be equal or less than the max key length)
@@ -615,6 +615,14 @@ class tabsqlitedb:
         if onechar:
             # for some users really like to select only single characters
             _condition += 'AND clen=1 '
+        if bitmask:
+            # now just the bits for chinese
+            all_ints = xrange(1,5)
+            need_ints = filter (lambda x: x & bitmask, all_ints)
+            bit_condition = 'OR'.join( map(lambda x: ' category = %d ' %x,\
+                    need_ints) )
+            _condition += 'AND (%s) ' % bit_condition
+
         # you can increase the x in _len + x to include more result, but in the most case, we only need one more key result, so we don't need the extra overhead :)
         # we start search for 1 key more, if nothing, then 2 key more and so on
         # this is the max len we need to add into the select cause.

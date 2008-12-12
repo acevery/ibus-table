@@ -456,25 +456,22 @@ class editor(object):
 
     def filter_candidates (self, candidates):
         '''Filter candidates if IME is Chinese'''
-        if self.db._is_chinese and (not self._py_mode):
-            bm_index = self._pt.index('category')
-            if self._chinese_mode == 0:
-                # simplify Chinese mode
-                return filter (lambda x: x[bm_index] & 1, candidates)
-            elif self._chinese_mode == 1:
-                # traditional Chinese mode
-                return filter (lambda x: x[bm_index] & (1 << 1), candidates)
-            elif self._chinese_mode == 2:
-                # big charset with SC first
-                return  filter (lambda x: x[bm_index] & 1, candidates)\
-                        +filter (lambda x: x[bm_index] & (1 << 1), candidates)\
-                        + filter (lambda x: x[bm_index] & (1 << 2), candidates)
-            elif self._chinese_mode == 3:
-                # big charset with SC first
-                return  filter (lambda x: x[bm_index] & (1 << 1), candidates)\
-                        +filter (lambda x: x[bm_index] & 1, candidates)\
-                        + filter (lambda x: x[bm_index] & (1 << 2), candidates)
-        return candidates[:]
+        #if self.db._is_chinese and (not self._py_mode):
+        if not self._chinese_mode in(2,3):
+            return candidates[:]
+        bm_index = self._pt.index('category')
+        if self._chinese_mode == 2:
+            # big charset with SC first
+            return  filter (lambda x: x[bm_index] & 1, candidates)\
+                    +filter (lambda x: x[bm_index] & (1 << 1) and \
+                            (not x[bm_index] & 1), candidates)\
+                    + filter (lambda x: x[bm_index] & (1 << 2), candidates)
+        elif self._chinese_mode == 3:
+            # big charset with SC first
+            return  filter (lambda x: x[bm_index] & (1 << 1), candidates)\
+                    +filter (lambda x: x[bm_index] & 1 and\
+                    (not x[bm_index] & (1<<1)) , candidates)\
+                    + filter (lambda x: x[bm_index] & (1 << 2), candidates)
 
     def update_candidates (self):
         '''Update lookuptable'''
@@ -491,7 +488,21 @@ class editor(object):
                 # here we need to consider two parts, table and pinyin
                 # first table
                 if not self._py_mode:
-                    self._candidates[0] = self.db.select_words( self._tabkey_list, self._onechar )
+                    if self.db._is_chinese :
+                        bm_index = self._pt.index('category')
+                        if self._chinese_mode == 0:
+                            # simplify Chinese mode
+                            self._candidates[0] = self.db.select_words(\
+                                    self._tabkey_list, self._onechar, 1 )
+                        elif self._chinese_mode == 1:
+                            # traditional Chinese mode
+                            self._candidates[0] = self.db.select_words(\
+                                    self._tabkey_list, self._onechar, 2 )
+                        else:
+                            self._candidates[0] = self.db.select_words(\
+                                    self._tabkey_list, self._onechar )
+                    else:
+                        self._candidates[0] = self.db.select_words( self._tabkey_list, self._onechar )
                 else:
                     self._candidates[0] = self.db.select_zi( self._tabkey_list )
                 self._chars[2] = self._chars[0][:]

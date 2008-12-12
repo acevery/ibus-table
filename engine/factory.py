@@ -100,6 +100,7 @@ class EngineFactory (ibus.EngineFactoryBase):
         '''Destructor, which finish some task for IME'''
         # we need to sync the temp userdb in memory to the user_db on disk
         self.db.sync_usrdb ()
+        print "Have synced user db"
         try:
             self._sm.Exit()
         except:
