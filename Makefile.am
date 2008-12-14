@@ -18,11 +18,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 DISTCHECK_CONFIGURE_FLAGS = \
-	--enable-zhengma \
-	--enable-wubi86 \
-	--enable-wubi98 \
-	--enable-cangjie5 \
-	--enable-erbi-qs \
 	--enable-additional \
 	$(NULL)
 
@@ -44,9 +39,26 @@ pkgconfig_DATA = \
 
 pkgconfigdir = $(libdir)/pkgconfig
 
+AUX_DIST = \
+	config.guess \
+	config.sub \
+	install-sh \
+	missing \
+	py-compile \
+	$(NULL)
+
+MAINTAINERCLEANFILES = \
+	Makefile.in \
+	aclocal.m4 \
+	configure \
+	$(AUX_DIST) \
+	$(NULL)
+
+
 EXTRA_DIST = \
+	config.rpath \
 	autogen.sh \
-	@PACKAGE_NAME@.spec.in \
+	@PACKAGE_NAME@.spec \
 	$(NULL)
 
 noinst_DIST = \

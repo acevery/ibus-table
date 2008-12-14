@@ -56,6 +56,14 @@ DISTCLEANFILES = \
 	*.engine \
 	$(NULL)
 
+CLEANFILES = \
+	$(DISTCLEANFILES) \
+	$(NULL)
+
+MAINTAINERCLEANFILES = \
+	Makefile.in \
+	$(NULL)
+
 .db.engine:
 	@echo "$@ is done :)"
 

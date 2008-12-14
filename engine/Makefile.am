@@ -43,6 +43,13 @@ EXTRA_DIST = \
 
 CLEANFILES = \
 	*.pyc \
+	*.pyo \
+	ibus-engine-table \
+	ibus-table-createdb \
+	$(NULL)
+
+MAINTAINERCLEANFILES = \
+	Makefile.in \
 	$(NULL)
 
 test:

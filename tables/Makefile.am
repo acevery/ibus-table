@@ -37,6 +37,10 @@ EXTRA_DIST = \
 	template.txt \
 	$(NULL)
 
+MAINTAINERCLEANFILES = \
+	Makefile.in \
+	$(NULL)
+
 install-data-local:
 	$(MKDIR_P) $(DESTDIR)$(pkgdatadir)/tables
 

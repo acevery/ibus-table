@@ -29,3 +29,8 @@ pytabledir = $(pkgdatadir)/data
 EXTRA_DIST = \
 	pinyin_table.txt.bz2 \
 	$(NULL)
+
+MAINTAINERCLEANFILES = \
+	Makefile.in \
+	$(NULL)
+

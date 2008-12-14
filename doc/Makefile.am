@@ -25,3 +25,6 @@ EXTRA_DIST = \
 	table.engine.in \
 	$(NULL)
 
+MAINTAINERCLEANFILES = \
+	Makefile.in \
+	$(NULL)

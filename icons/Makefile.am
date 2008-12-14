@@ -48,3 +48,8 @@ iconsdir = $(pkgdatadir)/icons
 EXTRA_DIST = \
 	$(icons_DATA) \
 	$(NULL)
+
+MAINTAINERCLEANFILES = \
+	Makefile.in \
+	$(NULL)
+

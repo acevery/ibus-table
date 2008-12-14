@@ -33,3 +33,8 @@ EXTRA_DIST = \
 	latex.svg \
 	compose.svg \
 	$(NULL)
+
+MAINTAINERCLEANFILES = \
+	Makefile.in \
+	$(NULL)
+
