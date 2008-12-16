@@ -321,7 +321,7 @@ class tabsqlitedb:
 
     def get_rules (self):
         '''Get phrase construct rules'''
-        rules={'above':4}
+        rules={}
         if self.user_can_define_phrase:
             try:
                 _rules = self.get_ime_property ('rules')
@@ -353,7 +353,10 @@ class tabsqlitedb:
     def phrase_keys_len (self):
         '''Return the phrase possible key length'''
         max_len = self.rules["above"]
-        return map ( lambda x: len(self.rules[x]), range(2, max_len+1) )[:]
+        try:
+            return map ( lambda x: len(self.rules[x]), range(2, max_len+1) )[:]
+        except:
+            return None
     
     def get_no_check_chars (self):
         '''Get the characters which engine should not change freq'''
@@ -842,7 +845,10 @@ class tabsqlitedb:
 
     def parse_phrase_to_tabkeys (self,phrase):
         '''Get the Table encoding of the phrase in string form'''
-        tabres = self.parse_phrase (phrase) [2:-1]
+        try:
+            tabres = self.parse_phrase (phrase) [2:-1]
+        except:
+            tabres = None
         tabkeys= u''.join ( map(self.deparse, tabres) )
         return tabkeys
 

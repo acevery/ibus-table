@@ -316,7 +316,7 @@ class editor(object):
             if input_chars:
                 _candi = u''.join( ['###'] + map( str, input_chars) + ['###'] )
             else:
-                _candi = u''
+                _candi = u'######'
         if self._strings:
             res = u''
             _cursor = self._cursor[0]
@@ -327,7 +327,7 @@ class editor(object):
                 res = u''.join( self._strings[ : _cursor ] + [ _candi  ] + self._strings[ _cursor : ])
             return res
         else:
-            return _candi
+            return (_candi != '######' and  _candi or u'')
     def add_caret (self, addstr):
         '''add length to caret position'''
         self._caret += len(addstr)
@@ -481,6 +481,8 @@ class editor(object):
             # we do not do sql enquery
             pass
         else:
+            # check whether last time we have only one candidate
+            only_one_last = self.one_candidate()
             # do enquiry
             self._lookup_table.clean ()
             self._lookup_table.show_cursor (False)
@@ -541,7 +543,8 @@ class editor(object):
                         # candidate
                         if ascii.ispunct (self._chars[0][-1].encode('ascii')) \
                                 or len (self._chars[0][:-1]) \
-                                    in self.db.pkeylens:
+                                in self.db.pkeylens \
+                                or only_one_last:
                             ## old manner:
                             if self._candidates[1]:
                                 self._candidates[0] = self._candidates[1]
