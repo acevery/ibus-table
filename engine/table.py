@@ -316,18 +316,19 @@ class editor(object):
             if input_chars:
                 _candi = u''.join( ['###'] + map( str, input_chars) + ['###'] )
             else:
-                _candi = u'######'
+                _candi = u''
         if self._strings:
             res = u''
             _cursor = self._cursor[0]
             _luc = len (self._u_chars)
             if _luc:
+                _candi = _candi == u'' and u'######' or _candi
                 res =u''.join( self._strings[ : _cursor - _luc] +[u'@@@'] + self._strings[_cursor - _luc : _cursor ]  + [ _candi  ] + self._strings[ _cursor : ])
             else:
                 res = u''.join( self._strings[ : _cursor ] + [ _candi  ] + self._strings[ _cursor : ])
             return res
         else:
-            return (_candi != '######' and  _candi or u'')
+            return _candi 
     def add_caret (self, addstr):
         '''add length to caret position'''
         self._caret += len(addstr)
