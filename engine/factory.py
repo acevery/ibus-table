@@ -66,13 +66,14 @@ class EngineFactory (ibus.EngineFactoryBase):
         self.credits    = self.db.get_ime_property ('credit')
         self.lang        = self.db.get_ime_property ('languages') 
         # now we construct the info for ibus
-        self.info = [
+        self.info = ibus.FactoryInfo(
+            self.factory_path,
             self.name,
             self.lang,
             self.icon,
             self.authors,
             self.credits
-            ]
+            )
         
         # init factory
         self.bus = bus

@@ -452,7 +452,7 @@ class editor(object):
         else:
             # this is a system phrase haven't been used:
             attrs.append ( ibus.AttributeForeground (0x000000, 0, len(_phrase)) )
-        self._lookup_table.append_candidate ( _phrase + _tbks, attrs )
+        self._lookup_table.append_candidate ( ibus.Text(_phrase + _tbks, attrs) )
         self._lookup_table.show_cursor (False)
 
     def filter_candidates (self, candidates):
@@ -1013,7 +1013,7 @@ class tabengine (ibus.EngineBase):
         '''Update Preedit String in UI'''
         _str = self._editor.get_preedit_strings ()
         if _str == u'':
-            self.update_preedit (u'', None, 0, False)
+            super(tabengine, self).update_preedit_text(ibus.Text(u'',None), 0, False)
         else:
             attrs = ibus.AttrList()
             res = patt_edit.match (_str)
@@ -1044,7 +1044,7 @@ class tabengine (ibus.EngineBase):
             attrs.append(ibus.AttributeUnderline(ibus.ATTR_UNDERLINE_SINGLE, 0, len(_str)))
 
 
-            self.update_preedit (_str, attrs, self._editor.get_caret(), True)
+            super(tabengine, self).update_preedit_text(ibus.Text(_str, attrs), self._editor.get_caret(), True)
     
     def _update_aux (self):
         '''Update Aux String in UI'''
@@ -1053,9 +1053,9 @@ class tabengine (ibus.EngineBase):
             attrs = ibus.AttrList([ ibus.AttributeForeground(0x9515b5,0, len(_ic)) ])
             #attrs = [ scim.Attribute(0,len(_ic),scim.ATTR_FOREGROUND,0x5540c1)]
 
-            self.update_aux_string (_ic, attrs, True)
+            super(tabengine, self).update_auxiliary_text(ibus.Text(_ic, attrs), True)
         else:
-            self.hide_aux_string ()
+            self.hide_auxiliary_text()
             #self.update_aux_string (u'', None, False)
 
     def _update_lookup_table (self):
@@ -1080,7 +1080,7 @@ class tabengine (ibus.EngineBase):
     def commit_string (self,string):
         self._editor.clear ()
         self._update_ui ()
-        super(tabengine,self).commit_string ( string )
+        super(tabengine,self).commit_text ( ibus.Text(string) )
         self._prev_char = string[-1]
 
     def _convert_to_full_width (self, c):
@@ -1131,12 +1131,12 @@ class tabengine (ibus.EngineBase):
 
         return False
     
-    def process_key_event(self, keyval, is_press, state):
+    def process_key_event(self, keyval, state):
         '''Process Key Events
         Key Events include Key Press and Key Release,
         modifier means Key Pressed
         '''
-        key = KeyEvent (keyval, is_press, state)
+        key = KeyEvent(keyval, state & modifier.RELEASE_MASK == 0, state)
         # ignore NumLock mask
         key.mask &= ~modifier.MOD2_MASK
 
@@ -1446,10 +1446,12 @@ class tabengine (ibus.EngineBase):
     def enable (self):
         try:
             self._sm.Reset()
+            self._sm.Show()
         except:
             pass
 
     def disable (self):
+        print "disable"
         self.reset()
         try:
             self._sm.Hide()
