@@ -865,6 +865,7 @@ class tabengine (ibus.EngineBase):
                     "org.ibus.table.SpeedMeter") 
         except:
             self._sm = None
+        self._on = False
         self.reset ()
 
     def reset (self):
@@ -1429,13 +1430,14 @@ class tabengine (ibus.EngineBase):
     
     # below for initial test
     def focus_in (self):
-        self.register_properties (self.properties)
-        self._refresh_properties ()
-        self._update_ui ()
-        try:
-            self._sm.Show()
-        except:
-            pass
+        if self._on:
+            self.register_properties (self.properties)
+            self._refresh_properties ()
+            self._update_ui ()
+            try:
+                self._sm.Show()
+            except:
+                pass
     
     def focus_out (self):
         try:
@@ -1446,17 +1448,19 @@ class tabengine (ibus.EngineBase):
     def enable (self):
         try:
             self._sm.Reset()
-            self._sm.Show()
         except:
             pass
+        self._on = True
+        self.focus_in()
 
     def disable (self):
-        print "disable"
         self.reset()
         try:
             self._sm.Hide()
         except:
             pass
+        self._on = False
+
 
     def lookup_table_page_up (self):
         if self._editor.page_up ():
