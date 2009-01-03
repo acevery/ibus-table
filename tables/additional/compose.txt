@@ -1,8 +1,7 @@
 ### File header must not be modified
 ### This file must be encoded into UTF-8.
-### Special thanks to ZhangWeiwu, who provide his own table to me to
 ### redistribute
-### This table under GPL
+### This table under LGPL-2.1 or later
 
 SCIM_Generic_Table_Phrase_Library_TEXT
 VERSION_1_0

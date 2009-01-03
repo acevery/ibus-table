@@ -1,6 +1,6 @@
 ### File header must not be modified
 ### This file must be encoded into UTF-8.
-### This table under GPL
+### This table under LGPL
 ### comments start with ### not single #
 ### Derive from the format of SCIM Table, so you can modify the table from
 ### scim-tables' table

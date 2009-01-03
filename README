@@ -1,6 +1,6 @@
 == Introduction ==
 IBus-Table is the IM Engine framework for table-based input methods, such as
-ZhengMa, WuBi, ErBi, ChangJie and so on.
+ZhengMa, WuBi, ErBi, CangJie and so on.
 The aim of IBus-Table is to make the users of table-based input methods
 can enjoy the typing on Linux environment.
 Definitly, it is far from perfect, so if you have any wish or any
