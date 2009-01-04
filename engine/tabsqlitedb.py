@@ -268,7 +268,7 @@ class tabsqlitedb:
             sqlstr = 'CREATE TABLE IF NOT EXISTS %s.pinyin ( plen INTEGER, ' % database
             #for i in range(6):
             #    sqlstr += 'p%d INTEGER, ' % i 
-            sqlstr += ''.join( map (lambda x: 'p%d INTEGER, ' % x, range(6) ) )
+            sqlstr += ''.join( map (lambda x: 'p%d INTEGER, ' % x, range(7) ) )
             sqlstr += 'zi TEXT, freq INTEGER);'
             self.db.execute ( sqlstr )
 
@@ -512,7 +512,7 @@ class tabsqlitedb:
         '''
         sqlstr = 'INSERT INTO %s.pinyin ( plen, '
         sql_suffix = 'VALUES ( ?, '
-        for i in range(6):
+        for i in range(7):
             sqlstr += 'p%d, ' % i
             sql_suffix += '?, '
         sqlstr += 'zi, freq ) '
@@ -522,13 +522,14 @@ class tabsqlitedb:
         count = 1
         for pinyin,zi,freq in pinyins:
             try:
-                py = self.parse(pinyin)
-                if len(py) != len(pinyin):
+                pinyin_n = pinyin.replace('1','!').replace('2','@').replace('3','#').replace('4','$').replace('5','%')
+                py = self.parse(pinyin_n)
+                if len(py) != len(pinyin_n):
                     error_m = u'%s %s: Can not parse pinyin' % (zi, pinyin )
                     raise Exception ( error_m.encode ('utf8') )
-                record = [None, None, None, None, None, None, None, None, None]
-                record [0] = len (pinyin)
-                for i in range(0,len(pinyin)):
+                record = [None]*10
+                record [0] = len (pinyin_n)
+                for i in range(0,len(pinyin_n)):
                     record [ 1+i ] = py[i].get_key_id()
                 record [-2] = zi
                 record [-1] = freq
@@ -701,15 +702,16 @@ class tabsqlitedb:
         This method is called in table.py by passing UserInput held data
         Return  result[:] 
         '''
-        # firstly, we make sure the len we used is equal or less than the max pinyin length 6
-        _len = min( len(tabkeys), 6 )
+        # firstly, we make sure the len we used is equal or less than
+        # the max pinyin length 7 (include tune[1-5])
+        _len = min( len(tabkeys), 7 )
         _condition = ''
         #for i in range(_len):
         #    _condition += 'AND p%d = ? ' % i
         _condition += ''.join ( map (lambda x: 'AND p%d = ? ' %x, range(_len)) )
         # you can increase the x in _len + x to include more result, but in the most case, we only need one more key result, so we don't need the extra overhead :)
         sqlstr = '''SELECT * FROM main.pinyin WHERE plen < %(mk)d  %(condition)s 
-        ORDER BY plen ASC, freq DESC;''' % { 'mk':_len+2, 'condition':_condition}
+        ORDER BY plen ASC, freq DESC;''' % { 'mk':_len+3, 'condition':_condition}
         # we have redefine the __int__(self) in class tabdict.tab_key to return the key id, so we can use map to got key id :)
         _tabkeys = map(int,tabkeys[:_len])
         result = self.db.execute(sqlstr, _tabkeys).fetchall()
