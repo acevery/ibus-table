@@ -165,7 +165,7 @@ class editor(object):
         self._zi = u''
         if self._cursor[1]:
             self.split_phrase()
-        if (len (self._chars[0]) == self._max_key_len and (not self._py_mode)) or ( len (self._chars[0]) == 6 and self._py_mode ) :
+        if (len (self._chars[0]) == self._max_key_len and (not self._py_mode)) or ( len (self._chars[0]) == 7 and self._py_mode ) :
             self.auto_commit_to_preedit()
             res = self.add_input (c)
             return res
@@ -173,7 +173,7 @@ class editor(object):
             self._chars[1].append (c)
         else:
             if (not self._py_mode and ( c in self._valid_input_chars)) or\
-                (self._py_mode and (c in u'abcdefghijklmnopqrstuvwxyz')):
+                (self._py_mode and (c in u'abcdefghijklmnopqrstuvwxyz!@#$%')):
                 try:
                     self._tabkey_list += self._parser (c)
                     self._chars[0].append (c)
@@ -305,7 +305,7 @@ class editor(object):
         '''Get preedit strings'''
         if self._candidates[0]:
             if self._py_mode:
-                _p_index = 7
+                _p_index = 8
             else:
                 _p_index = self.get_index ('phrase')
             _candi = u'###' + self._candidates[0][ int (self._lookup_table.get_cursor_pos() ) ][ _p_index ] + u'###' 
@@ -339,7 +339,7 @@ class editor(object):
         self._caret += self._cursor[1]
         if self._candidates[0]:
             if self._py_mode:
-                _p_index = 7
+                _p_index = 8
             else:
                 _p_index = self.get_index ('phrase')
             _candi =self._candidates[0][ int (self._lookup_table.get_cursor_pos() ) ][ _p_index ] 
@@ -427,10 +427,13 @@ class editor(object):
             _p_index = self.get_index('phrase')
             _fkey = self.get_index('m0')
         else:
-            _p_index = 7
+            _p_index = 8
             _fkey = 1
         if self.db._is_chinese:
             _tbks = u''.join( map(self._deparser , candi[_fkey + len(self._tabkey_list) : _p_index-1 ] ) )
+            if self._py_mode:
+                # restore tune symbol
+                _tbks = _tbks.replace('!','↑1').replace('@','↑2').replace('#','↑3').replace('$','↑4').replace('%','↑5')
         else:
             _tbks = u''.join( map(self._deparser , candi[_fkey + len(self._tabkey_list) : _p_index ] ) )
         _phrase = candi[_p_index]
@@ -544,6 +547,14 @@ class editor(object):
                                 or len (self._chars[0][:-1]) \
                                 in self.db.pkeylens \
                                 or only_one_last:
+                            # because we use [!@#$%] to denote [12345]
+                            # in py_mode, so we need to distinguish them
+                            if self._py_mode:
+                                if self._chars[0][-1] in "!@#$%":
+                                    self._chars[0].pop() 
+                                    self._tabkey_list.pop()
+                                    return True
+
                             ## old manner:
                             if self._candidates[1]:
                                 self._candidates[0] = self._candidates[1]
@@ -576,7 +587,7 @@ class editor(object):
         if not self._py_mode:
             _p_index = self.get_index('phrase')
         else:
-            _p_index = 7
+            _p_index = 8
         try:
             self._strings.insert(self._cursor[0], self._candidates[0][ self.get_cursor_pos() ][_p_index])
             self._cursor [0] += 1
@@ -592,7 +603,7 @@ class editor(object):
         if not self._py_mode:
             _p_index = self.get_index('phrase')
         else:
-            _p_index = 7
+            _p_index = 8
         try:
             self._u_chars.append( self._chars[0][:] )
             self._strings.insert(self._cursor[0], self._candidates[0][ self.get_cursor_pos() ][_p_index])
@@ -608,6 +619,8 @@ class editor(object):
         if input_chars:
             #aux_string =  u' '.join( map( u''.join, self._u_chars + [self._chars[0]] ) )
             aux_string =   u''.join (self._chars[0]) 
+            if self._py_mode:
+                aux_string = aux_string.replace('!','1').replace('@','2').replace('#','3').replace('$','4').replace('%','5')
             return aux_string
 
         aux_string = u''
@@ -1345,7 +1358,7 @@ class tabengine (ibus.EngineBase):
 
         elif unichr(key.code) in self._valid_input_chars or \
                 ( self._editor._py_mode and \
-                    unichr(key.code) in u'abcdefghijklmnopqrstuvwxyz' ):
+                    unichr(key.code) in u'abcdefghijklmnopqrstuvwxyz!@#$%' ):
             if self._direct_commit and ( len(self._editor._chars[0]) == self._ml \
                     or len (self._editor._chars[0]) in self.db.pkeylens ):
                 # it is time to direct commit

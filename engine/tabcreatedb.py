@@ -160,12 +160,17 @@ def main ():
         _pinyins = []
         patt_com = re.compile(r'^#.*')
         patt_blank = re.compile(r'^[ \t]*$')
-        patt_py = re.compile(r'(.*)\t(.*)\t.*')
+        patt_py = re.compile(r'(.*)\t(.*)\t(.*)')
+        patt_yin = re.compile(r'[a-z]+[1-5]')
 
         for l in f:
             if ( not patt_com.match(l) ) and ( not patt_blank.match(l) ):
-                if patt_py.match(l):
-                    _pinyins.append(l)
+                res = patt_py.match(l)
+                if res:
+                    yins = patt_yin.findall(res.group(2))
+                    for yin in yins:
+                        _pinyins.append("%s\t%s\t%s" \
+                                % (res.group(1), yin, res.group(3)))
         return _pinyins[:]
     
     def parse_extra (f):
