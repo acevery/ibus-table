@@ -25,6 +25,13 @@ Shift_L             when no key inputted: shift the input mode between
                         preedit string.
 Shift_R             shift between PinYin mode and Normal mode under
                         Table mode.
+
+Shift_L/Shift_R + 1 input tunes under PinYin mode. the tunes display in
+                  2     aux string area as ↑1, ↑2, ↑3, ↑4, ↑5. 
+                  3     1 is YinPin, 2 is YangPin, 3 is ShangSheng,
+                  4     4 is QuSheng, 5 is QingSheng
+                  5
+
 Arrow_Left          move cursor one character left in preedit string.
 Arrow_Right         move cursor one character right in preedit string.
 Backspace           remove the last input key or last character in
