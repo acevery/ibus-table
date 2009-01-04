@@ -35,8 +35,8 @@ tables_DATA =
 engine_DATA =
 
 if IBUS_TABLE_BUILD_ADDITIONAL
-tables_DATA += latex.db compose.db
-engine_DATA += latex.engine compose.engine
+tables_DATA += compose.db
+engine_DATA += compose.engine
 endif
 
 tables_DATA += $(NULL)
@@ -47,7 +47,6 @@ tablesdir = $(pkgdatadir)/tables
 enginedir = $(datadir)/ibus/engine
 
 EXTRA_DIST = \
-	latex.txt \
 	compose.txt \
 	$(NULL)
 
