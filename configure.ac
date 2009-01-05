@@ -35,6 +35,7 @@ m4_define([ibus_version],
 
 AC_INIT([package_name], [ibus_version], [http://code.google.com/p/ibus/issues/entry], [package_name])
 AM_INIT_AUTOMAKE([1.10])
+AM_MAINTAINER_MODE
 # AC_GNU_SOURCE
 
 # AC_CONFIG_HEADERS([config.h])
