@@ -708,11 +708,27 @@ class tabsqlitedb:
         #    _condition += 'AND p%d = ? ' % i
         _condition += ''.join ( map (lambda x: 'AND p%d = ? ' %x, range(_len)) )
         # you can increase the x in _len + x to include more result, but in the most case, we only need one more key result, so we don't need the extra overhead :)
-        sqlstr = '''SELECT * FROM main.pinyin WHERE plen < %(mk)d  %(condition)s 
-        ORDER BY plen ASC, freq DESC;''' % { 'mk':_len+3, 'condition':_condition}
-        # we have redefine the __int__(self) in class tabdict.tab_key to return the key id, so we can use map to got key id :)
-        _tabkeys = map(int,tabkeys[:_len])
-        result = self.db.execute(sqlstr, _tabkeys).fetchall()
+        # here we need make sure that the 3 <= plen <=7,
+        # so , if if _len < 3, than we start from 3; 
+        #   if _len >= 3, we start from _len + 1;
+        #   if _len = 7, we start from _len
+        if _len < 7:
+            if _len < 3:
+                x_len = 3
+            else:
+                x_len = _len + 1
+        else:
+            x_len = _len
+        
+        while x_len < 8:
+            sqlstr = '''SELECT * FROM main.pinyin WHERE plen < %(mk)d  %(condition)s 
+                ORDER BY plen ASC, freq DESC;''' % { 'mk':x_len, 'condition':_condition}
+            # we have redefine the __int__(self) in class tabdict.tab_key to return the key id, so we can use map to got key id :)
+            _tabkeys = map(int,tabkeys[:_len])
+            result = self.db.execute(sqlstr, _tabkeys).fetchall()
+            if len(result) > 0:
+                break
+            x_len += 1
         #self.db.commit()
         return result[:]
 
