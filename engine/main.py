@@ -50,10 +50,11 @@ opt.add_option('--ibus', '-i',
 
 
 class IMApp:
-    def __init__(self, dbfile,exec_by_ibus):
+    def __init__(self, dbfile, exec_by_ibus):
         self.__mainloop = gobject.MainLoop()
         self.__bus = ibus.Bus()
         self.__bus.connect("destroy", self.__bus_destroy_cb)
+        self.__factory = factory.EngineFactory(self.__bus, dbfile)
         if exec_by_ibus:
             self.__bus.request_name("org.freedesktop.IBus.Table", 0)
         else:
@@ -62,7 +63,6 @@ class IMApp:
                                               "0.1.0",
                                               "GPL",
                                               "Yuwei Yu <acevery@gmail.com>")
-            self.__factory = factory.EngineFactory(self.__bus, dbfile)
             # now we get IME info from self.__factory.db
             name = self.__factory.db.get_ime_property ("name")
             longname = name
@@ -111,10 +111,13 @@ def main():
     if options.daemon :
         if os.fork():
                 sys.exit()
-    if os.access( options.db, os.F_OK):
-        db = options.db
+    if options.db:
+        if os.access( options.db, os.F_OK):
+            db = options.db
+        else:
+            db = '%s%s%s' % (db_dir,os.path.sep, os.path.basename(options.db) )
     else:
-        db = '%s%s%s' % (db_dir,os.path.sep, os.path.basename(options.db) )
+        db=""
     ima=IMApp(db, options.ibus)
     try:
         ima.run()
