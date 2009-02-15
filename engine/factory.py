@@ -32,13 +32,11 @@ from gettext import dgettext
 _  = lambda a : dgettext ("ibus-table", a)
 N_ = lambda a : a
 
-fatory_base_path = "/com/redhat/IBus/engines/table/%s/factory"
 engine_base_path = "/com/redhat/IBus/engines/table/%s/engine/"
 
 class EngineFactory (ibus.EngineFactoryBase):
     """Table IM Engine Factory"""
     def __init__ (self, bus, db, icon=""):
-        import locale
         # here the db should be the abs path to sql db
         # this is the backend sql db we need for our IME
         # we need get lots of IME property from this db :)
@@ -46,32 +44,9 @@ class EngineFactory (ibus.EngineFactoryBase):
         
         # the name for dbus
         self.dbusname = os.path.basename(db).replace('.db','')
-        self.factory_path = fatory_base_path % self.dbusname
         self.engine_path = engine_base_path % self.dbusname
         udb = os.path.basename(db).replace('.db','-user.db') 
         self.db = tabsqlitedb.tabsqlitedb( name = db,user_db = udb )
-        ulocale = locale.getdefaultlocale ()[0].lower()
-        self.name     =  self.db.get_ime_property ('name.%s' % ulocale) 
-        if not self.name:
-            self.name         = _( self.db.get_ime_property ('name') )
-        self.uuid        = self.db.get_ime_property ('uuid')
-        self.authors    = self.db.get_ime_property ('author')
-        if icon:
-            self.icon = icon
-        else:
-            self.icon = '%s%s%s%s%s' % ( os.getenv("IBUS_TABLE_LOCATION") ,
-                os.path.sep,'icons',os.path.sep, self.db.get_ime_property ('icon') )
-        self.credits    = self.db.get_ime_property ('credit')
-        self.lang        = self.db.get_ime_property ('languages') 
-        # now we construct the info for ibus
-        self.info = ibus.FactoryInfo(
-            self.factory_path,
-            self.name,
-            self.lang,
-            self.icon,
-            self.authors,
-            self.credits
-            )
         
         # init factory
         self.bus = bus
