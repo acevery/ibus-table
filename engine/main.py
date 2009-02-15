@@ -39,23 +39,59 @@ opt.add_option('--table', '-t',
 opt.add_option('--daemon','-d',
         action = 'store_true',dest = 'daemon',default=False,
         help = 'Run as daemon, default: %default')
-opt.add_option('--icon', '-i',
-        action = 'store',type = 'string',dest = 'icon',default = '',
+opt.add_option('--ibus', '-i',
+        action = 'store_true',dest = 'ibus',default = False,
         help = 'Set the IME icon file, default: %default')
 
 
 (options, args) = opt.parse_args()
-if not options.db:
-    opt.error('no db found!')
+#if not options.db:
+#    opt.error('no db found!')
+
 
 class IMApp:
-    def __init__(self, dbfile, iconfile=''):
+    def __init__(self, dbfile,exec_by_ibus):
         self.__mainloop = gobject.MainLoop()
         self.__bus = ibus.Bus()
         self.__bus.connect("destroy", self.__bus_destroy_cb)
-        self.__engine = factory.EngineFactory(self.__bus, dbfile,\
-                iconfile)
-        self.__engine.register()
+        if exec_by_ibus:
+            self.__bus.request_name("org.freedesktop.IBus.Table", 0)
+        else:
+            self.__component = ibus.Component("org.freedesktop.IBus.Table",
+                                              "Table Component",
+                                              "0.1.0",
+                                              "GPL",
+                                              "Yuwei Yu <acevery@gmail.com>")
+            self.__factory = factory.EngineFactory(self.__bus, dbfile)
+            # now we get IME info from self.__factory.db
+            name = self.__factory.db.get_ime_property ("name")
+            longname = name
+            description = self.__factory.db.get_ime_property ("description")
+            language = self.__factory.db.get_ime_property ("languages")
+            license = self.__factory.db.get_ime_property ("credit")
+            author = self.__factory.db.get_ime_property ("author")
+            icon = self.__factory.db.get_ime_property ("icon")
+            if icon:
+                try:
+                    icon_dir = os.path.join (os.getenv('IBUS_TABLE_LOCATION'),
+                            'icons')
+                except:
+                    icon_dir = "/usr/share/ibus-table/icons"
+                icon = os.path.join (icon_dir, icon)
+                if not os.access( icon, os.F_OK):
+                    icon = ''
+            layout = self.__factory.db.get_ime_property ("layout")
+            
+            self.__component.add_engine(name,
+                                        longname,
+                                        description,
+                                        language,
+                                        license,
+                                        author,
+                                        icon,
+                                        layout)
+            self.__bus.register_component(self.__component)
+
 
     def run(self):
         self.__mainloop.run()
@@ -64,7 +100,10 @@ class IMApp:
         self.__bus_destroy_cb()
 
     def __bus_destroy_cb(self, bus=None):
-        self.__engine.do_destroy()
+        try:
+            self.__factory.do_destroy()
+        except:
+            pass
         self.__mainloop.quit()
 
 
@@ -76,11 +115,7 @@ def main():
         db = options.db
     else:
         db = '%s%s%s' % (db_dir,os.path.sep, os.path.basename(options.db) )
-    if os.access( options.icon, os.F_OK):
-        icon = options.icon
-    else:
-        icon = ''
-    ima=IMApp(db, icon)
+    ima=IMApp(db, options.ibus)
     try:
         ima.run()
     except KeyboardInterrupt:

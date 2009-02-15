@@ -37,7 +37,7 @@ engine_base_path = "/com/redhat/IBus/engines/table/%s/engine/"
 
 class EngineFactory (ibus.EngineFactoryBase):
     """Table IM Engine Factory"""
-    def __init__ (self, bus, db, icon):
+    def __init__ (self, bus, db, icon=""):
         import locale
         # here the db should be the abs path to sql db
         # this is the backend sql db we need for our IME
@@ -75,7 +75,8 @@ class EngineFactory (ibus.EngineFactoryBase):
         
         # init factory
         self.bus = bus
-        super(EngineFactory,self).__init__(self.info, table.tabengine, self.engine_path, bus, self.factory_path)
+        #super(EngineFactory,self).__init__(self.info, table.tabengine, self.engine_path, bus, self.factory_path)
+        super(EngineFactory,self).__init__ (bus)
         self.engine_id=1
         self.db.db.commit()
         try:
@@ -89,11 +90,12 @@ class EngineFactory (ibus.EngineFactoryBase):
         except:
             self._sm = None
     
-    def create_engine(self):
+    def create_engine(self, engine_name):
         # because we need db to be past to Engine
         engine = table.tabengine(self.bus, self.engine_path + str(self.engine_id), self.db)
         self.engine_id += 1
-        return engine.get_dbus_object()
+        #return engine.get_dbus_object()
+        return engine
 
     def do_destroy (self):
         '''Destructor, which finish some task for IME'''
