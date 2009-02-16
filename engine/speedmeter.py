@@ -8,6 +8,8 @@
 # 
 # display the typing speed
 #
+# ibus-table - The Tables engine for IBus
+#
 # Copyright (c) 2008-2009 Yu Yuwei <acevery@gmail.com>
 #
 # This library is free software; you can redistribute it and/or

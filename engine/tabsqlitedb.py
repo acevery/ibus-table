@@ -97,6 +97,8 @@ class tabsqlitedb:
                       'pinyin_mode':'FALSE',
                       'dynamic_adjust':'FALSE',
                       #'no_check_chars':u'',
+                      'description':'A IME under IBus Table',
+                      'layout':'en',
                       'rules':''}
                       #'rules':'ce2:p11+p12+p21+p22;ce3:p11+p21+p22+p31;ca4:p11+p21+p31+p41'}
             # inital the attribute in ime table, which should be updated from mabiao

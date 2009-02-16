@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# vim:set et sts=4 sw=4
+# vim: set et sw=4 sts=4
 #
 # ibus-table - The Tables engine for IBus
 #
@@ -32,51 +32,28 @@ from gettext import dgettext
 _  = lambda a : dgettext ("ibus-table", a)
 N_ = lambda a : a
 
-fatory_base_path = "/com/redhat/IBus/engines/table/%s/factory"
 engine_base_path = "/com/redhat/IBus/engines/table/%s/engine/"
 
 class EngineFactory (ibus.EngineFactoryBase):
     """Table IM Engine Factory"""
-    def __init__ (self, bus, db, icon):
-        import locale
+    def __init__ (self, bus, db="", icon=""):
         # here the db should be the abs path to sql db
         # this is the backend sql db we need for our IME
         # we need get lots of IME property from this db :)
         #self.db = tabsqlitedb.tabsqlitedb( name = database )
         
-        # the name for dbus
-        self.dbusname = os.path.basename(db).replace('.db','')
-        self.factory_path = fatory_base_path % self.dbusname
-        self.engine_path = engine_base_path % self.dbusname
-        udb = os.path.basename(db).replace('.db','-user.db') 
-        self.db = tabsqlitedb.tabsqlitedb( name = db,user_db = udb )
-        ulocale = locale.getdefaultlocale ()[0].lower()
-        self.name     =  self.db.get_ime_property ('name.%s' % ulocale) 
-        if not self.name:
-            self.name         = _( self.db.get_ime_property ('name') )
-        self.uuid        = self.db.get_ime_property ('uuid')
-        self.authors    = self.db.get_ime_property ('author')
-        if icon:
-            self.icon = icon
+        if db:
+            self.dbusname = os.path.basename(db).replace('.db','')
+            udb = os.path.basename(db).replace('.db','-user.db') 
+            self.db = tabsqlitedb.tabsqlitedb( name = db,user_db = udb )
+            self.db.db.commit()
         else:
-            self.icon = '%s%s%s%s%s' % ( os.getenv("IBUS_TABLE_LOCATION") ,
-                os.path.sep,'icons',os.path.sep, self.db.get_ime_property ('icon') )
-        self.credits    = self.db.get_ime_property ('credit')
-        self.lang        = self.db.get_ime_property ('languages') 
-        # now we construct the info for ibus
-        self.info = [
-            self.name,
-            self.lang,
-            self.icon,
-            self.authors,
-            self.credits
-            ]
+            self.db = None
         
         # init factory
         self.bus = bus
-        super(EngineFactory,self).__init__(self.info, table.tabengine, self.engine_path, bus, self.factory_path)
+        super(EngineFactory,self).__init__ (bus)
         self.engine_id=1
-        self.db.db.commit()
         try:
             bus = dbus.Bus()
             user = os.path.basename( os.path.expanduser('~') )
@@ -88,11 +65,25 @@ class EngineFactory (ibus.EngineFactoryBase):
         except:
             self._sm = None
     
-    def create_engine(self):
+    def create_engine(self, engine_name):
         # because we need db to be past to Engine
+        # the type (engine_name) == dbus.String
+        name = engine_name.encode ('utf8')
+        self.engine_path = engine_base_path % name
+        if not self.db:
+            try:
+                db_dir = os.path.join (os.getenv('IBUS_TABLE_LOCATION'),'tables')
+            except:
+                db_dir = "/usr/share/ibus-table/tables"
+            db = os.path.join (db_dir,name+'.db')
+            udb = name+'-user.db'
+            self.db = tabsqlitedb.tabsqlitedb( name = db,user_db = udb )
+            self.db.db.commit()
+
         engine = table.tabengine(self.bus, self.engine_path + str(self.engine_id), self.db)
         self.engine_id += 1
-        return engine.get_dbus_object()
+        #return engine.get_dbus_object()
+        return engine
 
     def do_destroy (self):
         '''Destructor, which finish some task for IME'''

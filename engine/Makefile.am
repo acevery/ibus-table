@@ -1,4 +1,4 @@
-# vim:set noet ts=4:
+# vim:set noet ts=4
 #
 # ibus-table - The Tables engine for IBus
 #
@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Lesser General Public
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-
+#
 
 engine_table_PYTHON = \
 	factory.py \
