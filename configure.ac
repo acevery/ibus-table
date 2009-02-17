@@ -67,6 +67,7 @@ AC_CONFIG_FILES([po/Makefile.in
     engine/Makefile
     engine/ibus-engine-table
     engine/ibus-table-createdb
+    engine/table.xml.in
     data/Makefile
     doc/Makefile
     doc/table.engine
