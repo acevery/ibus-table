@@ -32,14 +32,17 @@ engine_table_DATA = \
 	$(NULL)
 engine_tabledir = $(datadir)/ibus-table/engine
 
-bin_SCRIPTS = ibus-engine-table \
-			  ibus-table-createdb \
-			  $(NULL)
+bin_SCRIPTS = ibus-table-createdb 
 
+libexec_SCRIPTS = ibus-engine-table
+
+engine_DATA = table.xml
+enginedir = $(datadir)/ibus/component
 
 EXTRA_DIST = \
 	ibus-table-createdb.in \
 	ibus-engine-table.in \
+	table.xml.in \
 	$(NULL)
 
 CLEANFILES = \
@@ -47,11 +50,20 @@ CLEANFILES = \
 	*.pyo \
 	ibus-engine-table \
 	ibus-table-createdb \
+	table.xml \
 	$(NULL)
 
 MAINTAINERCLEANFILES = \
 	Makefile.in \
 	$(NULL)
+
+table.xml: table.xml.in
+	( \
+		libexecdir=${libexecdir}; \
+		pkgdatadir=${pkgdatadir}; \
+		s=`cat $<`; \
+		eval "echo \"$${s}\""; \
+	) > $@
 
 test:
 	$(ENV) \

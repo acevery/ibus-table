@@ -106,10 +106,7 @@ class IMApp:
         self.__bus_destroy_cb()
 
     def __bus_destroy_cb(self, bus=None):
-        try:
-            self.__factory.do_destroy()
-        except:
-            pass
+        self.__factory.do_destroy()
         self.__mainloop.quit()
 
 def indent(elem, level=0):

@@ -234,11 +234,9 @@ class SpeedMeter(dbus.service.Object):
 
     @method()
     def Exit(self):
-        self.counts -=1
-        if not self.counts > 0:
-            self.timer.join()
-            gtk.main_quit()
-            gdk.threads_leave()
+        self.timer.join()
+        gtk.main_quit()
+        gdk.threads_leave()
 
     @method()
     def Show(self):
