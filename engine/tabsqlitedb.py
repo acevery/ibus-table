@@ -81,7 +81,7 @@ class tabsqlitedb:
                       'uuid':'%s' % uuid.uuid4(),
                       'serial_number':'%s' % time.strftime('%Y%m%d'),
                       'icon':'ibus-table.svg',
-                      'license':'GPL',
+                      'license':'LGPL',
                       'languages':'',
                       'valid_input_chars':'abcdefghijklmnopqrstuvwxyz',
                       'max_key_length':'4',
