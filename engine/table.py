@@ -1247,6 +1247,11 @@ class tabengine (ibus.EngineBase):
             self.property_activate ( u"dcommit" )
             return True
         
+        # Match Chinese mode shift
+        if self._match_hotkey (key, keysyms.semicolon, modifier.CONTROL_MASK):
+            self.property_activate ( u"cmode" )
+            return True
+        
         # Ignore key release event now :)
         if key.mask & modifier.RELEASE_MASK:
             return True
