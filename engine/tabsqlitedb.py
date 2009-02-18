@@ -81,7 +81,7 @@ class tabsqlitedb:
                       'uuid':'%s' % uuid.uuid4(),
                       'serial_number':'%s' % time.strftime('%Y%m%d'),
                       'icon':'ibus-table.svg',
-                      'credit':'GPL',
+                      'license':'GPL',
                       'languages':'',
                       'valid_input_chars':'abcdefghijklmnopqrstuvwxyz',
                       'max_key_length':'4',
@@ -97,6 +97,8 @@ class tabsqlitedb:
                       'pinyin_mode':'FALSE',
                       'dynamic_adjust':'FALSE',
                       #'no_check_chars':u'',
+                      'description':'A IME under IBus Table',
+                      'layout':'us',
                       'rules':''}
                       #'rules':'ce2:p11+p12+p21+p22;ce3:p11+p21+p22+p31;ca4:p11+p21+p31+p41'}
             # inital the attribute in ime table, which should be updated from mabiao

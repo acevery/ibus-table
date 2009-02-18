@@ -11,12 +11,18 @@ BEGIN_DEFINITION
 
 ### An unique id to distinguish this table among others.
 ### Use uuidgen to generate this kind of id.
-UUID = 9e8e0e60-0cf8-11dd-b08f-000e32bf6efd
+UUID = 9e8e0e60-0cf8-11dd-b08f-000e12b86efd
 
 ### A unique number indicates the version of this file.
 ### For example the last modified date of this file.
 ### This number must be less than 2^32.
-SERIAL_NUMBER = 20080829
+SERIAL_NUMBER = 20090218
+
+### License
+LICENSE = GPL
+
+### Description
+DESCRIPTION = Mimic Compose Key input
 
 ### ICON 
 ICON = compose.svg

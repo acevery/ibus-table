@@ -1,4 +1,4 @@
-# vim:set noet ts=4:
+# vim:set noet ts=4
 #
 # ibus-table - The Table engine for IBus
 #
