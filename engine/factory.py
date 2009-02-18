@@ -92,14 +92,15 @@ class EngineFactory (ibus.EngineFactoryBase):
 
     def do_destroy (self):
         '''Destructor, which finish some task for IME'''
-        # we need to sync the temp userdb in memory to the user_db on disk
-        for _db in self.dblist:
-            _db.sync_usrdb ()
-        #print "Have synced user db\n"
-        try:
-            self._sm.Exit()
-        except:
-            pass
+        # 
+        ## we need to sync the temp userdb in memory to the user_db on disk
+        #for _db in self.dblist:
+        #    _db.sync_usrdb ()
+        ##print "Have synced user db\n"
+        #try:
+        #    self._sm.Exit()
+        #except:
+        #    pass
         super(EngineFactory,self).do_destroy()
 
 

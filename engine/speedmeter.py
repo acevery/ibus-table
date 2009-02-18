@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 # vim: set et ts=4 sts=4
 #
-# ibus-table - The Tables engine for IBus
-#
 # filename: ibus-table-speedmeter.py
 # 
 # display the typing speed
+#
+# ibus-table - The Tables engine for IBus
 #
 # Copyright (c) 2008-2009 Yu Yuwei <acevery@gmail.com>
 #
@@ -234,9 +234,11 @@ class SpeedMeter(dbus.service.Object):
 
     @method()
     def Exit(self):
-        self.timer.join()
-        gtk.main_quit()
-        gdk.threads_leave()
+        self.counts -=1
+        if not self.counts > 0:
+            self.timer.join()
+            gtk.main_quit()
+            gdk.threads_leave()
 
     @method()
     def Show(self):
