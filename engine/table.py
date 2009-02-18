@@ -874,7 +874,6 @@ class tabengine (ibus.EngineBase):
                     % user, "/org/ibus/table/SpeedMeter")
             self._sm =  dbus.Interface(self._sm_bus,\
                     "org.ibus.table.SpeedMeter") 
-            self._sm.Regist()
         except:
             self._sm = None
         self._on = False
@@ -891,10 +890,6 @@ class tabengine (ibus.EngineBase):
     
     def do_destroy(self):
         self.db.sync_usrdb ()
-        try:
-            self._sm.Exit ()
-        except:
-            pass
         super(tabengine,self).do_destroy()
 
     def _init_properties (self):
@@ -1472,10 +1467,10 @@ class tabengine (ibus.EngineBase):
 
     def disable (self):
         self.reset()
-        try:
-            self._sm.Hide()
-        except:
-            pass
+        #try:
+        #    self._sm.Hide()
+        #except:
+        #    pass
         self._on = False
 
 

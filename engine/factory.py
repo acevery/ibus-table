@@ -57,16 +57,16 @@ class EngineFactory (ibus.EngineFactoryBase):
         self.bus = bus
         super(EngineFactory,self).__init__ (bus)
         self.engine_id=0
-        #try:
-        #    bus = dbus.Bus()
-        #    user = os.path.basename( os.path.expanduser('~') )
-        #    self._sm_bus = bus.get_object ("org.ibus.table.SpeedMeter.%s"\
-        #            % user, "/org/ibus/table/SpeedMeter")
-        #    self._sm =  dbus.Interface(self._sm_bus,\
-        #            "org.ibus.table.SpeedMeter") 
-        #    self._sm.Regist()
-        #except:
-        #    self._sm = None
+        try:
+            bus = dbus.Bus()
+            user = os.path.basename( os.path.expanduser('~') )
+            self._sm_bus = bus.get_object ("org.ibus.table.SpeedMeter.%s"\
+                    % user, "/org/ibus/table/SpeedMeter")
+            self._sm =  dbus.Interface(self._sm_bus,\
+                    "org.ibus.table.SpeedMeter") 
+            self._sm.Control (os.getpid())
+        except:
+            self._sm = None
     
     def create_engine(self, engine_name):
         # because we need db to be past to Engine

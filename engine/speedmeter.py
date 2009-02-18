@@ -38,6 +38,7 @@ import os.path as path
 import os 
 import sys
 import optparse
+import subprocess as sb
 
 opt = optparse.OptionParser()
 
@@ -100,15 +101,22 @@ def daemonize(stdout='/dev/null', stderr=None, stdin='/dev/null',
 
 class Timer(threading.Thread):
     '''add 0 to clist every second, clist must be a list of int'''
-    def __init__(self, accumulate):
+    def __init__(self, accumulate, checkfun, quitfun):
         super(Timer,self).__init__()
         self.on = True
         self.tlock = threading.RLock()
         self.func = accumulate
+        self.checkfun = checkfun
+        self.quitfun = quitfun
         self.sum = 0
     
     def run (self):
         while self.on:
+            go_on = self.checkfun ()
+            if not go_on:
+                self.quitfun ()
+                return
+
             if self.sum == 0:
                 # since we lock in func, so it is safe here
                 self.func(0)
@@ -201,8 +209,8 @@ class SpeedMeter(dbus.service.Object):
         self.__path = SPEED_METER_PATH
         # initiate parent class
         super(SpeedMeter, self).__init__(self.__conn, self.__path)
-        # counts for clients
-        self.counts = 0
+        # controler's pid
+        self.controler_pid = None
         # list for caculate typing speed
         self.list = [(0, time.time(), 0)]
         # do gui part here
@@ -210,7 +218,8 @@ class SpeedMeter(dbus.service.Object):
         # timer
         self.full = False
         self.c_time = 0
-        self.timer = Timer(self.update_speed)
+        self.timer = Timer(self.update_speed, self.check_control, \
+                self.quit_from_timer)
         gdk.threads_enter()
         self.timer.start()
         gdk.threads_leave()
@@ -218,6 +227,12 @@ class SpeedMeter(dbus.service.Object):
         self.run ()
 
     # now define the service method
+    @method(in_signature='i')
+    def Control(self, pid):
+        # start typing -> Accumulate(0)
+        # commit string -> Accumulate(len(string))
+        self.controler_pid = pid
+
     @method(in_signature='i')
     def Accumulate(self, phrase_len):
         # start typing -> Accumulate(0)
@@ -228,17 +243,10 @@ class SpeedMeter(dbus.service.Object):
     def Reset(self):
         self.reset()
     
-    @method()
-    def Regist(self):
-        self.counts += 1
 
     @method()
-    def Exit(self):
-        self.counts -=1
-        if not self.counts > 0:
-            self.timer.join()
-            gtk.main_quit()
-            gdk.threads_leave()
+    def Quit(self):
+        self.quit ()
 
     @method()
     def Show(self):
@@ -251,10 +259,30 @@ class SpeedMeter(dbus.service.Object):
         self.window.hide()
 
     @method(out_signature='i')
-    def report(self):
-        return self.counts
 
-    def create_ui(self):
+    def quit( self ):
+        self.timer.join()
+        gtk.main_quit()
+        gdk.threads_leave()
+
+    def quit_from_timer( self ):
+        gtk.main_quit()
+        gdk.threads_leave()
+
+    def check_control( self ):
+        '''check whether the controler is alive'''
+        if self.controler_pid:
+            p = sb.Popen ("ps aux | grep -P '\s%s\s'" % self.controler_pid,\
+                    shell=True, stdout=sb.PIPE)
+            result = p.stdout.readlines()
+            if result:
+                return True
+            else:
+                return False
+        else:
+            return True
+
+    def create_ui( self ):
         self.window = gtk.Window(gtk.WINDOW_POPUP)
         #self.window.connect("destroy", lambda w: gtk.main_quit() )
         root = gdk.get_default_root_window()
@@ -305,7 +333,7 @@ class SpeedMeter(dbus.service.Object):
         gtk.main()
 
     def update_speed ( self, phrase_len ):
-        '''Call this after locking, and then relase lock'''
+        '''Update the output of SpeedMeter'''
         now = time.time()
         # only do lock here
         self.timer.tlock.acquire()

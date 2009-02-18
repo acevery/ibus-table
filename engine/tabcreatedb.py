@@ -62,13 +62,7 @@ opt_parser.add_option( '-d', '--debug',
         action = 'store_true', dest='debug', default = False,
         help = 'print extra debug messages')
 
-opt_parser.add_option( '-b', '--bin-path',
-        action = 'store', dest='binpath', default = '/usr/bin',
-        help = 'tell me where the ibus-engine-table is in your system, e.g. "/usr/bin/" or "/usr/bin/ibus-engine-table". If you have already installed ibus-table, I can use "which" to find it out.')
 
-opt_parser.add_option( '-k', '--pkgdata-path',
-        action = 'store', dest='pkgdata_path', default = '/usr/share',
-        help = 'tell me where the ibus-engine-table where is pkgdatadir of ibus-table.')
 
 opts,args = opt_parser.parse_args()
 if not opts.name and opts.only_index:
@@ -78,34 +72,6 @@ if not opts.name and opts.only_index:
 if not opts.name:
     opts.name = os.path.basename(opts.source).split('.')[0] + '.db'
 
-if not opts.only_index:
-    if opts.binpath:
-        # user give the path of ibus-engine-table
-        if not opts.binpath.endswith('ibus-engine-table'):
-            # It is a path, so add ibus-engine-table to it
-            opts.binpath = os.path.join (opts.binpath, 'ibus-engine-table')
-    else:
-        # we need to find the bin location
-        opts.binpath = os.path.join(os.getenv('IBUS_TABLE_BIN_PATH'), 'ibus-engine-table' )
-        if not opts.binpath:
-            # at last we use which to find it
-            import subprocess as sp
-            p = sp.Popen(['which','ibus-engine-table'],stdout=sp.PIPE)
-            binpath = p.stdout.readline().strip()
-            if not binpath:
-                print 'Cannot find ibus-engine-table, please tell me the path of ibus-engine-table that I would use in the generated "table.engine"'
-                sys.exit(3)
-            opts.binpath = binpath
-
-    if not opts.pkgdata_path:
-        # we get pkgdata_path from env varible.
-        opts.pkgdata_path = os.path.join(os.getenv("IBUS_TABLE_DATA_DIR"), "ibus-table")
-
-engine_language = ''
-engine_icon = 'ibus-table.svg'
-engine_author = ''
-engine_name = ''
-engine_local_names = []
 
 def main ():
     def debug_print ( message ):
@@ -205,7 +171,6 @@ def main ():
             yield (zi, gcm)
     
     def attribute_parser (f):
-        global engine_language, engine_icon, engine_author, engine_name, engine_local_names
         for l in f:
             try:
                 attr,val = unicode (l,"utf-8").strip().split ('=')
@@ -215,38 +180,6 @@ def main ():
             origin_attr = attr
             attr = attr.lower()
             val = val.strip()
-            if attr == 'languages':
-                # we need this for table.engine
-                # if we have more than one language, er, 
-                # this make a little complicated
-                if len(val) > 1:
-                    debug_print('\t  we have more than one language in this IM: "%s"' % val)
-                    # we will check whether these are all belong to a main one
-                    langs={}
-                    try:
-                        # too lazy to write long one, just use map and "and or trick"
-                        map (lambda x: langs.update( {x[:2]: langs.has_key( x[:2]) and langs[x[:2]]+1 or 1}),  val.split(',') )
-                        
-                        all_langs = langs.keys()
-                        if len(all_langs) == 1:
-                            debug_print ('\t    we use "%s" as Lang' % all_langs[0])
-                            engine_language = all_langs[0]
-                        else:
-                            # too bad, more than one main language,
-                            # we just leave lang to blank :'(
-                            debug_print ('\t    we have more than one main language: %s' % all_langs )
-                    except:
-                        pass
-                else:
-                    engine_language = val
-            elif attr == 'icon' and val:
-                engine_icon = os.path.basename(val)
-            elif attr == 'author':
-                engine_author = val
-            elif attr == 'name':
-                engine_name = val
-            elif attr.startswith("name."):
-                engine_local_names.append("Name.%s=%s\n" % (origin_attr[5:], val))
             yield (attr,val)
     
     def extra_parser (f):
@@ -358,21 +291,6 @@ def main ():
     else:
         debug_print ("We don't create index on database, you should only active this function only for distribution purpose")
         db.drop_indexes ('main')
-    # at last, we create the *.engine file for this IM :)
-    debug_print('generating "%s" file' % opts.name.replace('.db','.engine'))
-    f = file ('%s' % opts.name.replace('.db','.engine'), 'w' )
-    eglines = ['Exec=%s -t %s\n' %(opts.binpath, opts.name), 
-            'Name=%s\n' % (engine_name if engine_name else opts.name.replace('.db','').capitalize())] + \
-            engine_local_names + \
-            [
-            'Lang=%s\n' % engine_language,
-            'Icon=%s\n' % os.path.join(opts.pkgdata_path,\
-                "ibus-table/icons", engine_icon),
-            'Author=%s\n' % engine_author,
-            'Credits=\n'
-            ]
-    f.writelines(eglines)
-    f.close()
     debug_print ('Done! :D')
     
 if __name__ == "__main__":

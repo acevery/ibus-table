@@ -68,8 +68,6 @@ AC_CONFIG_FILES([po/Makefile.in
     engine/ibus-table-createdb
     engine/table.xml.in
     data/Makefile
-    doc/Makefile
-    doc/table.engine
     icons/Makefile
     icons/additional/Makefile
     tables/Makefile
