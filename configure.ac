@@ -43,6 +43,9 @@ AC_CONFIG_MACRO_DIR([m4])
 #check python
 AM_PATH_PYTHON([2.5])
 
+# check for ibus-table-createdb
+PKG_CHECK_MODULES([IBUS_TABLE],[ibus >= 1.1.0])
+
 # define GETTEXT_* variables
 GETTEXT_PACKAGE=ibus-table
 AC_SUBST(GETTEXT_PACKAGE)
