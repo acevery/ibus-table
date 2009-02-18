@@ -4,7 +4,7 @@
     <name>org.freedesktop.IBus.Table</name>
     <description>Table Component</description>
     <exec>${libexecdir}/ibus-engine-table --ibus</exec>
-    <version>1.1.0.20090213</version>
+    <version>@VERSION@</version>
     <author>Yuwei Yu &lt;acevery@gmail.com&gt;</author>
     <license>LGPL</license>
     <homepage>http://code.google.com/p/ibus</homepage>
