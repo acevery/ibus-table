@@ -22,9 +22,7 @@
 #
 
 createdb = \
-	$(PYTHON) $(abs_top_srcdir)/engine/tabcreatedb.py \
-		-k $(datadir) \
-		-b $(bindir)
+	$(PYTHON) $(abs_top_srcdir)/engine/tabcreatedb.py 
 
 createdb_index = \
 	$(PYTHON) $(abs_top_srcdir)/engine/tabcreatedb.py -i
@@ -33,7 +31,7 @@ tables_DATA =
 
 if IBUS_TABLE_BUILD_ADDITIONAL
 tables_DATA += compose.db \
-	latex.db \
+	latex.db 
 endif
 
 tables_DATA += $(NULL)
