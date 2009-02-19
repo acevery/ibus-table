@@ -22,35 +22,30 @@
 #
 
 createdb = \
-	$(PYTHON) $(abs_top_srcdir)/engine/tabcreatedb.py \
-		-k $(datadir) \
-		-b $(bindir)
+	$(PYTHON) $(abs_top_srcdir)/engine/tabcreatedb.py 
 
 createdb_index = \
 	$(PYTHON) $(abs_top_srcdir)/engine/tabcreatedb.py -i
 
 tables_DATA =
-engine_DATA =
 
 if IBUS_TABLE_BUILD_ADDITIONAL
-tables_DATA += compose.db
-engine_DATA += compose.engine
+tables_DATA += compose.db \
+	latex.db 
 endif
 
 tables_DATA += $(NULL)
-engine_DATA += $(NULL)
 
 
 tablesdir = $(pkgdatadir)/tables
-enginedir = $(datadir)/ibus/engine
 
 EXTRA_DIST = \
 	compose.txt \
+	latex.txt \
 	$(NULL)
 
 DISTCLEANFILES = \
 	*.db \
-	*.engine \
 	$(NULL)
 
 CLEANFILES = \
@@ -61,8 +56,6 @@ MAINTAINERCLEANFILES = \
 	Makefile.in \
 	$(NULL)
 
-.db.engine:
-	@echo "$@ is done :)"
 
 .txt.db:
 	$(createdb) -n $@ -s $<

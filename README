@@ -57,3 +57,4 @@ Ctrl + ,            open/close Single Character Mode, only show single
                         character not phrases.
 Ctrl + .            shift between full/half punctuation.
 Ctrl + /            shift between direct/normal commit mode.
+Ctrl + ;            shift between different SubCharset in Chinese

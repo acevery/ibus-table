@@ -24,11 +24,19 @@ import sys
 import optparse
 import ibus
 import gobject
+from elementtree.ElementTree import Element, SubElement, tostring
+import re
+patt = re.compile (r'<\?.*\?>\n')
+
 import factory
+import tabsqlitedb
+
 try:
     db_dir = os.path.join (os.getenv('IBUS_TABLE_LOCATION'),'tables')
+    icon_dir = os.path.join (os.getenv('IBUS_TABLE_LOCATION'),'icons')
 except:
     db_dir = "/usr/share/ibus-table/tables"
+    icon_dir = "/usr/share/ibus-table/icons"
 
 opt = optparse.OptionParser()
 
@@ -42,6 +50,9 @@ opt.add_option('--daemon','-d',
 opt.add_option('--ibus', '-i',
         action = 'store_true',dest = 'ibus',default = False,
         help = 'Set the IME icon file, default: %default')
+opt.add_option('--xml', '-x',
+        action = 'store_true',dest = 'xml',default = False,
+        help = 'output the engines xml part, default: %default')
 
 
 (options, args) = opt.parse_args()
@@ -72,11 +83,6 @@ class IMApp:
             author = self.__factory.db.get_ime_property ("author")
             icon = self.__factory.db.get_ime_property ("icon")
             if icon:
-                try:
-                    icon_dir = os.path.join (os.getenv('IBUS_TABLE_LOCATION'),
-                            'icons')
-                except:
-                    icon_dir = "/usr/share/ibus-table/icons"
                 icon = os.path.join (icon_dir, icon)
                 if not os.access( icon, os.F_OK):
                     icon = ''
@@ -100,14 +106,86 @@ class IMApp:
         self.__bus_destroy_cb()
 
     def __bus_destroy_cb(self, bus=None):
-        try:
-            self.__factory.do_destroy()
-        except:
-            pass
+        self.__factory.do_destroy()
         self.__mainloop.quit()
 
+def indent(elem, level=0):
+    '''Use to format xml Element pretty :)'''
+    i = "\n" + level*"    "
+    if len(elem):
+        if not elem.text or not elem.text.strip():
+            elem.text = i + "    "
+        for e in elem:
+            indent(e, level+1)
+            if not e.tail or not e.tail.strip():
+                e.tail = i + "    "
+        if not e.tail or not e.tail.strip():
+            e.tail = i
+    else:
+        if level and (not elem.tail or not elem.tail.strip()):
+            elem.tail = i
 
 def main():
+    if options.xml:
+        from locale import getdefaultlocale
+        # we will output the engines xml and return.
+        # 1. we find all dbs in db_dir and extract the infos into
+        #    Elements
+        dbs = os.listdir(db_dir)
+        dbs = filter (lambda x: x.endswith('.db'), dbs)
+        if not dbs:
+            return
+
+        egs = Element('engines')
+        for _db in dbs:
+            _sq_db = tabsqlitedb.tabsqlitedb (os.path.join (db_dir, _db))
+            _engine = SubElement (egs,'engine')
+            
+            _name = SubElement (_engine, 'name')
+            _name.text = _sq_db.get_ime_property ('name').lower()
+            
+            _longname = SubElement (_engine, 'longname')
+            _locale = getdefaultlocale()[0].lower()
+            _longname.text = _sq_db.get_ime_property ( \
+                    '.'.join(['name',_locale]) )
+            if not _longname.text:
+                _longname.text = _name.text
+            
+            _language = SubElement (_engine, 'language')
+            _langs = _sq_db.get_ime_property ('languages')
+            if _langs:
+                _langs = _langs.split (',')
+                if len (_langs) == 1:
+                    _language.text = _langs[0].strip()
+                else:
+                    # we ignore the place
+                    _language.text = _langs[0].strip().split('_')[0]
+
+            _license = SubElement (_engine, 'license')
+            _license.text = _sq_db.get_ime_property ('license')
+
+            _author = SubElement (_engine, 'author')
+            _author.text  = _sq_db.get_ime_property ('author')
+
+            _icon = SubElement (_engine, 'icon')
+            _icon_basename = _sq_db.get_ime_property ('icon')
+            if _icon_basename:
+                _icon.text = os.path.join (icon_dir, _icon_basename)
+            
+            _layout = SubElement (_engine, 'layout')
+            _layout.text = _sq_db.get_ime_property ('layout')
+
+            _desc = SubElement (_engine, 'description')
+            _desc.text = _sq_db.get_ime_property ('description')
+
+        # now format the xmlout pretty
+        indent (egs)
+        egsout = tostring (egs, encoding='utf8')
+        egsout = patt.sub ('',egsout)
+        print egsout
+        
+        return 0
+
     if options.daemon :
         if os.fork():
                 sys.exit()

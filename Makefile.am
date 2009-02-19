@@ -28,7 +28,6 @@ SUBDIRS = \
 	m4 \
 	tables \
 	data \
-	doc \
 	po \
 	$(NULL)
 

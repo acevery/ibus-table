@@ -889,6 +889,7 @@ class tabengine (ibus.EngineBase):
         self._update_ui ()
     
     def do_destroy(self):
+        self.db.sync_usrdb ()
         super(tabengine,self).do_destroy()
 
     def _init_properties (self):
@@ -1246,6 +1247,11 @@ class tabengine (ibus.EngineBase):
             self.property_activate ( u"dcommit" )
             return True
         
+        # Match Chinese mode shift
+        if self._match_hotkey (key, keysyms.semicolon, modifier.CONTROL_MASK):
+            self.property_activate ( u"cmode" )
+            return True
+        
         # Ignore key release event now :)
         if key.mask & modifier.RELEASE_MASK:
             return True
@@ -1466,10 +1472,10 @@ class tabengine (ibus.EngineBase):
 
     def disable (self):
         self.reset()
-        try:
-            self._sm.Hide()
-        except:
-            pass
+        #try:
+        #    self._sm.Hide()
+        #except:
+        #    pass
         self._on = False
 
 

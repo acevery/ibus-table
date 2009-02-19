@@ -47,13 +47,16 @@ class EngineFactory (ibus.EngineFactoryBase):
             udb = os.path.basename(db).replace('.db','-user.db') 
             self.db = tabsqlitedb.tabsqlitedb( name = db,user_db = udb )
             self.db.db.commit()
+            self.dblist = [self.db]
         else:
             self.db = None
+            self.dblist = []
+
         
         # init factory
         self.bus = bus
         super(EngineFactory,self).__init__ (bus)
-        self.engine_id=1
+        self.engine_id=0
         try:
             bus = dbus.Bus()
             user = os.path.basename( os.path.expanduser('~') )
@@ -61,7 +64,7 @@ class EngineFactory (ibus.EngineFactoryBase):
                     % user, "/org/ibus/table/SpeedMeter")
             self._sm =  dbus.Interface(self._sm_bus,\
                     "org.ibus.table.SpeedMeter") 
-            self._sm.Regist()
+            self._sm.Control (os.getpid())
         except:
             self._sm = None
     
@@ -77,23 +80,29 @@ class EngineFactory (ibus.EngineFactoryBase):
                 db_dir = "/usr/share/ibus-table/tables"
             db = os.path.join (db_dir,name+'.db')
             udb = name+'-user.db'
-            self.db = tabsqlitedb.tabsqlitedb( name = db,user_db = udb )
-            self.db.db.commit()
+            _sq_db = tabsqlitedb.tabsqlitedb( name = db,user_db = udb )
+            _sq_db.db.commit()
+            self.dblist.append (_sq_db)
+        else:
+            _sq_db = self.db
 
-        engine = table.tabengine(self.bus, self.engine_path + str(self.engine_id), self.db)
+        engine = table.tabengine(self.bus, self.engine_path \
+                + str(self.engine_id), _sq_db)
         self.engine_id += 1
         #return engine.get_dbus_object()
         return engine
 
     def do_destroy (self):
         '''Destructor, which finish some task for IME'''
-        # we need to sync the temp userdb in memory to the user_db on disk
-        self.db.sync_usrdb ()
-        #print "Have synced user db\n"
-        try:
-            self._sm.Exit()
-        except:
-            pass
+        # 
+        ## we need to sync the temp userdb in memory to the user_db on disk
+        #for _db in self.dblist:
+        #    _db.sync_usrdb ()
+        ##print "Have synced user db\n"
+        #try:
+        #    self._sm.Exit()
+        #except:
+        #    pass
         super(EngineFactory,self).do_destroy()
 
 
