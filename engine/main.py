@@ -24,7 +24,7 @@ import sys
 import optparse
 import ibus
 import gobject
-from elementtree.ElementTree import Element, SubElement, tostring
+from xml.etree.ElementTree import Element, SubElement, tostring
 import re
 patt = re.compile (r'<\?.*\?>\n')
 
