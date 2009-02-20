@@ -876,6 +876,7 @@ class tabengine (ibus.EngineBase):
                     "org.ibus.table.SpeedMeter") 
         except:
             self._sm = None
+        self._sm_on = True
         self._on = False
         self.reset ()
 
@@ -1252,6 +1253,15 @@ class tabengine (ibus.EngineBase):
             self.property_activate ( u"cmode" )
             return True
         
+        # Match speedmeter shift
+        if self._match_hotkey (key, keysyms.apostrophe, modifier.CONTROL_MASK):
+            self._sm_on = not self._sm_on
+            if self._sm_on:
+                self._sm.Show ()
+            else:
+                self._sm.Hide ()
+            return True
+        
         # Ignore key release event now :)
         if key.mask & modifier.RELEASE_MASK:
             return True
@@ -1452,7 +1462,8 @@ class tabengine (ibus.EngineBase):
             self._refresh_properties ()
             self._update_ui ()
             try:
-                self._sm.Show()
+                if self._sm_on:
+                    self._sm.Show()
             except:
                 pass
     
