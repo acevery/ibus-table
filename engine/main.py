@@ -24,7 +24,6 @@ import sys
 import optparse
 import ibus
 import gobject
-from xml.etree.ElementTree import Element, SubElement, tostring
 import re
 patt = re.compile (r'<\?.*\?>\n')
 
@@ -128,6 +127,7 @@ def indent(elem, level=0):
 def main():
     if options.xml:
         from locale import getdefaultlocale
+        from xml.etree.ElementTree import Element, SubElement, tostring
         # we will output the engines xml and return.
         # 1. we find all dbs in db_dir and extract the infos into
         #    Elements
@@ -142,7 +142,7 @@ def main():
             _engine = SubElement (egs,'engine')
             
             _name = SubElement (_engine, 'name')
-            _name.text = _sq_db.get_ime_property ('name').lower()
+            _name.text = _db.replace ('.db','')
             
             _longname = SubElement (_engine, 'longname')
             _locale = getdefaultlocale()[0].lower()
