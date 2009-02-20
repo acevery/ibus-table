@@ -298,6 +298,8 @@ class tabsqlitedb:
             else:
                 #print '"',attr,'"'," didn't in ime property now!"
                 pass
+        # then flush previous cache
+        self.ime_property_cache = {}
         # we need to update some self variables now.
         self._mlen = int (self.get_ime_property ('max_key_length' ))
         self._is_chinese = self.is_chinese()
