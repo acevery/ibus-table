@@ -99,10 +99,10 @@ class EngineFactory (ibus.EngineFactoryBase):
         for _db in self.dbdict:
             self.dbdict[_db].sync_usrdb ()
         ##print "Have synced user db\n"
-        #try:
-        self._sm.Quit()
-        #except:
-        #    pass
+        try:
+            self._sm.Quit()
+        except:
+            pass
         super(EngineFactory,self).do_destroy()
 
 
