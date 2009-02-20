@@ -48,6 +48,7 @@ class tabsqlitedb:
         self.deparse = tabdict.deparse
         self._add_phrase_sqlstr = ''
         self.old_phrases=[]
+        self.ime_property_cache = {}
         
         if filename:
             # now we are creating db
@@ -69,10 +70,10 @@ class tabsqlitedb:
             print 'encountering error when init db'
             pass
         # create IME property table
-        sqlstr = 'CREATE TABLE IF NOT EXISTS main.ime (attr TEXT, val TEXT);' 
-        self.db.executescript( sqlstr )
+        self.db.executescript('CREATE TABLE IF NOT EXISTS main.ime (attr TEXT, val TEXT);')
         # make sure we have values in ime table.
-        if not self.db.execute('SELECT * FROM main.ime;').fetchall():
+        if not self.db.execute('SELECT val FROM main.ime \
+            WHERE attr="name";').fetchall():
             ime_keys={'name':'',
                       'name.zh_cn':'',
                       'name.zh_hk':'',
@@ -196,7 +197,7 @@ class tabsqlitedb:
             self.add_phrases (self.old_phrases, 'user_db')
 
         # try create all tables in user database
-        self.create_indexes ("user_db")
+        self.create_indexes ("user_db",commit=False)
         self.generate_userdb_desc ()
         
         # attach mudb for working process
@@ -232,6 +233,7 @@ class tabsqlitedb:
         #print self.db.execute('select * from user_db.phrases;').fetchall()
         map (self.u_add_phrase,data_a)
         map (self.u_add_phrase,data_n)
+        self.db.commit ()
     
     def is_chinese (self):
         __lang = self.get_ime_property ('languages')
@@ -391,7 +393,7 @@ class tabsqlitedb:
     
     def u_add_phrase (self,nphrase):
         '''Add a phrase to userdb'''
-        self.add_phrase (nphrase,database='user_db')
+        self.add_phrase (nphrase,database='user_db',commit=False)
 
     def _set_add_phrase_sqlstr(self):
         '''Create the sqlstr for add phrase according to self._mlen.'''
@@ -577,7 +579,7 @@ class tabsqlitedb:
         self.db.executescript (sqlstr)
         self.db.commit()
     
-    def create_indexes(self, database):
+    def create_indexes(self, database, commit=True):
         sqlstr = '''
             DROP INDEX IF EXISTS %(database)s.goucima_index_z;
             CREATE INDEX IF NOT EXISTS %(database)s.goucima_index_z ON goucima (zi);
@@ -600,7 +602,8 @@ class tabsqlitedb:
         else:
             sqlstr = sqlstr_t % {'database':database,'tabkeystr':tabkeystr }
         self.db.executescript (sqlstr)
-        self.db.commit()
+        if commit:
+            self.db.commit()
     
     def compare (self,x,y):
         return cmp (x[0],y[0]) or -(cmp (x[-1],y[-1])) or -(cmp (x[-2],y[-2]))
@@ -738,13 +741,14 @@ class tabsqlitedb:
         '''get IME property from database, attr is the string of property,
         which should be str.lower() :)
         '''
-        sqlstr = 'SELECT val FROM main.ime WHERE attr = ?' 
-        _result = self.db.execute( sqlstr, (attr,)).fetchall()
-        #self.db.commit()
-        if _result:
-            return _result[0][0]
-        else:
-            return None
+        if not attr in self.ime_property_cache:
+            sqlstr = 'SELECT val FROM main.ime WHERE attr = ?' 
+            _result = self.db.execute( sqlstr, (attr,)).fetchall()
+            if _result:
+                self.ime_property_cache[attr] = _result[0][0]
+            else:
+                self.ime_property_cache[attr] = None
+        return self.ime_property_cache[attr]
 
     def get_phrase_table_index (self):
         '''get a list of phrase table columns name'''

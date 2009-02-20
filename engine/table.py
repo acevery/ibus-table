@@ -890,7 +890,7 @@ class tabengine (ibus.EngineBase):
         self._update_ui ()
     
     def do_destroy(self):
-        self.db.sync_usrdb ()
+        #self.db.sync_usrdb ()
         super(tabengine,self).do_destroy()
 
     def _init_properties (self):

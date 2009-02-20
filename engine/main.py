@@ -63,7 +63,7 @@ class IMApp:
     def __init__(self, dbfile, exec_by_ibus):
         self.__mainloop = gobject.MainLoop()
         self.__bus = ibus.Bus()
-        self.__bus.connect("destroy", self.__bus_destroy_cb)
+        self.__bus.connect("disconnected", self.__bus_destroy_cb)
         self.__factory = factory.EngineFactory(self.__bus, dbfile)
         if exec_by_ibus:
             self.__bus.request_name("org.freedesktop.IBus.Table", 0)
