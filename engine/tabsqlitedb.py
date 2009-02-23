@@ -873,7 +873,10 @@ class tabsqlitedb:
             tabres = self.parse_phrase (phrase) [2:-1]
         except:
             tabres = None
-        tabkeys= u''.join ( map(self.deparse, tabres) )
+        if tabres:
+            tabkeys= u''.join ( map(self.deparse, tabres) )
+        else:
+            tabkeys= u''
         return tabkeys
 
     def check_phrase (self,phrase,tabkey=None,database='main'):
