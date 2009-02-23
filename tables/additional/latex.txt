@@ -453,4 +453,4 @@ BEGIN_TABLE
 \flat	♭	0
 \natural	♮	0
 \sharp	♯	0
-END_TABLE	0
+END_TABLE

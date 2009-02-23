@@ -876,7 +876,7 @@ class tabengine (ibus.EngineBase):
                     "org.ibus.table.SpeedMeter") 
         except:
             self._sm = None
-        self._sm_on = True
+        self._sm_on = False
         self._on = False
         self.reset ()
 
@@ -1086,10 +1086,11 @@ class tabengine (ibus.EngineBase):
         self._update_aux ()
 
     def add_string_len(self, astring):
-        try:
-            self._sm.Accumulate(len(astring))
-        except:
-            pass
+        if self._sm_on:
+            try:
+                self._sm.Accumulate(len(astring))
+            except:
+                pass
     
     def commit_string (self,string):
         self._editor.clear ()
@@ -1463,7 +1464,9 @@ class tabengine (ibus.EngineBase):
             self._update_ui ()
             try:
                 if self._sm_on:
-                    self._sm.Show()
+                    self._sm.Show ()
+                else:
+                    self._sm.Hide ()
             except:
                 pass
     
