@@ -1486,10 +1486,10 @@ class tabengine (ibus.EngineBase):
 
     def disable (self):
         self.reset()
-        #try:
-        #    self._sm.Hide()
-        #except:
-        #    pass
+        try:
+            self._sm.Hide()
+        except:
+            pass
         self._on = False
 
 

@@ -87,7 +87,7 @@ class EngineFactory (ibus.EngineFactoryBase):
                 self.dbdict[name] = _sq_db
 
         engine = table.tabengine(self.bus, self.engine_path \
-                + str(self.engine_id), self.dbdict[name])
+                + str(self.engine_id), self.dbdict[self.dbusname])
         self.engine_id += 1
         #return engine.get_dbus_object()
         return engine
