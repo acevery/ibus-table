@@ -85,9 +85,11 @@ class EngineFactory (ibus.EngineFactoryBase):
                 _sq_db = tabsqlitedb.tabsqlitedb( name = db,user_db = udb )
                 _sq_db.db.commit()
                 self.dbdict[name] = _sq_db
+        else:
+            name = self.dbusname
 
         engine = table.tabengine(self.bus, self.engine_path \
-                + str(self.engine_id), self.dbdict[self.dbusname])
+                + str(self.engine_id), self.dbdict[name])
         self.engine_id += 1
         #return engine.get_dbus_object()
         return engine
