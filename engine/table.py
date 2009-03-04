@@ -890,6 +890,8 @@ class tabengine (ibus.EngineBase):
         self._update_ui ()
     
     def do_destroy(self):
+        self.reset ()
+        self.focus_out ()
         #self.db.sync_usrdb ()
         super(tabengine,self).do_destroy()
 
