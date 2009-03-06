@@ -1,8 +1,4 @@
-commit a8e019d4582db1d9142a1efbecd945c4470b3fb0
-Author: 余钰炜 <acevery@gmail.com>
-Date:   Fri Mar 6 14:07:12 2009 +0800
-
-    add Caius into project
+# Regularly generated manually by command `git log > ChangeLog`
 
 commit fe3f5dc73f9b7f3655ab15c4cf52e8fac9dbef1d
 Author: 余钰炜 <acevery@gmail.com>
@@ -89,6 +85,21 @@ Date:   Thu Feb 19 21:16:09 2009 +0800
 
     use xml.etree instead of elementtree
 
+<<<<<<< HEAD:ChangeLog
+=======
+commit 2b0726ce00c2a9512d58b90cb94e3b95481a1ec1
+Merge: 3a5330a... e8ccd01...
+Author: Caius "kaio" Chance <caio@dejieshi.com>
+Date:   Thu Feb 19 15:06:06 2009 +1000
+
+    RE-Merge commit 'acevery/master'
+    
+    Conflicts:
+    	doc/Makefile.am
+    	engine/Makefile.am
+    	engine/table.xml.in.in
+
+>>>>>>> e926b14b0718c3e02df28d1efd5490a715b7d9e9:ChangeLog
 commit e8ccd0137d01f615dbd92fce41d1d49b77d39796
 Author: 余钰炜 <acevery@gmail.com>
 Date:   Wed Feb 18 21:58:16 2009 +0800
@@ -180,12 +191,53 @@ Date:   Tue Feb 17 23:05:45 2009 +0800
 
     step 3
 
+<<<<<<< HEAD:ChangeLog
+=======
+commit 3a5330ace95f39020407492cdedf4262614a3042
+Merge: f8b80b8... ffa04fe...
+Author: Caius "kaio" Chance <caio@dejieshi.com>
+Date:   Mon Feb 16 18:11:05 2009 +1000
+
+    Merge commit 'acevery/for_c_ibus_daemon'
+    
+    Conflicts:
+    	configure.ac
+    	data/Makefile.am
+    	doc/Makefile.am
+    	engine/Makefile.am
+    	engine/factory.py
+    	engine/ibus-engine-table.in
+    	engine/main.py
+    	engine/speedmeter.py
+    	engine/table.py
+    	icons/Makefile.am
+    	icons/additional/Makefile.am
+    	tables/Makefile.am
+    	tables/additional/Makefile.am
+
+>>>>>>> e926b14b0718c3e02df28d1efd5490a715b7d9e9:ChangeLog
 commit ffa04fe490dd89a0ef8de2335ef5ad8971a2c265
 Author: 余钰炜 <acevery@gmail.com>
 Date:   Mon Feb 16 00:07:01 2009 +0800
 
     second step for ibus-1
 
+<<<<<<< HEAD:ChangeLog
+=======
+commit f8b80b85b7a774a734720dd973574b9b77dee482
+Merge: b1a8593... 198cf85...
+Author: Caius Chance <cchance@hako.localdomain>
+Date:   Mon Feb 16 01:37:05 2009 +1000
+
+    Merge commit 'lidaobing/master'
+
+commit b1a85938c0aa38db91fb4d0c4f3835e7e4d9a3c0
+Author: Caius Chance <cchance@hako.localdomain>
+Date:   Mon Feb 16 00:50:20 2009 +1000
+
+    added table spec xml
+
+>>>>>>> e926b14b0718c3e02df28d1efd5490a715b7d9e9:ChangeLog
 commit 24f5090106d6c7ea8ec203bc428654d9db0b64de
 Author: 余钰炜 <acevery@gmail.com>
 Date:   Sun Feb 15 21:00:40 2009 +0800
@@ -265,6 +317,17 @@ Date:   Sat Jan 3 23:31:21 2009 +0800
 
     fix License conflict
 
+<<<<<<< HEAD:ChangeLog
+=======
+commit 198cf85c7ec2f498a95f49e49fd4af8ebce834c4
+Author: LI Daobing <lidaobing@gmail.com>
+Date:   Sat Jan 3 14:52:37 2009 +0800
+
+    fix typo in README
+    
+    ChangJie -> CangJie
+
+>>>>>>> e926b14b0718c3e02df28d1efd5490a715b7d9e9:ChangeLog
 commit 3d4042fd2ff4072ef29a1b806b88aadd018b0206
 Author: 余钰炜 <acevery@gmail.com>
 Date:   Sun Dec 28 21:59:13 2008 +0800
