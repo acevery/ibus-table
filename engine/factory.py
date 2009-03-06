@@ -34,6 +34,7 @@ N_ = lambda a : a
 
 engine_base_path = "/com/redhat/IBus/engines/table/%s/engine/"
 
+
 class EngineFactory (ibus.EngineFactoryBase):
     """Table IM Engine Factory"""
     def __init__ (self, bus, db="", icon=""):
@@ -47,10 +48,10 @@ class EngineFactory (ibus.EngineFactoryBase):
             udb = os.path.basename(db).replace('.db','-user.db') 
             self.db = tabsqlitedb.tabsqlitedb( name = db,user_db = udb )
             self.db.db.commit()
-            self.dblist = [self.db]
+            self.dbdict = {self.dbusname:self.db}
         else:
             self.db = None
-            self.dblist = []
+            self.dbdict = {}
 
         
         # init factory
@@ -64,7 +65,6 @@ class EngineFactory (ibus.EngineFactoryBase):
                     % user, "/org/ibus/table/SpeedMeter")
             self._sm =  dbus.Interface(self._sm_bus,\
                     "org.ibus.table.SpeedMeter") 
-            self._sm.Control (os.getpid())
         except:
             self._sm = None
     
@@ -74,20 +74,22 @@ class EngineFactory (ibus.EngineFactoryBase):
         name = engine_name.encode ('utf8')
         self.engine_path = engine_base_path % name
         if not self.db:
-            try:
-                db_dir = os.path.join (os.getenv('IBUS_TABLE_LOCATION'),'tables')
-            except:
-                db_dir = "/usr/share/ibus-table/tables"
-            db = os.path.join (db_dir,name+'.db')
-            udb = name+'-user.db'
-            _sq_db = tabsqlitedb.tabsqlitedb( name = db,user_db = udb )
-            _sq_db.db.commit()
-            self.dblist.append (_sq_db)
+            # first check self.dbdict
+            if not name in self.dbdict:
+                try:
+                    db_dir = os.path.join (os.getenv('IBUS_TABLE_LOCATION'),'tables')
+                except:
+                    db_dir = "/usr/share/ibus-table/tables"
+                db = os.path.join (db_dir,name+'.db')
+                udb = name+'-user.db'
+                _sq_db = tabsqlitedb.tabsqlitedb( name = db,user_db = udb )
+                _sq_db.db.commit()
+                self.dbdict[name] = _sq_db
         else:
-            _sq_db = self.db
+            name = self.dbusname
 
         engine = table.tabengine(self.bus, self.engine_path \
-                + str(self.engine_id), _sq_db)
+                + str(self.engine_id), self.dbdict[name])
         self.engine_id += 1
         #return engine.get_dbus_object()
         return engine
@@ -96,13 +98,13 @@ class EngineFactory (ibus.EngineFactoryBase):
         '''Destructor, which finish some task for IME'''
         # 
         ## we need to sync the temp userdb in memory to the user_db on disk
-        #for _db in self.dblist:
-        #    _db.sync_usrdb ()
+        for _db in self.dbdict:
+            self.dbdict[_db].sync_usrdb ()
         ##print "Have synced user db\n"
-        #try:
-        #    self._sm.Exit()
-        #except:
-        #    pass
+        try:
+            self._sm.Quit()
+        except:
+            pass
         super(EngineFactory,self).do_destroy()
 
 

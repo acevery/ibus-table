@@ -876,6 +876,7 @@ class tabengine (ibus.EngineBase):
                     "org.ibus.table.SpeedMeter") 
         except:
             self._sm = None
+        self._sm_on = False
         self._on = False
         self.reset ()
 
@@ -889,7 +890,9 @@ class tabengine (ibus.EngineBase):
         self._update_ui ()
     
     def do_destroy(self):
-        self.db.sync_usrdb ()
+        self.reset ()
+        self.focus_out ()
+        #self.db.sync_usrdb ()
         super(tabengine,self).do_destroy()
 
     def _init_properties (self):
@@ -1085,10 +1088,11 @@ class tabengine (ibus.EngineBase):
         self._update_aux ()
 
     def add_string_len(self, astring):
-        try:
-            self._sm.Accumulate(len(astring))
-        except:
-            pass
+        if self._sm_on:
+            try:
+                self._sm.Accumulate(len(astring))
+            except:
+                pass
     
     def commit_string (self,string):
         self._editor.clear ()
@@ -1250,6 +1254,15 @@ class tabengine (ibus.EngineBase):
         # Match Chinese mode shift
         if self._match_hotkey (key, keysyms.semicolon, modifier.CONTROL_MASK):
             self.property_activate ( u"cmode" )
+            return True
+        
+        # Match speedmeter shift
+        if self._match_hotkey (key, keysyms.apostrophe, modifier.CONTROL_MASK):
+            self._sm_on = not self._sm_on
+            if self._sm_on:
+                self._sm.Show ()
+            else:
+                self._sm.Hide ()
             return True
         
         # Ignore key release event now :)
@@ -1452,7 +1465,10 @@ class tabengine (ibus.EngineBase):
             self._refresh_properties ()
             self._update_ui ()
             try:
-                self._sm.Show()
+                if self._sm_on:
+                    self._sm.Show ()
+                else:
+                    self._sm.Hide ()
             except:
                 pass
     
@@ -1472,10 +1488,10 @@ class tabengine (ibus.EngineBase):
 
     def disable (self):
         self.reset()
-        #try:
-        #    self._sm.Hide()
-        #except:
-        #    pass
+        try:
+            self._sm.Hide()
+        except:
+            pass
         self._on = False
 
 
