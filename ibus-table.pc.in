@@ -1,7 +1,7 @@
 prefix=@prefix@
 exec_prefix=@exec_prefix@
-libdir=@datadir@
 datarootdir=@datarootdir@
+libdir=@datadir@
 datadir=@datadir@
 
 extradatadir=@datadir@/ibus-table/data
