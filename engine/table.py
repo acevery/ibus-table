@@ -1271,11 +1271,12 @@ class tabengine (ibus.EngineBase):
 
         if self._editor.is_empty ():
             # we have not input anything
-            if key.code <= 127 and (not key.mask & modifier.ALT_MASK + modifier.CONTROL_MASK):
+            if key.code <= 127 and ( unichr(key.code) not in self._valid_input_chars ) \
+                    and (not key.mask & modifier.ALT_MASK + modifier.CONTROL_MASK):
                 if key.code == keysyms.space:
                     self.commit_string (cond_letter_translate (unichr (key.code)))
                     return True
-                if ascii.ispunct (key.code) and ( unichr(key.code) not in self._valid_input_chars ) :
+                if ascii.ispunct (key.code):
                     self.commit_string (cond_punct_translate (unichr (key.code)))
                     return True
                 if ascii.isdigit (key.code):
