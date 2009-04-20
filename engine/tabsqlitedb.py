@@ -112,8 +112,8 @@ class tabsqlitedb:
         self._is_chinese = self.is_chinese()
         # for fast add word
         self._set_add_phrase_sqlstr()
-        #(MLEN, CLEN, M0, M1, M2, M3, M4, PHRASE, FREQ, USER_FREQ) = range (0,10)
-        self._pt_index = ['mlen','clen']
+        #(ID, MLEN, CLEN, M0, M1, M2, M3, M4, CATEGORY, PHRASE, FREQ, USER_FREQ) = range (0,12)
+        self._pt_index = ['id', 'mlen', 'clen']
         for i in range(self._mlen):
             self._pt_index.append ('m%d' %i)
         if self._is_chinese:
@@ -162,7 +162,7 @@ class tabsqlitedb:
                 desc = self.get_database_desc (user_db)
                 if desc == None :
                     self.init_user_db (user_db)
-                elif desc["version"] != "0.2":
+                elif desc["version"] != "0.3":
                     new_name = "%s.%d" %(user_db, os.getpid())
                     print >> stderr, "Can not support the user db. We will rename it to %s" % new_name
                     self.old_phrases = self.extra_user_phrases( user_db )
@@ -275,7 +275,8 @@ class tabsqlitedb:
             self.db.execute ( sqlstr )
 
         # create phrase table (mabiao)
-        sqlstr = 'CREATE TABLE IF NOT EXISTS %s.phrases ( mlen INTEGER, clen INTEGER, ' % database
+        sqlstr = 'CREATE TABLE IF NOT EXISTS %s.phrases (id INTEGER PRIMARY KEY AUTOINCREMENT,\
+                mlen INTEGER, clen INTEGER, ' % database
         #for i in range(self._mlen):
         #    sqlstr += 'm%d INTEGER, ' % i 
         sqlstr += ''.join ( map (lambda x: 'm%d INTEGER, ' % x, range(self._mlen)) )
@@ -304,7 +305,7 @@ class tabsqlitedb:
         self._mlen = int (self.get_ime_property ('max_key_length' ))
         self._is_chinese = self.is_chinese()
         self._set_add_phrase_sqlstr()
-        self._pt_index = ['mlen','clen']
+        self._pt_index = ['id', 'mlen', 'clen']
         for i in range(self._mlen):
             self._pt_index.append ('m%d' %i)
         if self._is_chinese:
@@ -592,7 +593,8 @@ class tabsqlitedb:
 
         sqlstr_t = '''
             DROP INDEX IF EXISTS %(database)s.phrases_index_p;
-            CREATE INDEX IF NOT EXISTS %(database)s.phrases_index_p ON phrases (%(tabkeystr)s mlen ASC, freq DESC);
+            CREATE INDEX IF NOT EXISTS %(database)s.phrases_index_p ON phrases
+            (%(tabkeystr)s mlen ASC, freq DESC, id ASC);
             DROP INDEX IF EXISTS %(database)s.phrases_index_i;
             CREATE INDEX IF NOT EXISTS %(database)s.phrases_index_i ON phrases (phrase, mlen ASC);
             ''' 
@@ -644,7 +646,7 @@ class tabsqlitedb:
             SELECT * FROM user_db.phrases WHERE mlen < %(mk)d %(condition)s 
             UNION ALL
             SELECT * FROM mudb.phrases WHERE mlen < %(mk)d %(condition)s )
-            ORDER BY mlen ASC, user_freq DESC, freq DESC;''' % { 'mk':_len+x_len, 'condition':_condition}
+            ORDER BY mlen ASC, user_freq DESC, freq DESC, id ASC;''' % { 'mk':_len+x_len, 'condition':_condition}
             # we have redefine the __int__(self) in class tabdict.tab_key to return the key id, so we can use map to got key id :)
             _tabkeys = map(int,tabkeys[:_len])
             _tabkeys += _tabkeys + _tabkeys
