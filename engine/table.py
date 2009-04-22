@@ -780,12 +780,14 @@ class editor(object):
             return (False,u'')
         if self._t_chars :
             # user has input sth
+            istr = self.get_all_input_strings ()
             self.commit_to_preedit ()
             pstr = self.get_preedit_strings ()
+            #print "istr: ",istr
             self.clear()
-            return (True,pstr)
+            return (True,pstr,istr)
         else:
-            return (False,u'')
+            return (False,u'',u'')
     
     def one_candidate (self):
         '''Return true if there is only one candidate'''
@@ -1362,7 +1364,7 @@ class tabengine (ibus.EngineBase):
             if sp_res[0]:
                 self.commit_string (sp_res[1])
                 self.add_string_len(sp_res[1])
-                self.db.check_phrase (sp_res[1])
+                self.db.check_phrase (sp_res[1], sp_res[2])
             else:
                 if sp_res[1] == u' ':
                     self.commit_string (cond_letter_translate (u" "))
@@ -1388,7 +1390,7 @@ class tabengine (ibus.EngineBase):
                 if sp_res[0]:
                     self.commit_string (sp_res[1])
                     self.add_string_len(sp_res[1])
-                    self.db.check_phrase (sp_res[1])
+                    self.db.check_phrase (sp_res[1],sp_res[2])
             
             res = self._editor.add_input ( unichr(key.code) )
             if not res:
@@ -1401,7 +1403,7 @@ class tabengine (ibus.EngineBase):
                 if sp_res[0]:
                     self.commit_string (sp_res[1] + key_char)
                     self.add_string_len(sp_res[1])
-                    self.db.check_phrase (sp_res[1])
+                    self.db.check_phrase (sp_res[1],sp_res[2])
                     return True
                 else:
                     self.commit_string ( key_char )
@@ -1415,7 +1417,7 @@ class tabengine (ibus.EngineBase):
                     if sp_res[0]:
                         self.commit_string (sp_res[1])
                         self.add_string_len(sp_res[1])
-                        self.db.check_phrase (sp_res[1])
+                        self.db.check_phrase (sp_res[1], sp_res[2])
                         return True
 
             self._update_ui ()
@@ -1436,13 +1438,14 @@ class tabengine (ibus.EngineBase):
             if res:
                 o_py = self._editor._py_mode
                 commit_string = self._editor.get_preedit_strings ()
+                input_keys = self._editor.get_all_input_strings ()
                 self.commit_string (commit_string)
                 self.add_string_len(commit_string)
                 if o_py != self._editor._py_mode:
                     self._refresh_properties ()
                     self._update_ui ()
                 # modify freq info
-                self.db.check_phrase (commit_string)
+                self.db.check_phrase (commit_string, input_keys)
             return True
         
         elif key.code <= 127:

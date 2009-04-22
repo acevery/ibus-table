@@ -191,10 +191,18 @@ class tabsqlitedb:
             self.db.execute ('ATTACH DATABASE "%s" AS user_db;' % user_db)
         self.create_tables ("user_db")
         if self.old_phrases:
-            self.old_phrases =\
-                    map(lambda x: [self.parse_phrase_to_tabkeys(x[0])]\
-                    + list(x) , self.old_phrases)
-            self.add_phrases (self.old_phrases, 'user_db')
+            # (mlen, phrase, freq, user_freq)
+            # the phrases will be deparse again, and then be added     
+            # the characters will be discard :(
+            #chars = filter (lambda x: x[0] == 1, self.old_phrases)
+            # print chars
+            phrases = filter (lambda x: x[0] > 1, self.old_phrases)
+            phrases = map(lambda x: [self.parse_phrase_to_tabkeys(x[1])]\
+                    + list(x[1:]) , phrases)
+ 
+            map (self.u_add_phrase,phrases)
+            self.db.commit ()
+
 
         # try create all tables in user database
         self.create_indexes ("user_db",commit=False)
@@ -208,9 +216,9 @@ class tabsqlitedb:
     def update_phrase (self, entry, database='user_db'):
         '''update phrase freqs'''
         #print entry
-        _con = [ entry[-1] ] + list(entry[0:2+entry[0]]) + [entry[-3]]
+        _con = [ entry[-1] ] + list(entry[1:3+entry[1]]) + [entry[-3]]
         #print _con
-        _condition = u''.join( map(lambda x: 'AND m%d = ? ' % x, range(entry[0]) )    )
+        _condition = u''.join( map(lambda x: 'AND m%d = ? ' % x, range(entry[1]) )    )
         #print _condition
         sqlstr = 'UPDATE %s.phrases SET user_freq = ? WHERE mlen = ? AND clen = ? %s AND phrase = ?;' % (database, _condition)
         #print sqlstr
@@ -226,8 +234,8 @@ class tabsqlitedb:
         data_a = filter ( lambda x: x[-2]==2, mudata)
         data_n = filter ( lambda x: x[-2]==-2, mudata)
         #print data_a
-        data_a = map (lambda x: (u''.join ( map(self.deparse, x[2:2+x[0]])),x[-3],0,x[-1] ), data_a)
-        data_n = map (lambda x: (u''.join ( map(self.deparse, x[2:2+x[0]])),x[-3],-1,x[-1] ), data_n)
+        data_a = map (lambda x: (u''.join ( map(self.deparse, x[3:3+x[1]])),x[-3],0,x[-1] ), data_a)
+        data_n = map (lambda x: (u''.join ( map(self.deparse, x[3:3+x[1]])),x[-3],-1,x[-1] ), data_n)
         #print data_u
         map (self.update_phrase, data_u)
         #print self.db.execute('select * from user_db.phrases;').fetchall()
@@ -551,7 +559,8 @@ class tabsqlitedb:
         sqlstr = '''
             CREATE TABLE tmp AS SELECT * FROM %(database)s.phrases;
             DELETE FROM %(database)s.phrases;
-            INSERT INTO %(database)s.phrases SELECT * FROM tmp ORDER BY %(tabkeystr)s mlen ASC, freq DESC;
+            INSERT INTO %(database)s.phrases SELECT * FROM tmp ORDER BY
+            %(tabkeystr)s mlen ASC, user_freq DESC, freq DESC, id ASC;
             DROP TABLE tmp;
             CREATE TABLE tmp AS SELECT * FROM %(database)s.goucima;
             DELETE FROM %(database)s.goucima;
@@ -610,7 +619,7 @@ class tabsqlitedb:
             self.db.commit()
     
     def compare (self,x,y):
-        return cmp (x[0],y[0]) or -(cmp (x[-1],y[-1])) or -(cmp (x[-2],y[-2]))
+        return cmp (x[1],y[1]) or -(cmp (x[-1],y[-1])) or -(cmp (x[-2],y[-2]))
 
     def select_words( self, tabkeys, onechar=False, bitmask=0 ):
         '''
@@ -665,7 +674,8 @@ class tabsqlitedb:
         #searchres = map ( lambda res: res[-2] and [ True, [(res[:-2],[res[:-1],res[-1:]])] ]\
         #        or [ False, [(res[:-2] , [res[:-1],res[-1:]])] ] \
         #        , result )
-        searchres = map ( lambda res: [ int(res[-2]), int(res[-1]), [(res[:-2],[res[:-1],res[-1:]])] ], result)
+        searchres = map ( lambda res: [ int(res[-2]), int(res[-1]),
+            [(res[1:-2],[res[:-1],res[-1:]])] ], result)
         # for sysdb
         reslist=filter( lambda x: not x[1], searchres )
         map (lambda x: sysdb.update(x[2]), reslist)
@@ -763,7 +773,7 @@ class tabsqlitedb:
             sqlstring = 'CREATE TABLE IF NOT EXISTS user_db.desc (name PRIMARY KEY, value);'
             self.db.executescript (sqlstring)
             sqlstring = 'INSERT OR IGNORE INTO user_db.desc  VALUES (?, ?);'
-            self.db.execute (sqlstring, ('version', '0.2'))
+            self.db.execute (sqlstring, ('version', '0.3'))
             self.db.execute (sqlstring, ('id', str(uuid.uuid4 ())))
             sqlstring = 'INSERT OR IGNORE INTO user_db.desc  VALUES (?, DATETIME("now", "localtime"));'
             self.db.execute (sqlstring, ("create-time", ))
@@ -907,26 +917,36 @@ class tabsqlitedb:
             except:
                 # if we don't have goucima:
                 return
-        if tabkey == None:
+        if tabkey == None or len(tabkey) > self._mlen :
             sqlstr = '''SELECT * FROM (SELECT * FROM main.phrases WHERE phrase = ?
             UNION ALL SELECT * FROM user_db.phrases WHERE phrase = ?
             UNION ALL SELECT * FROM mudb.phrases WHERE phrase = ?)
-            ORDER BY user_freq DESC, freq DESC
+            ORDER BY user_freq DESC, freq DESC, id ASC;
             ''' 
             result = self.db.execute(sqlstr, (phrase,phrase,phrase)).fetchall()
         else:
             # we are using this to check whether the tab-key and phrase is in db
+            #print tabkey
             tabks = self.parse (tabkey)
+            #print tabks
             tabkids = tuple( map(int,tabks) )
             condition = ' and '.join( map(lambda x: 'm%d = ?' % x, range( len(tabks) )) )
             sqlstr = '''SELECT * FROM %(database)s.phrases WHERE phrase = ? and %(cond)s;''' % {'database':database, 'cond':condition}
+            #print sqlstr
             result = self.db.execute(sqlstr, (phrase,)+tabkids ).fetchall()
-            return bool(result)
+            if not bool(result):
+                sqlstr = '''SELECT * FROM (SELECT * FROM main.phrases WHERE phrase = ?
+                UNION ALL SELECT * FROM user_db.phrases WHERE phrase = ?
+                UNION ALL SELECT * FROM mudb.phrases WHERE phrase = ?)
+                ORDER BY user_freq DESC, freq DESC, id ASC;
+                ''' 
+                result = self.db.execute(sqlstr, (phrase,phrase,phrase)).fetchall()
 
         sysdb = {}
         usrdb = {}
         mudb = {}
-        searchres = map ( lambda res: [ int(res[-2]), int(res[-1]), [(res[:-2],[res[:-1],res[-1]])] ], result)
+        searchres = map ( lambda res: [ int(res[-2]), int(res[-1]),
+            [(res[1:-2],[res[:-1],res[-1]])] ], result)
         # for sysdb
         reslist=filter( lambda x: not x[1], searchres )
         map (lambda x: sysdb.update(x[2]), reslist)
@@ -1044,11 +1064,11 @@ class tabsqlitedb:
     def remove_phrase (self,phrase,database='user_db'):
         '''Remove phrase from database, default is from user_db
         phrase should be the a row of select * result from database
-        Like (mlen,clen,m0,m1,m2,m3,phrase,freq,user_freq)
+        Like (id, mlen,clen,m0,m1,m2,m3,phrase,freq,user_freq)
         '''
         _ph = list(phrase[:-2])
         _condition = ''    
-        for i in range(_ph[0]):
+        for i in range(_ph[1]):
             _condition += 'AND m%d = ? ' % i
         nn =_ph.count(None)
         if nn:
@@ -1085,10 +1105,14 @@ class tabsqlitedb:
         except:
             return None
         if only_defined:
-            _phrases = db.execute("select phrase, freq, user_freq\
-                    from phrases where freq=-1;").fetchall()
+            _phrases = db.execute("SELECT clen, phrase, freq, user_freq\
+                    FROM phrases \
+                    WHERE freq=-1 AND mlen != 0 \
+                    GROUP BY clen,phrase;").fetchall()
         else:
-            _phrases = db.execute("select phrase, freq, user_freq\
-                    from phrases;").fetchall()
+            _phrases = db.execute("SELECT clen, phrase, freq, user_freq\
+                    FROM phrases\
+                    WHERE mlen !=0 \
+                    GROUP BY clen,phrase;").fetchall()
         db.commit()
         return _phrases[:]
