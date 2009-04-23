@@ -1434,11 +1434,11 @@ class tabengine (ibus.EngineBase):
             return res
         
         elif key.code >= keysyms._1 and key.code <= keysyms._9 and self._editor._candidates[0]:
+            input_keys = self._editor.get_all_input_strings ()
             res = self._editor.number (key.code - keysyms._1)
             if res:
                 o_py = self._editor._py_mode
                 commit_string = self._editor.get_preedit_strings ()
-                input_keys = self._editor.get_all_input_strings ()
                 self.commit_string (commit_string)
                 self.add_string_len(commit_string)
                 if o_py != self._editor._py_mode:

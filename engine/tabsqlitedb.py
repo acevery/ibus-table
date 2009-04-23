@@ -162,7 +162,7 @@ class tabsqlitedb:
                 desc = self.get_database_desc (user_db)
                 if desc == None :
                     self.init_user_db (user_db)
-                elif desc["version"] != "0.3":
+                elif desc["version"] != "0.4":
                     new_name = "%s.%d" %(user_db, os.getpid())
                     print >> stderr, "Can not support the user db. We will rename it to %s" % new_name
                     self.old_phrases = self.extra_user_phrases( user_db )
@@ -230,6 +230,7 @@ class tabsqlitedb:
         # we need to update the user_db
         #print 'sync userdb'
         mudata = self.db.execute ('SELECT * FROM mudb.phrases;').fetchall()
+        #print mudata
         data_u = filter ( lambda x: x[-2] in [1,-3], mudata)
         data_a = filter ( lambda x: x[-2]==2, mudata)
         data_n = filter ( lambda x: x[-2]==-2, mudata)
@@ -773,7 +774,7 @@ class tabsqlitedb:
             sqlstring = 'CREATE TABLE IF NOT EXISTS user_db.desc (name PRIMARY KEY, value);'
             self.db.executescript (sqlstring)
             sqlstring = 'INSERT OR IGNORE INTO user_db.desc  VALUES (?, ?);'
-            self.db.execute (sqlstring, ('version', '0.3'))
+            self.db.execute (sqlstring, ('version', '0.4'))
             self.db.execute (sqlstring, ('id', str(uuid.uuid4 ())))
             sqlstring = 'INSERT OR IGNORE INTO user_db.desc  VALUES (?, DATETIME("now", "localtime"));'
             self.db.execute (sqlstring, ("create-time", ))
@@ -926,14 +927,21 @@ class tabsqlitedb:
             result = self.db.execute(sqlstr, (phrase,phrase,phrase)).fetchall()
         else:
             # we are using this to check whether the tab-key and phrase is in db
-            #print tabkey
+            #print "tabkey: ", tabkey
             tabks = self.parse (tabkey)
             #print tabks
             tabkids = tuple( map(int,tabks) )
             condition = ' and '.join( map(lambda x: 'm%d = ?' % x, range( len(tabks) )) )
-            sqlstr = '''SELECT * FROM %(database)s.phrases WHERE phrase = ? and %(cond)s;''' % {'database':database, 'cond':condition}
+            sqlstr = '''SELECT * FROM 
+            (
+                SELECT * FROM main.phrases WHERE phrase = ? and %(cond)s
+                UNION ALL SELECT * FROM user_db.phrases WHERE phrase = ? and %(cond)s
+                UNION ALL SELECT * FROM mudb.phrases WHERE phrase = ? and %(cond)s
+            )
+            ORDER BY user_freq DESC, freq DESC, id ASC;
+            ''' % {'cond':condition}
             #print sqlstr
-            result = self.db.execute(sqlstr, (phrase,)+tabkids ).fetchall()
+            result = self.db.execute(sqlstr, ((phrase,)+tabkids)*3 ).fetchall()
             if not bool(result):
                 sqlstr = '''SELECT * FROM (SELECT * FROM main.phrases WHERE phrase = ?
                 UNION ALL SELECT * FROM user_db.phrases WHERE phrase = ?
@@ -945,17 +953,21 @@ class tabsqlitedb:
         sysdb = {}
         usrdb = {}
         mudb = {}
+        #print "result is: ", result 
         searchres = map ( lambda res: [ int(res[-2]), int(res[-1]),
             [(res[1:-2],[res[:-1],res[-1]])] ], result)
         # for sysdb
         reslist=filter( lambda x: not x[1], searchres )
         map (lambda x: sysdb.update(x[2]), reslist)
+        #print "sysdb is ", sysdb
         # for usrdb
         reslist=filter( lambda x: ( x[0] in [0,-1] ) and x[1], searchres )
         map (lambda x: usrdb.update(x[2]), reslist)
+        #print "usrdb is ", usrdb 
         # for mudb
         reslist=filter( lambda x: (x[0] not in [0,-1])  and x[1], searchres )
         map (lambda x: mudb.update(x[2]), reslist)
+        #print "mudb is ", mudb
         
         tabkey = ''
         if len(phrase) >=2:
@@ -1105,12 +1117,14 @@ class tabsqlitedb:
         except:
             return None
         if only_defined:
-            _phrases = db.execute("SELECT clen, phrase, freq, user_freq\
+            _phrases = db.execute(\
+                    "SELECT clen, phrase, freq, sum(user_freq)\
                     FROM phrases \
                     WHERE freq=-1 AND mlen != 0 \
                     GROUP BY clen,phrase;").fetchall()
         else:
-            _phrases = db.execute("SELECT clen, phrase, freq, user_freq\
+            _phrases = db.execute(\
+                    "SELECT clen, phrase, freq, sum(user_freq)\
                     FROM phrases\
                     WHERE mlen !=0 \
                     GROUP BY clen,phrase;").fetchall()
