@@ -775,7 +775,6 @@ class tabsqlitedb:
             self.db.executescript (sqlstring)
             sqlstring = 'INSERT OR IGNORE INTO user_db.desc  VALUES (?, ?);'
             self.db.execute (sqlstring, ('version', '0.4'))
-            self.db.execute (sqlstring, ('id', str(uuid.uuid4 ())))
             sqlstring = 'INSERT OR IGNORE INTO user_db.desc  VALUES (?, DATETIME("now", "localtime"));'
             self.db.execute (sqlstring, ("create-time", ))
             self.db.commit ()
