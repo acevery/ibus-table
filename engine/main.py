@@ -30,12 +30,14 @@ patt = re.compile (r'<\?.*\?>\n')
 import factory
 import tabsqlitedb
 
+
 try:
     db_dir = os.path.join (os.getenv('IBUS_TABLE_LOCATION'),'tables')
     icon_dir = os.path.join (os.getenv('IBUS_TABLE_LOCATION'),'icons')
 except:
     db_dir = "/usr/share/ibus-table/tables"
     icon_dir = "/usr/share/ibus-table/icons"
+
 
 opt = optparse.OptionParser()
 
@@ -53,10 +55,21 @@ opt.add_option('--xml', '-x',
         action = 'store_true',dest = 'xml',default = False,
         help = 'output the engines xml part, default: %default')
 
+opt.add_option('--no-debug', '-n',
+        action = 'store_false',dest = 'debug',default = True,
+        help = 'redirect stdout and stderr to ~/.ibus/tables/debug.log, default: %default')
 
 (options, args) = opt.parse_args()
 #if not options.db:
 #    opt.error('no db found!')
+
+if options.debug:
+    logfile = os.path.expanduser('~/.ibus/tables/debug.log')
+    sys.stdout = open (logfile,'a',0)
+    sys.stderr = open (logfile,'a',0)
+    from time import strftime
+    print '--- ', strftime('%Y-%m-%d: %H:%M:%S'), ' ---'
+
 
 
 class IMApp:

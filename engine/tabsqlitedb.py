@@ -1078,6 +1078,7 @@ class tabsqlitedb:
         Like (id, mlen,clen,m0,m1,m2,m3,phrase,freq,user_freq)
         '''
         _ph = list(phrase[:-2])
+        print _ph
         _condition = ''    
         for i in range(_ph[1]):
             _condition += 'AND m%d = ? ' % i
@@ -1089,24 +1090,24 @@ class tabsqlitedb:
             msqlstr= 'SELECT * FROM %(database)s.phrases WHERE mlen = ? and clen = ? %(condition)s AND category = ? AND phrase = ? ;' % { 'database':database, 'condition':_condition }
         else:
             msqlstr= 'SELECT * FROM %(database)s.phrases WHERE mlen = ? and clen = ? %(condition)s AND phrase = ? ;' % { 'database':database, 'condition':_condition }
-        if self.db.execute(msqlstr, _ph).fetchall():
+        if self.db.execute(msqlstr, _ph[1:]).fetchall():
             if self._is_chinese:
                 sqlstr = 'DELETE FROM %(database)s.phrases WHERE mlen = ? AND clen =? %(condition)s AND category = ? AND phrase = ?  ;' % { 'database':database, 'condition':_condition }
             else:
                 sqlstr = 'DELETE FROM %(database)s.phrases WHERE mlen = ? AND clen =? %(condition)s AND phrase = ?  ;' % { 'database':database, 'condition':_condition }
-            self.db.execute(sqlstr,_ph)
+            self.db.execute(sqlstr,_ph[1:])
             self.db.commit()
 
         if self._is_chinese:
             msqlstr= 'SELECT * FROM mudb.phrases WHERE mlen = ? and clen = ? %(condition)s AND category = ? AND phrase = ? ;' % { 'condition':_condition }
         else:
             msqlstr= 'SELECT * FROM mudb.phrases WHERE mlen = ? and clen = ? %(condition)s AND phrase = ? ;' % { 'condition':_condition }
-        if self.db.execute(msqlstr, _ph).fetchall():
+        if self.db.execute(msqlstr, _ph[1:]).fetchall():
             if self._is_chinese:
                 sqlstr = 'DELETE FROM mudb.phrases WHERE mlen = ? AND clen =? %(condition)s AND category = ? AND phrase = ?  ;' % {  'condition':_condition }
             else:
                 sqlstr = 'DELETE FROM mudb.phrases WHERE mlen = ? AND clen =? %(condition)s AND phrase = ?  ;' % {  'condition':_condition }
-            self.db.execute(sqlstr,_ph)
+            self.db.execute(sqlstr,_ph[1:])
             self.db.commit()
 
     def extra_user_phrases(self, udb, only_defined=False):
