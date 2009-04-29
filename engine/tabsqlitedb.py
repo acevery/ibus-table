@@ -1064,8 +1064,8 @@ class tabsqlitedb:
             if result:
                 for _res in result:
                     tabkey = u''
-                    for i in range ( int ( _res[0] ) ):
-                        tabkey += self.deparse ( _res[2+i] )
+                    for i in range ( int ( _res[1] ) ):
+                        tabkey += self.deparse ( _res[3+i] )
                     codes.append(tabkey)
         except:
             import traceback
@@ -1078,7 +1078,6 @@ class tabsqlitedb:
         Like (id, mlen,clen,m0,m1,m2,m3,phrase,freq,user_freq)
         '''
         _ph = list(phrase[:-2])
-        print _ph
         _condition = ''    
         for i in range(_ph[1]):
             _condition += 'AND m%d = ? ' % i
