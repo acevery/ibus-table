@@ -26,6 +26,7 @@ import ibus
 import gobject
 import re
 patt = re.compile (r'<\?.*\?>\n')
+from signal import signal, SIGTERM
 
 import factory
 import tabsqlitedb
@@ -121,6 +122,11 @@ class IMApp:
         self.__factory.do_destroy()
         self.__mainloop.quit()
 
+def cleanup (ima_ins):
+    print "cleanup"
+    ima_ins.quit()
+    sys.exit()
+
 def indent(elem, level=0):
     '''Use to format xml Element pretty :)'''
     i = "\n" + level*"    "
@@ -210,6 +216,7 @@ def main():
     else:
         db=""
     ima=IMApp(db, options.ibus)
+    signal (SIGTERM, lambda signum, stack_frame: cleanup(ima))
     try:
         ima.run()
     except KeyboardInterrupt:
