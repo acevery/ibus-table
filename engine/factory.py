@@ -23,6 +23,7 @@
 #
 
 import ibus
+from ibus.exception import *
 import table
 import tabsqlitedb
 import os
@@ -76,26 +77,32 @@ class EngineFactory (ibus.EngineFactoryBase):
         # the type (engine_name) == dbus.String
         name = engine_name.encode ('utf8')
         self.engine_path = engine_base_path % path_patt.sub ('_', name)
-        if not self.db:
-            # first check self.dbdict
-            if not name in self.dbdict:
-                try:
-                    db_dir = os.path.join (os.getenv('IBUS_TABLE_LOCATION'),'tables')
-                except:
-                    db_dir = "/usr/share/ibus-table/tables"
-                db = os.path.join (db_dir,name+'.db')
-                udb = name+'-user.db'
-                _sq_db = tabsqlitedb.tabsqlitedb( name = db,user_db = udb )
-                _sq_db.db.commit()
-                self.dbdict[name] = _sq_db
-        else:
-            name = self.dbusname
+        try:
+            if not self.db:
+                # first check self.dbdict
+                if not name in self.dbdict:
+                    try:
+                        db_dir = os.path.join (os.getenv('IBUS_TABLE_LOCATION'),'tables')
+                    except:
+                        db_dir = "/usr/share/ibus-table/tables"
+                    db = os.path.join (db_dir,name+'.db')
+                    udb = name+'-user.db'
+                    _sq_db = tabsqlitedb.tabsqlitedb( name = db,user_db = udb )
+                    _sq_db.db.commit()
+                    self.dbdict[name] = _sq_db
+            else:
+                name = self.dbusname
 
-        engine = table.tabengine(self.bus, self.engine_path \
-                + str(self.engine_id), self.dbdict[name])
-        self.engine_id += 1
-        #return engine.get_dbus_object()
-        return engine
+            engine = table.tabengine(self.bus, self.engine_path \
+                    + str(self.engine_id), self.dbdict[name])
+            self.engine_id += 1
+            #return engine.get_dbus_object()
+            return engine
+        except:
+            print "fail to create engine %s" % engine_name
+            import traceback
+            traceback.print_exc ()
+            raise IBusException("Can not create engine %s" % engine_name)
 
     def do_destroy (self):
         '''Destructor, which finish some task for IME'''
