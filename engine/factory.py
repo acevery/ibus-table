@@ -72,7 +72,7 @@ class EngineFactory (ibus.EngineFactoryBase):
         # because we need db to be past to Engine
         # the type (engine_name) == dbus.String
         name = engine_name.encode ('utf8')
-        self.engine_path = engine_base_path % name
+        self.engine_path = engine_base_path % name.replace('-','_')
         if not self.db:
             # first check self.dbdict
             if not name in self.dbdict:
