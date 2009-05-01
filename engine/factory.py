@@ -27,6 +27,9 @@ import table
 import tabsqlitedb
 import os
 import dbus
+from re import compile as re_compile
+
+path_patt = re_compile(r'[^a-zA-Z0-9_/]')
 
 from gettext import dgettext
 _  = lambda a : dgettext ("ibus-table", a)
@@ -72,7 +75,7 @@ class EngineFactory (ibus.EngineFactoryBase):
         # because we need db to be past to Engine
         # the type (engine_name) == dbus.String
         name = engine_name.encode ('utf8')
-        self.engine_path = engine_base_path % name.replace('-','_')
+        self.engine_path = engine_base_path % path_patt.sub ('_', name)
         if not self.db:
             # first check self.dbdict
             if not name in self.dbdict:
