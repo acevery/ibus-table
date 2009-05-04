@@ -917,7 +917,7 @@ class tabsqlitedb:
             except:
                 # if we don't have goucima:
                 return
-        if tabkey == None or len(tabkey) > self._mlen :
+        if (not tabkey) or len(tabkey) > self._mlen :
             sqlstr = '''SELECT * FROM (SELECT * FROM main.phrases WHERE phrase = ?
             UNION ALL SELECT * FROM user_db.phrases WHERE phrase = ?
             UNION ALL SELECT * FROM mudb.phrases WHERE phrase = ?)
@@ -928,7 +928,7 @@ class tabsqlitedb:
             # we are using this to check whether the tab-key and phrase is in db
             #print "tabkey: ", tabkey
             tabks = self.parse (tabkey)
-            #print tabks
+            #print "tabks: ", tabks
             tabkids = tuple( map(int,tabks) )
             condition = ' and '.join( map(lambda x: 'm%d = ?' % x, range( len(tabks) )) )
             sqlstr = '''SELECT * FROM 
