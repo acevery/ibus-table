@@ -620,7 +620,8 @@ class tabsqlitedb:
             self.db.commit()
     
     def compare (self,x,y):
-        return cmp (x[1],y[1]) or -(cmp (x[-1],y[-1])) or -(cmp (x[-2],y[-2]))
+        return cmp (x[1], y[1]) or -(cmp (x[-1], y[-1])) \
+                or -(cmp (x[-2], y[-2])) or (cmp (x[0], y[0]))
 
     def select_words( self, tabkeys, onechar=False, bitmask=0 ):
         '''

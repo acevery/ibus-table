@@ -27,11 +27,11 @@ __all__ = (
 
 import os
 import ibus
-from ibus import Property
+#from ibus import Property
 from ibus import keysyms
 from ibus import modifier
 from ibus import ascii
-import tabsqlitedb
+#import tabsqlitedb
 import tabdict
 import re
 patt_edit = re.compile (r'(.*)###(.*)###(.*)')
