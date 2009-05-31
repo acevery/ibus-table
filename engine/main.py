@@ -65,6 +65,8 @@ opt.add_option('--no-debug', '-n',
 #    opt.error('no db found!')
 
 if (not options.xml) and options.debug:
+    if not os.access ( os.path.expanduser('~/.ibus/tables'), os.F_OK):
+        os.system ('mkdir -p ~/.ibus/tables')
     logfile = os.path.expanduser('~/.ibus/tables/debug.log')
     sys.stdout = open (logfile,'a',0)
     sys.stderr = open (logfile,'a',0)
