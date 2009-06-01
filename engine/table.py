@@ -102,7 +102,11 @@ class editor(object):
     def get_chinese_mode (self):
         '''Use LC_CTYPE in your box to determine the _chinese_mode'''
         try:
-            __lc = os.environ['LC_CTYPE'].split('.')[0].lower()
+            if os.environ.has_key('LC_CTYPE'):
+                __lc = os.environ['LC_CTYPE'].split('.')[0].lower()
+            else:
+                __lc = os.environ['LANG'].split('.')[0].lower()
+
             if __lc.find('zh_') == 0:
                 # this is a zh_XX
                 __place =__lc.split('_')[1]
