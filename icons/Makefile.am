@@ -35,7 +35,7 @@ icons_DATA = \
 	phrase.svg \
 	chinese.svg \
 	english.svg \
-	dcommit.svg \
+	acommit.svg \
 	ncommit.svg \
 	cb-mode.svg \
 	sc-mode.svg \

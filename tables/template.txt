@@ -60,6 +60,9 @@ LAYOUT = us
 ### The max number of input keys for every phrase or character.
 MAX_KEY_LENGTH = 4
 
+### Use auto_commit mode as default
+AUTO_COMMIT = FALSE
+
 ### Use full width punctuation by default
 DEF_FULL_WIDTH_PUNCT = TRUE
 ### Not use full width letter by default
