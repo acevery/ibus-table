@@ -50,6 +50,9 @@ USER_CAN_DEFINE_PHRASE = FALSE
 ### Whether support PinYin Mode, default is true
 PINYIN_MODE = FALSE
 
+### Use auto_commit mode as default
+AUTO_COMMIT = TRUE
+
 ### Use full width punctuation by default
 DEF_FULL_WIDTH_PUNCT = FALSE
 ### Use full width letter by default
