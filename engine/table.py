@@ -869,7 +869,10 @@ class tabengine (ibus.EngineBase):
                 ]
         # some properties we will involved, Property is taken from scim.
         #self._setup_property = Property ("setup", _("Setup"))
-        self._direct_commit = False
+        try:
+            self._auto_commit = self.db.get_ime_property('auto_commit').lower() == u'true'
+        except:
+            self._auto_commit = False
         # the commit phrases length
         self._len_list = [0]
         # connect to SpeedMeter
@@ -910,13 +913,13 @@ class tabengine (ibus.EngineBase):
         self._punct_property = ibus.Property(u'punct')
         self._py_property = ibus.Property(u'py_mode')
         self._onechar_property = ibus.Property(u'onechar')
-        self._direct_commit_property = ibus.Property(u'dcommit')
+        self._auto_commit_property = ibus.Property(u'acommit')
         for prop in (self._status_property,
             self._letter_property,
             self._punct_property,
             self._py_property,
             self._onechar_property,
-            self._direct_commit_property
+            self._auto_commit_property
             #self._setup_property
             ):
             self.properties.append(prop)
@@ -969,12 +972,12 @@ class tabengine (ibus.EngineBase):
         else:
             self._onechar_property.set_icon ( u'%s%s' % (self._icon_dir, 'phrase.svg' ))
             self._onechar_property.set_tooltip ( _(u'Switch to single char mode') )
-        if self._direct_commit:
-            self._direct_commit_property.set_icon ( u'%s%s' % (self._icon_dir, 'dcommit.svg' ) ) 
-            self._direct_commit_property.set_tooltip ( _(u'Switch to normal commit mode, which use space to commit') ) 
+        if self._auto_commit:
+            self._auto_commit_property.set_icon ( u'%s%s' % (self._icon_dir, 'acommit.svg' ) ) 
+            self._auto_commit_property.set_tooltip ( _(u'Switch to normal commit mode, which use space to commit') ) 
         else:
-            self._direct_commit_property.set_icon ( u'%s%s' % (self._icon_dir, 'ncommit.svg' ) ) 
-            self._direct_commit_property.set_tooltip ( _(u'Switch to direct commit mode') ) 
+            self._auto_commit_property.set_icon ( u'%s%s' % (self._icon_dir, 'ncommit.svg' ) ) 
+            self._auto_commit_property.set_tooltip ( _(u'Switch to direct commit mode') ) 
         # the chinese_mode:
         if self.db._is_chinese:
             if self._editor._chinese_mode == 0:
@@ -1016,8 +1019,8 @@ class tabengine (ibus.EngineBase):
             self._editor.r_shift ()
         elif property == u'onechar':
             self._editor._onechar = not self._editor._onechar
-        elif property == u'dcommit':
-            self._direct_commit = not self._direct_commit
+        elif property == u'acommit':
+            self._auto_commit = not self._auto_commit
         elif property == u'letter':
             self._full_width_letter [self._mode] = not self._full_width_letter [self._mode]
         elif property == u'punct':
@@ -1254,7 +1257,7 @@ class tabengine (ibus.EngineBase):
             return True
         # Match direct commit mode switch hotkey
         if self._match_hotkey (key, keysyms.slash, modifier.CONTROL_MASK):
-            self.property_activate ( u"dcommit" )
+            self.property_activate ( u"acommit" )
             return True
         
         # Match Chinese mode shift
@@ -1386,7 +1389,7 @@ class tabengine (ibus.EngineBase):
         elif unichr(key.code) in self._valid_input_chars or \
                 ( self._editor._py_mode and \
                     unichr(key.code) in u'abcdefghijklmnopqrstuvwxyz!@#$%' ):
-            if self._direct_commit and ( len(self._editor._chars[0]) == self._ml \
+            if self._auto_commit and ( len(self._editor._chars[0]) == self._ml \
                     or len (self._editor._chars[0]) in self.db.pkeylens ):
                 # it is time to direct commit
                 sp_res = self._editor.space ()
@@ -1413,8 +1416,9 @@ class tabengine (ibus.EngineBase):
                     self.commit_string ( key_char )
                     return True
             else:
-                if self._direct_commit and self._editor.one_candidate () and \
-                        len(self._editor._chars[0]) == self._ml:
+                if self._auto_commit and self._editor.one_candidate () and \
+                        (len(self._editor._chars[0]) == self._ml \
+                            or not self.db._is_chinese):
                     # it is time to direct commit
                     sp_res = self._editor.space ()
                     #return (whethercommit,commitstring)

@@ -1,3 +1,7 @@
+June 2, 2009:
+    add auto_commit key into tabsqlitedb;
+    only check phrase length during auto_commit mode in Chinese IME;
+    rename dcommit.svg -> acommit.svg.
 May 26, 2009:
     merge from kaio.git
         -- add zh_TW.po, zh_HK.po; remove unused module in engine/table.py

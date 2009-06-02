@@ -97,6 +97,7 @@ class tabsqlitedb:
                       'user_can_define_phrase':'FALSE',
                       'pinyin_mode':'FALSE',
                       'dynamic_adjust':'FALSE',
+                      'auto_commit':'false',
                       #'no_check_chars':u'',
                       'description':'A IME under IBus Table',
                       'layout':'us',
