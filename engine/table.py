@@ -1157,7 +1157,7 @@ class tabengine (ibus.EngineBase):
 
         return False
     
-    def process_key_event(self, keyval, keycode, state):
+    def process_key_event(self, keyval, state):
         '''Process Key Events
         Key Events include Key Press and Key Release,
         modifier means Key Pressed
