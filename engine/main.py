@@ -26,7 +26,7 @@ import ibus
 import gobject
 import re
 patt = re.compile (r'<\?.*\?>\n')
-from signal import signal, SIGTERM
+from signal import signal, SIGTERM, SIGINT
 
 import factory
 import tabsqlitedb
@@ -219,6 +219,7 @@ def main():
         db=""
     ima=IMApp(db, options.ibus)
     signal (SIGTERM, lambda signum, stack_frame: cleanup(ima))
+    signal (SIGINT, lambda signum, stack_frame: cleanup(ima))
     try:
         ima.run()
     except KeyboardInterrupt:
