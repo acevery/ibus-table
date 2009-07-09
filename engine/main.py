@@ -81,6 +81,7 @@ class IMApp:
         self.__bus = ibus.Bus()
         self.__bus.connect("disconnected", self.__bus_destroy_cb)
         self.__factory = factory.EngineFactory(self.__bus, dbfile)
+        self.destroied = False
         if exec_by_ibus:
             self.__bus.request_name("org.freedesktop.IBus.Table", 0)
         else:
@@ -116,16 +117,20 @@ class IMApp:
 
     def run(self):
         self.__mainloop.run()
+        self.__bus_destroy_cb()
 
     def quit(self):
         self.__bus_destroy_cb()
 
     def __bus_destroy_cb(self, bus=None):
+        if self.destroied:
+            return
+        print "finalizing:)"
         self.__factory.do_destroy()
+        self.destroied = True
         self.__mainloop.quit()
 
 def cleanup (ima_ins):
-    print "cleanup"
     ima_ins.quit()
     sys.exit()
 
