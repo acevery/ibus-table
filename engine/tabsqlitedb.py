@@ -595,18 +595,13 @@ class tabsqlitedb:
     
     def create_indexes(self, database, commit=True):
         sqlstr = '''
-            DROP INDEX IF EXISTS %(database)s.goucima_index_z;
             CREATE INDEX IF NOT EXISTS %(database)s.goucima_index_z ON goucima (zi);
-            DROP INDEX IF EXISTS %(database)s.pinyin_index_i;
             CREATE INDEX IF NOT EXISTS %(database)s.pinyin_index_i ON pinyin (p0,p1,p2,p3,p4,p5,plen ASC, freq DESC);
-            VACUUM; 
             ''' % { 'database':database }
 
         sqlstr_t = '''
-            DROP INDEX IF EXISTS %(database)s.phrases_index_p;
             CREATE INDEX IF NOT EXISTS %(database)s.phrases_index_p ON phrases
             (%(tabkeystr)s mlen ASC, freq DESC, id ASC);
-            DROP INDEX IF EXISTS %(database)s.phrases_index_i;
             CREATE INDEX IF NOT EXISTS %(database)s.phrases_index_i ON phrases (phrase, mlen ASC);
             ''' 
         tabkeystr = ''
