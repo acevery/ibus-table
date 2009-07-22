@@ -593,10 +593,11 @@ class editor(object):
         else:
             _p_index = 8
         try:
-            self._strings.insert(self._cursor[0], self._candidates[0][ self.get_cursor_pos() ][_p_index])
-            self._cursor [0] += 1
-            if self._py_mode:
-                self._zi = self._candidates[0][ self.get_cursor_pos() ][_p_index]
+            if self._candidates[0]:
+                self._strings.insert(self._cursor[0], self._candidates[0][ self.get_cursor_pos() ][_p_index])
+                self._cursor [0] += 1
+                if self._py_mode:
+                    self._zi = self._candidates[0][ self.get_cursor_pos() ][_p_index]
             self.over_input ()
             self.update_candidates ()
         except:
