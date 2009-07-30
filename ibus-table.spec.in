@@ -45,8 +45,8 @@ make DESTDIR=${RPM_BUILD_ROOT} NO_INDEX=true install
 rm -rf $RPM_BUILD_ROOT
 
 %post additional
-ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/compose.db
-ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/latex.db
+ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/additional/compose.db
+ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/additional/latex.db
 
 %files -f %{name}.lang
 %defattr(-,root,root,-)
