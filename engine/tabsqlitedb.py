@@ -32,7 +32,7 @@ import time
 import re
 
 patt_r = re.compile(r'c([ea])(\d):(.*)')
-patt_p = re.compile(r'p(-{0,1}\d)(\d)')
+patt_p = re.compile(r'p(-{0,1}\d)(-{0,1}\d)')
 
 # first make some number index we will used :)
 #(MLEN, CLEN, M0, M1, M2, M3, M4, PHRASE, FREQ, USER_FREQ) = range (0,10)
