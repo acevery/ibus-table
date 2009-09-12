@@ -1073,11 +1073,11 @@ class tabengine (ibus.EngineBase):
             if self._mode:
                 self._config.set_value( self._config_section,
                         "TabDefFullWidthPunct",
-                        self._full_width_letter [self._mode])
+                        self._full_width_punct [self._mode])
             else:
                 self._config.set_value( self._config_section,
                         "EnDefFullWidthPunct",
-                        self._full_width_letter [self._mode])
+                        self._full_width_punct [self._mode])
         elif property == u'cmode':
             self._editor.change_chinese_mode()
             self.reset()
