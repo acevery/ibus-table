@@ -55,8 +55,11 @@ class KeyEvent:
 
 class editor(object):
     '''Hold user inputs chars and preedit string'''
-    def __init__ (self,phrase_table_index,valid_input_chars, max_key_length, database, parser = tabdict.parse, deparser = tabdict.deparse, max_length = 64):
+    def __init__ (self, config, phrase_table_index,valid_input_chars, max_key_length, database, parser = tabdict.parse, deparser = tabdict.deparse, max_length = 64):
         self.db = database
+        self._config = config
+        self._name = self.db.get_ime_property('name')
+        self._config_section = "engine/Table/%s" % self._name
         self._pt = phrase_table_index
         self._parser = parser
         self._deparser = deparser
@@ -89,15 +92,18 @@ class editor(object):
         # self._caret: caret position in lookup_table
         self._caret = 0
         # self._onechar: whether we only select single character
-        self._onechar = False
+        self._onechar = self._config.get_value (self._config_section, "OneChar", False)
         # self._chinese_mode: the candidate filter mode,
         #   0 is simplify Chinese
         #   1 is traditional Chinese
         #   2 is Big charset mode, but simplify Chinese first
         #   3 is Big charset mode, but traditional Chinese first
         #   4 is Big charset mode.
-        # we use LC_CTYPE to determine which one to use
-        self._chinese_mode = self.get_chinese_mode()
+        # we use LC_CTYPE or LANG to determine which one to use
+        self._chinese_mode = self._config.get_value (
+                self._config_section,
+                "ChineseMode",
+                self.get_chinese_mode())
 
     def get_chinese_mode (self):
         '''Use LC_CTYPE in your box to determine the _chinese_mode'''
@@ -126,6 +132,10 @@ class editor(object):
     def change_chinese_mode (self):
         if self._chinese_mode != -1:
             self._chinese_mode = (self._chinese_mode +1 ) % 5
+        self._config.set_value (
+                self._config_section,
+                "ChineseMode",
+                self._chinese_mode )
 
     def clear (self):
         '''Remove data holded'''
@@ -815,6 +825,7 @@ class tabengine (ibus.EngineBase):
 
     def __init__ (self, bus, obj_path, db ):
         super(tabengine,self).__init__ (bus,obj_path)
+        self._bus = bus
         self._lookup_table = ibus.LookupTable (tabengine._page_size)
         # this is the backend sql db we need for our IME
         # we receive this db from IMEngineFactory
@@ -850,8 +861,14 @@ class tabengine (ibus.EngineBase):
         self._pt = self.db.get_phrase_table_index ()
         self._ml = int(self.db.get_ime_property ('max_key_length'))
         
+        # name for config section
+        self._name = self.db.get_ime_property('name')
+        self._config_section = "engine/Table/%s" % self._name
+        
+        # config module
+        self._config = self._bus.get_config ()
         # Containers we used:
-        self._editor = editor(self._pt, self._valid_input_chars, self._ml, self.db)
+        self._editor = editor(self._config, self._pt, self._valid_input_chars, self._ml, self.db)
 
         # some other vals we used:
         # self._prev_key: hold the key event last time.
@@ -859,14 +876,23 @@ class tabengine (ibus.EngineBase):
         self._prev_char = None
         self._double_quotation_state = False
         self._single_quotation_state = False
-        # [ENmode,TABmode] we get TABmode properties from db
+
+        # [EnMode,TabMode] we get TabMode properties from db
         self._full_width_letter = [
-                False, 
-                self.db.get_ime_property('def_full_width_letter').lower() == u'true'
+                self._config.get_value (self._config_section,
+                    "EnDefFullWidthLetter",
+                    False),
+                self._config.get_value (self._config_section, 
+                    "TabDefFullWidthLetter", 
+                    self.db.get_ime_property('def_full_width_letter').lower() == u'true' )
                 ]
         self._full_width_punct = [
-                False,
-                self.db.get_ime_property('def_full_width_punct').lower() == u'true'
+                self._config.get_value (self._config_section,
+                    "EnDefFullWidthPunct",
+                    False),
+                self._config.get_value (self._config_section, 
+                    "TabDefFullWidthPunct", 
+                    self.db.get_ime_property('def_full_width_punct').lower() == u'true' )
                 ]
         # some properties we will involved, Property is taken from scim.
         #self._setup_property = Property ("setup", _("Setup"))
@@ -874,6 +900,8 @@ class tabengine (ibus.EngineBase):
             self._auto_commit = self.db.get_ime_property('auto_commit').lower() == u'true'
         except:
             self._auto_commit = False
+        self._auto_commit = self._config.get_value (self._config_section, "AutoCommit",
+                self._auto_commit)
         # the commit phrases length
         self._len_list = [0]
         # connect to SpeedMeter
@@ -1020,12 +1048,36 @@ class tabengine (ibus.EngineBase):
             self._editor.r_shift ()
         elif property == u'onechar':
             self._editor._onechar = not self._editor._onechar
+            self._config.set_value( self._config_section,
+                    "OneChar",
+                    self._editor._onechar)
+
         elif property == u'acommit':
             self._auto_commit = not self._auto_commit
+            self._config.set_value( self._config_section,
+                    "AutoCommit",
+                    self._auto_commit)
         elif property == u'letter':
             self._full_width_letter [self._mode] = not self._full_width_letter [self._mode]
+            if self._mode:
+                self._config.set_value( self._config_section,
+                        "TabDefFullWidthLetter",
+                        self._full_width_letter [self._mode])
+            else:
+                self._config.set_value( self._config_section,
+                        "EnDefFullWidthLetter",
+                        self._full_width_letter [self._mode])
+
         elif property == u'punct':
             self._full_width_punct [self._mode] = not self._full_width_punct [self._mode]
+            if self._mode:
+                self._config.set_value( self._config_section,
+                        "TabDefFullWidthPunct",
+                        self._full_width_letter [self._mode])
+            else:
+                self._config.set_value( self._config_section,
+                        "EnDefFullWidthPunct",
+                        self._full_width_letter [self._mode])
         elif property == u'cmode':
             self._editor.change_chinese_mode()
             self.reset()
@@ -1519,5 +1571,16 @@ class tabengine (ibus.EngineBase):
             self._update_lookup_table ()
             return True
         return False
+
+    # for further implementation :)
+    @classmethod
+    def CONFIG_VALUE_CHANGED(cls, bus, section, name, value):
+        config = bus.get_config()
+        if section != self._config_section:
+            return
     
-    
+    @classmethod
+    def CONFIG_RELOADED(cls, bus):
+        config = bus.get_config()
+        if section != self._config_section:
+            return
