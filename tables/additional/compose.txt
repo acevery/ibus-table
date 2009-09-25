@@ -2,6 +2,7 @@
 ### This file must be encoded into UTF-8.
 ### redistribute
 ### This table under LGPL-2.1 or later
+### vim:noet ts=4 sts=4 sw=4
 
 SCIM_Generic_Table_Phrase_Library_TEXT
 VERSION_1_0
@@ -16,7 +17,7 @@ UUID = 9e8e0e60-0cf8-11dd-b08f-000e12b86efd
 ### A unique number indicates the version of this file.
 ### For example the last modified date of this file.
 ### This number must be less than 2^32.
-SERIAL_NUMBER = 20090218
+SERIAL_NUMBER = 20090925
 
 ### License
 LICENSE = GPL
@@ -41,8 +42,8 @@ AUTHOR = Yu Yuwei <yu-yuwei@xmu.edu.cn>
 STATUS_PROMPT = C
 
 ### Valid input chars.
-VALID_INPUT_CHARS == abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"'()*+,./:<>?^_`|~
-MAX_KEY_LENGTH = 2
+VALID_INPUT_CHARS == abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"'()*-+=,./:<>?^_`|~
+MAX_KEY_LENGTH = 3
 
 ### Whether user are allow to define phrase, default is true
 USER_CAN_DEFINE_PHRASE = FALSE
@@ -130,6 +131,7 @@ BEGIN_TABLE
 *U	Ů	1
 *a	å	1
 *u	ů	1
++-	±	1
 +_	±	1
 ,,	¸	1
 ,A	Ą	1
@@ -264,6 +266,12 @@ BEGIN_TABLE
 <t	ť	1
 <u	ǔ	1
 <z	ž	1
+=C	€	1
+=L	£	1
+=Y	¥	1
+=e	€	1
+=l	£	1
+=y	¥	1
 >>	»	1
 >A	Â	1
 >C	Ĉ	1
@@ -287,6 +295,7 @@ BEGIN_TABLE
 >o	ô	1
 >s	ŝ	1
 >u	û	1
+/u	µ	1
 >w	ŵ	1
 >y	ŷ	1
 ??	¿	1
@@ -314,6 +323,7 @@ C'	Ć	1
 C,	Ç	1
 C.	Ċ	1
 C<	Č	1
+C=	€	1
 C>	Ĉ	1
 CO	©	1
 C^	Ĉ	1
@@ -333,7 +343,6 @@ E<	Ě	1
 E>	Ê	1
 E^	Ê	1
 E_	Ē	1
-E__	€	1
 E`	È	1
 F	F	1
 F.	Ḟ	1
@@ -374,6 +383,7 @@ L,	Ļ	1
 L.	Ŀ	1
 L/	Ł	1
 L<	Ľ	1
+L=	£	1
 L_	£	1
 M	M	1
 M.	Ṁ	1
@@ -453,11 +463,12 @@ W`	Ẁ	1
 X	X	1
 Y	Y	1
 Y'	Ý	1
+Y-	¥	1
+Y=	¥	1
 Y:	Ÿ	1
 Y>	Ŷ	1
 Y^	Ŷ	1
 Y_	Ȳ	1
-Y__	¥	1
 Y`	Ỳ	1
 Y~	Ỹ	1
 Z	Z	1
@@ -507,11 +518,9 @@ _L	£	1
 _O	Ō	1
 _U	Ū	1
 _Y	Ȳ	1
-__	¯	1
-__	–	1
-__	—	1
-__E	€	1
-__Y	¥	1
+--	¯	1
+--	–	1
+--	—	1
 _a	ā	1
 _ae	ǣ	1
 _e	ē	1
@@ -574,6 +583,7 @@ e.	ė	1
 e.	ẹ	1
 e:	ë	1
 e<	ě	1
+e=	€	1
 e>	ê	1
 e^	ê	1
 e_	ē	1
@@ -618,6 +628,7 @@ l,	ļ	1
 l.	ŀ	1
 l/	ł	1
 l<	ľ	1
+l=	£	1
 m	m	1
 m.	ṁ	1
 n	n	1
@@ -687,6 +698,7 @@ u^	û	1
 u_	ū	1
 u`	ù	1
 u~	ũ	1
+u/	µ	1
 v	v	1
 w	w	1
 w'	ẃ	1
@@ -699,6 +711,8 @@ xo	¤	1
 xx	×	1
 y	y	1
 y'	ý	1
+y-	¥	1
+y=	¥	1
 y:	ÿ	1
 y>	ŷ	1
 y^	ŷ	1
