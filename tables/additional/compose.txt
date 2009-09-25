@@ -3,6 +3,8 @@
 ### redistribute
 ### This table under LGPL-2.1 or later
 ### vim:noet ts=4 sts=4 sw=4
+### thank 袁野 <yuanyelele@gmail.com> for Adding more characters,
+### most important a-z, A-Z and German letters.
 
 SCIM_Generic_Table_Phrase_Library_TEXT
 VERSION_1_0
