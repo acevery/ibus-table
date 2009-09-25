@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# vim: set et ts=4 sts=4
+# vim:et sts=4 sw=4
 #
 # ibus-table - The Tables engine for IBus
 #
@@ -858,6 +858,15 @@ class tabengine (ibus.EngineBase):
             if _c in tabdict.tab_key_list:
                 self._valid_input_chars.append(_c)
         del self._chars
+
+        # check whether we can use '=' and '-' for page_down/up
+        self._page_down_keys = [keysyms.Page_Down, keysyms.KP_Page_Down]
+        self._page_up_keys = [keysyms.Page_Up, keysyms.KP_Page_Up]
+        if '=' not in self._valid_input_chars \
+                and '-' not in self._valid_input_chars:
+            self._page_down_keys.append (keysyms.equal)
+            self._page_up_keys.append (keysyms.minus)
+        
         self._pt = self.db.get_phrase_table_index ()
         self._ml = int(self.db.get_ime_property ('max_key_length'))
         
@@ -1484,12 +1493,14 @@ class tabengine (ibus.EngineBase):
             self._update_ui ()
             return True
         
-        elif key.code in (keysyms.equal, keysyms.Page_Down, keysyms.KP_Page_Down) and self._editor._candidates[0]:
+        elif key.code in self._page_down_keys \
+                and self._editor._candidates[0]:
             res = self._editor.page_down()
             self._update_lookup_table ()
             return res
 
-        elif key.code in (keysyms.minus, keysyms.Page_Up, keysyms.KP_Page_Up) and self._editor._candidates[0]:
+        elif key.code in self._page_up_keys \
+                and self._editor._candidates[0]:
             res = self._editor.page_up ()
             self._update_lookup_table ()
             return res

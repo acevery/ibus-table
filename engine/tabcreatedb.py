@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# vim: set et sts=4 sw=4
+# vim:et sts=4 sw=4
 #
 # ibus-table - The Tables engine for IBus
 #
@@ -101,7 +101,7 @@ def main ():
 
         for l in f:
             if ( not patt_com.match(l) ) and ( not patt_blank.match(l) ):
-                for _patt, _list in ( (patt_conf,_attri),(patt_table,_table),(patt_gouci,_gouci) ):
+                for _patt, _list in ( (patt_table,_table),(patt_gouci,_gouci),(patt_conf,_attri) ):
                     if _patt.match(l):
                         _list.append(l)
                         break

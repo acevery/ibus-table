@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# vim: set et sw=4 sts=4
+# vim:et sw=4 sts=4 sw=4
 #
 # ibus-table - The Tables engine for IBus
 #

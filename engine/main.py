@@ -1,4 +1,4 @@
-# vim:set et sts=4 sw=4
+# vim:et sts=4 sw=4
 #
 # ibus-table - The Tables engine for IBus
 #
