@@ -380,7 +380,10 @@ class tabsqlitedb:
         else:
             # we try to findout whether we have least commit len
             # in ime table
-            least_commit_len = int(self.get_ime_property('least_commit_length'))
+            try:
+                least_commit_len = int(self.get_ime_property('least_commit_length'))
+            except:
+                least_commit_len = 0
             if least_commit_len > 0:
                 return range (least_commit_len, self._mlen + 1)
             else:
