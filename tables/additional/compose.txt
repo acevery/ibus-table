@@ -65,6 +65,9 @@ DEF_FULL_WIDTH_LETTER = FALSE
 ### according your using frequency.
 DYNAMIC_ADJUST = TRUE 
 
+### Least key length allowed to commit to preedit
+LEAST_COMMIT_LENGTH = 1
+
 END_DEFINITION
 
 ### Begin Table data.

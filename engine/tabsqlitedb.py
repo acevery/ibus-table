@@ -101,8 +101,13 @@ class tabsqlitedb:
                       #'no_check_chars':u'',
                       'description':'A IME under IBus Table',
                       'layout':'us',
-                      'rules':''}
+                      'rules':'',
                       #'rules':'ce2:p11+p12+p21+p22;ce3:p11+p21+p22+p31;ca4:p11+p21+p31+p41'}
+                      'least_commit_length':'0'
+                      # we use this entry for those IME, which don't
+                      # have rules to build up phrase, but still need
+                      # auto commit to preedit
+                      }
             # inital the attribute in ime table, which should be updated from mabiao
             for _name in ime_keys:
                 sqlstr = 'INSERT INTO main.ime (attr,val) VALUES (?,?);'
@@ -142,8 +147,7 @@ class tabsqlitedb:
         
         self.rules = self.get_rules ()
         self.pkeylens = []
-        if self.rules:
-            self.pkeylens = self.phrase_keys_len ()
+        self.pkeylens = self.phrase_keys_len ()
         
         #self._no_check_chars = self.get_no_check_chars()
         # for fast gouci
@@ -163,7 +167,7 @@ class tabsqlitedb:
                 desc = self.get_database_desc (user_db)
                 if desc == None :
                     self.init_user_db (user_db)
-                elif desc["version"] != "0.4":
+                elif desc["version"] != "0.5":
                     new_name = "%s.%d" %(user_db, os.getpid())
                     print >> stderr, "Can not support the user db. We will rename it to %s" % new_name
                     self.old_phrases = self.extra_user_phrases( user_db )
@@ -349,7 +353,7 @@ class tabsqlitedb:
                         if res.group(1) == 'a':
                             rules['above'] = int(res.group(2))
                         _cms = res.group(3).split('+')
-                        if len(_cms) > int(self.get_ime_property('max_key_length')):
+                        if len(_cms) > self._mlen:
                             print 'rule: "%s" over max key length' % rule
                             break
                         for _cm in _cms:
@@ -367,11 +371,22 @@ class tabsqlitedb:
 
     def phrase_keys_len (self):
         '''Return the phrase possible key length'''
-        max_len = self.rules["above"]
-        try:
-            return map ( lambda x: len(self.rules[x]), range(2, max_len+1) )[:]
-        except:
-            return None
+        if self.rules:
+            max_len = self.rules["above"]
+            try:
+                return map ( lambda x: len(self.rules[x]), range(2, max_len+1) )[:]
+            except:
+                return None
+        else:
+            # we try to findout whether we have least commit len
+            # in ime table
+            least_commit_len = int(self.get_ime_property('least_commit_length'))
+            if least_commit_len > 0:
+                return range (least_commit_len, self._mlen + 1)
+            else:
+                return None
+            
+
     
     def get_no_check_chars (self):
         '''Get the characters which engine should not change freq'''
