@@ -1,5 +1,5 @@
 # Process this file with autoconf to produce a configure script.
-# vim:set et ts=4
+# vim:set et ts=4:
 #
 # ibus-table - The Tables engine for IBus
 #

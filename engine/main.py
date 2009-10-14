@@ -159,8 +159,8 @@ def main():
         #    Elements
         dbs = os.listdir(db_dir)
         dbs = filter (lambda x: x.endswith('.db'), dbs)
-        if not dbs:
-            return
+        #if not dbs:
+        #    return
 
         egs = Element('engines')
         for _db in dbs:
