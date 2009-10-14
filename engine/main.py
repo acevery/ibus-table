@@ -171,9 +171,13 @@ def main():
             _name.text = _db.replace ('.db','')
             
             _longname = SubElement (_engine, 'longname')
-            _locale = getdefaultlocale()[0].lower()
-            _longname.text = _sq_db.get_ime_property ( \
+            _longname.text = ''
+            try:
+                _locale = getdefaultlocale()[0].lower()
+                _longname.text = _sq_db.get_ime_property ( \
                     '.'.join(['name',_locale]) )
+            except:
+                pass
             if not _longname.text:
                 _longname.text = _name.text
             
