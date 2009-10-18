@@ -103,7 +103,8 @@ class tabsqlitedb:
                       'layout':'us',
                       'rules':'',
                       #'rules':'ce2:p11+p12+p21+p22;ce3:p11+p21+p22+p31;ca4:p11+p21+p31+p41'}
-                      'least_commit_length':'0'
+                      'least_commit_length':'0',
+                      'start_chars':''
                       # we use this entry for those IME, which don't
                       # have rules to build up phrase, but still need
                       # auto commit to preedit
@@ -148,6 +149,7 @@ class tabsqlitedb:
         self.rules = self.get_rules ()
         self.pkeylens = []
         self.pkeylens = self.phrase_keys_len ()
+        self.startchars = self.get_start_chars ()
         
         #self._no_check_chars = self.get_no_check_chars()
         # for fast gouci
@@ -388,9 +390,14 @@ class tabsqlitedb:
                 return range (least_commit_len, self._mlen + 1)
             else:
                 return []
-            
-
     
+    def get_start_chars (self):
+        '''return possible start chars of IME'''
+        try:
+            return self.get_ime_property('start_chars')
+        except:
+            return ''
+
     def get_no_check_chars (self):
         '''Get the characters which engine should not change freq'''
         _chars= self.get_ime_property('no_check_chars')
@@ -789,7 +796,7 @@ class tabsqlitedb:
             sqlstring = 'CREATE TABLE IF NOT EXISTS user_db.desc (name PRIMARY KEY, value);'
             self.db.executescript (sqlstring)
             sqlstring = 'INSERT OR IGNORE INTO user_db.desc  VALUES (?, ?);'
-            self.db.execute (sqlstring, ('version', '0.4'))
+            self.db.execute (sqlstring, ('version', '0.5'))
             sqlstring = 'INSERT OR IGNORE INTO user_db.desc  VALUES (?, DATETIME("now", "localtime"));'
             self.db.execute (sqlstring, ("create-time", ))
             self.db.commit ()

@@ -491,109 +491,119 @@ class editor(object):
 
     def update_candidates (self):
         '''Update lookuptable'''
-        if (self._chars[0] == self._chars[2] and self._candidates[0]) \
-                or self._chars[1]:
-            # if no change in valid input char or we have invalid input,
-            # we do not do sql enquery
-            pass
+        # first check whether the IME have defined start_chars
+        if self.db.startchars and ( len(self._chars[0]) == 1 )\
+                and ( len(self._chars[1]) == 0 ) \
+                and ( self._chars[0][0] not in self.db.startchars):
+            self._u_chars.append ( self._chars[0][0] )
+            self._strings.insert ( self._cursor[0], self._chars[0][0] )
+            self._cursor [0] += 1
+            self.clear_input()
         else:
-            # check whether last time we have only one candidate
-            only_one_last = self.one_candidate()
-            # do enquiry
-            self._lookup_table.clean ()
-            self._lookup_table.show_cursor (False)
-            if self._tabkey_list:
-                # here we need to consider two parts, table and pinyin
-                # first table
-                if not self._py_mode:
-                    if self.db._is_chinese :
-                        bm_index = self._pt.index('category')
-                        if self._chinese_mode == 0:
-                            # simplify Chinese mode
-                            self._candidates[0] = self.db.select_words(\
-                                    self._tabkey_list, self._onechar, 1 )
-                        elif self._chinese_mode == 1:
-                            # traditional Chinese mode
-                            self._candidates[0] = self.db.select_words(\
-                                    self._tabkey_list, self._onechar, 2 )
-                        else:
-                            self._candidates[0] = self.db.select_words(\
-                                    self._tabkey_list, self._onechar )
-                    else:
-                        self._candidates[0] = self.db.select_words( self._tabkey_list, self._onechar )
-                else:
-                    self._candidates[0] = self.db.select_zi( self._tabkey_list )
-                self._chars[2] = self._chars[0][:]
-                    
+            if (self._chars[0] == self._chars[2] and self._candidates[0]) \
+                    or self._chars[1]:
+                # if no change in valid input char or we have invalid input,
+                # we do not do sql enquery
+                pass
             else:
-                self._candidates[0] =[]
-            if self._candidates[0]:
-                self._candidates[0] = self.filter_candidates (self._candidates[0])
-            if self._candidates[0]:
-                map ( self.ap_candidate,self._candidates[0] )
-            else:
-                if self._chars[0]:
-                    ## old manner:
-                    #if self._candidates[1]:
-                    #    #print self._candidates[1]
-                    #    self._candidates[0] = self._candidates[1]
-                    #    self._candidates[1] = []
-                    #    last_input = self.pop_input ()
-                    #    self.auto_commit_to_preedit ()
-                    #    res = self.add_input( last_input )
-                    #    print res
-                    #    return res
-                    #else:
-                    #    self.pop_input ()
-                    #    self._lookup_table.clean()
-                    #    self._lookup_table.show_cursor (False)
-                    #    return False
-                    ###################
-                    ## new manner, we add new char to invalid input
-                    ## chars
-                    if not self._chars[1]:
-                        # we don't have invalid input chars
-                        # here we need to check the last input
-                        # is a punctuation or not, if is a punct,
-                        # then we use old maner to summit the former valid
-                        # candidate
-                        if ascii.ispunct (self._chars[0][-1].encode('ascii')) \
-                                or len (self._chars[0][:-1]) \
-                                in self.db.pkeylens \
-                                or only_one_last:
-                            # because we use [!@#$%] to denote [12345]
-                            # in py_mode, so we need to distinguish them
-                            ## old manner:
-                            if self._py_mode:
-                                if self._chars[0][-1] in "!@#$%":
-                                    self._chars[0].pop() 
-                                    self._tabkey_list.pop()
-                                    return True
-
-                            if self._candidates[1]:
-                                self._candidates[0] = self._candidates[1]
-                                self._candidates[1] = []
-                                last_input = self.pop_input ()
-                                self.auto_commit_to_preedit ()
-                                res = self.add_input( last_input )
-                                return res
+                # check whether last time we have only one candidate
+                only_one_last = self.one_candidate()
+                # do enquiry
+                self._lookup_table.clean ()
+                self._lookup_table.show_cursor (False)
+                if self._tabkey_list:
+                    # here we need to consider two parts, table and pinyin
+                    # first table
+                    if not self._py_mode:
+                        if self.db._is_chinese :
+                            bm_index = self._pt.index('category')
+                            if self._chinese_mode == 0:
+                                # simplify Chinese mode
+                                self._candidates[0] = self.db.select_words(\
+                                        self._tabkey_list, self._onechar, 1 )
+                            elif self._chinese_mode == 1:
+                                # traditional Chinese mode
+                                self._candidates[0] = self.db.select_words(\
+                                        self._tabkey_list, self._onechar, 2 )
                             else:
-                                self.pop_input ()
-                                self._lookup_table.clean()
-                                self._lookup_table.show_cursor (False)
-                                return False
-                        else:    
-                            # this is not a punct or not a valid phrase
-                            # last time
-                            self._chars[1].append( self._chars[0].pop() )
-                            self._tabkey_list.pop()
+                                self._candidates[0] = self.db.select_words(\
+                                        self._tabkey_list, self._onechar )
+                        else:
+                            self._candidates[0] = self.db.select_words( self._tabkey_list, self._onechar )
                     else:
-                        pass
-                    self._candidates[0] =[]
+                        self._candidates[0] = self.db.select_zi( self._tabkey_list )
+                    self._chars[2] = self._chars[0][:]
+                        
                 else:
-                    self._lookup_table.clean()
-                    self._lookup_table.show_cursor (False)
-            self._candidates[1] = self._candidates[0]
+                    self._candidates[0] =[]
+                if self._candidates[0]:
+                    self._candidates[0] = self.filter_candidates (self._candidates[0])
+                if self._candidates[0]:
+                    map ( self.ap_candidate,self._candidates[0] )
+                else:
+                    if self._chars[0]:
+                        ## old manner:
+                        #if self._candidates[1]:
+                        #    #print self._candidates[1]
+                        #    self._candidates[0] = self._candidates[1]
+                        #    self._candidates[1] = []
+                        #    last_input = self.pop_input ()
+                        #    self.auto_commit_to_preedit ()
+                        #    res = self.add_input( last_input )
+                        #    print res
+                        #    return res
+                        #else:
+                        #    self.pop_input ()
+                        #    self._lookup_table.clean()
+                        #    self._lookup_table.show_cursor (False)
+                        #    return False
+                        ###################
+                        ## new manner, we add new char to invalid input
+                        ## chars
+                        if not self._chars[1]:
+                            # we don't have invalid input chars
+                            # here we need to check the last input
+                            # is a punctuation or not, if is a punct,
+                            # then we use old maner to summit the former valid
+                            # candidate
+                            if ascii.ispunct (self._chars[0][-1].encode('ascii')) \
+                                    or len (self._chars[0][:-1]) \
+                                    in self.db.pkeylens \
+                                    or only_one_last:
+                                # because we use [!@#$%] to denote [12345]
+                                # in py_mode, so we need to distinguish them
+                                ## old manner:
+                                if self._py_mode:
+                                    if self._chars[0][-1] in "!@#$%":
+                                        self._chars[0].pop() 
+                                        self._tabkey_list.pop()
+                                        return True
+
+                                if self._candidates[1]:
+                                    self._candidates[0] = self._candidates[1]
+                                    self._candidates[1] = []
+                                    last_input = self.pop_input ()
+                                    self.auto_commit_to_preedit ()
+                                    res = self.add_input( last_input )
+                                    return res
+                                else:
+                                    self.pop_input ()
+                                    self._lookup_table.clean()
+                                    self._lookup_table.show_cursor (False)
+                                    return False
+                            else:    
+                                # this is not a punct or not a valid phrase
+                                # last time
+                                self._chars[1].append( self._chars[0].pop() )
+                                self._tabkey_list.pop()
+                        else:
+                            pass
+                        self._candidates[0] =[]
+                    else:
+                        self._lookup_table.clean()
+                        self._lookup_table.show_cursor (False)
+                self._candidates[1] = self._candidates[0]
+            
         return True    
 
     def commit_to_preedit (self):
