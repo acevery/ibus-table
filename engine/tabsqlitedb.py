@@ -376,7 +376,7 @@ class tabsqlitedb:
             try:
                 return map ( lambda x: len(self.rules[x]), range(2, max_len+1) )[:]
             except:
-                return None
+                return []
         else:
             # we try to findout whether we have least commit len
             # in ime table
@@ -387,7 +387,7 @@ class tabsqlitedb:
             if least_commit_len > 0:
                 return range (least_commit_len, self._mlen + 1)
             else:
-                return None
+                return []
             
 
     
