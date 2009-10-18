@@ -67,6 +67,9 @@ USER_CAN_DEFINE_PHRASE = FALSE
 ### Chinese.
 PINYIN_MODE = FALSE
 
+### Input keys should start with \
+START_CHARS = \
+
 END_DEFINITION
 
 ### Begin Table data.
