@@ -27,16 +27,17 @@ export IBUS_TABLE_LOCATION=@datarootdir@/ibus-table
 
 for arg in $@; do
 	case $arg in
-	--xml)
+	--xml | -x)
 		exec python @datarootdir@/ibus-table/engine/main.py --xml;;
 	--help | -h)
 		exec python @datarootdir@/ibus-table/engine/main.py $@;;
+  *)
+    # first running speedmeter as a daemon
+    python @datarootdir@/ibus-table/engine/speedmeter.py -d > /dev/null
+
+    # then start our IME
+    exec python @datarootdir@/ibus-table/engine/main.py $@
+    exit 0
 	esac
 done
-
-# first running speedmeter as a daemon
-python @datarootdir@/ibus-table/engine/speedmeter.py -d
-
-# then start our IME
-exec python @datarootdir@/ibus-table/engine/main.py $@
 
