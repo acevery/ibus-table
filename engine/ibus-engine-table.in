@@ -33,7 +33,7 @@ for arg in $@; do
 		exec python @datarootdir@/ibus-table/engine/main.py $@;;
   *)
     # first running speedmeter as a daemon
-    python @datarootdir@/ibus-table/engine/speedmeter.py -d > /dev/null
+    #python @datarootdir@/ibus-table/engine/speedmeter.py -d > /dev/null
 
     # then start our IME
     exec python @datarootdir@/ibus-table/engine/main.py $@

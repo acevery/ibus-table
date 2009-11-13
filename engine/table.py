@@ -924,16 +924,16 @@ class tabengine (ibus.EngineBase):
         # the commit phrases length
         self._len_list = [0]
         # connect to SpeedMeter
-        try:
-            bus = dbus.SessionBus()
-            user = os.path.basename( os.path.expanduser('~') )
-            self._sm_bus = bus.get_object ("org.ibus.table.SpeedMeter.%s"\
-                    % user, "/org/ibus/table/SpeedMeter")
-            self._sm =  dbus.Interface(self._sm_bus,\
-                    "org.ibus.table.SpeedMeter") 
-        except:
-            self._sm = None
-        self._sm_on = False
+        #try:
+        #    bus = dbus.SessionBus()
+        #    user = os.path.basename( os.path.expanduser('~') )
+        #    self._sm_bus = bus.get_object ("org.ibus.table.SpeedMeter.%s"\
+        #            % user, "/org/ibus/table/SpeedMeter")
+        #    self._sm =  dbus.Interface(self._sm_bus,\
+        #            "org.ibus.table.SpeedMeter") 
+        #except:
+        #    self._sm = None
+        #self._sm_on = False
         self._on = False
         self.reset ()
 
@@ -1168,12 +1168,12 @@ class tabengine (ibus.EngineBase):
         self._update_preedit ()
         self._update_aux ()
 
-    def add_string_len(self, astring):
-        if self._sm_on:
-            try:
-                self._sm.Accumulate(len(astring))
-            except:
-                pass
+    #def add_string_len(self, astring):
+    #    if self._sm_on:
+    #        try:
+    #            self._sm.Accumulate(len(astring))
+    #        except:
+    #            pass
     
     def commit_string (self,string):
         self._editor.clear ()
@@ -1338,13 +1338,13 @@ class tabengine (ibus.EngineBase):
             return True
         
         # Match speedmeter shift
-        if self._match_hotkey (key, keysyms.apostrophe, modifier.CONTROL_MASK):
-            self._sm_on = not self._sm_on
-            if self._sm_on:
-                self._sm.Show ()
-            else:
-                self._sm.Hide ()
-            return True
+        #if self._match_hotkey (key, keysyms.apostrophe, modifier.CONTROL_MASK):
+        #    self._sm_on = not self._sm_on
+        #    if self._sm_on:
+        #        self._sm.Show ()
+        #    else:
+        #        self._sm.Hide ()
+        #    return True
         
         # Ignore key release event now :)
         if key.mask & modifier.RELEASE_MASK:
@@ -1442,7 +1442,7 @@ class tabengine (ibus.EngineBase):
             #return (KeyProcessResult,whethercommit,commitstring)
             if sp_res[0]:
                 self.commit_string (sp_res[1])
-                self.add_string_len(sp_res[1])
+                #self.add_string_len(sp_res[1])
                 self.db.check_phrase (sp_res[1], sp_res[2])
             else:
                 if sp_res[1] == u' ':
@@ -1468,7 +1468,7 @@ class tabengine (ibus.EngineBase):
                 #return (whethercommit,commitstring)
                 if sp_res[0]:
                     self.commit_string (sp_res[1])
-                    self.add_string_len(sp_res[1])
+                    #self.add_string_len(sp_res[1])
                     self.db.check_phrase (sp_res[1],sp_res[2])
             
             res = self._editor.add_input ( unichr(key.code) )
@@ -1481,7 +1481,7 @@ class tabengine (ibus.EngineBase):
                 #return (KeyProcessResult,whethercommit,commitstring)
                 if sp_res[0]:
                     self.commit_string (sp_res[1] + key_char)
-                    self.add_string_len(sp_res[1])
+                    #self.add_string_len(sp_res[1])
                     self.db.check_phrase (sp_res[1],sp_res[2])
                     return True
                 else:
@@ -1496,7 +1496,7 @@ class tabengine (ibus.EngineBase):
                     #return (whethercommit,commitstring)
                     if sp_res[0]:
                         self.commit_string (sp_res[1])
-                        self.add_string_len(sp_res[1])
+                        #self.add_string_len(sp_res[1])
                         self.db.check_phrase (sp_res[1], sp_res[2])
                         return True
 
@@ -1522,7 +1522,7 @@ class tabengine (ibus.EngineBase):
                 o_py = self._editor._py_mode
                 commit_string = self._editor.get_preedit_strings ()
                 self.commit_string (commit_string)
-                self.add_string_len(commit_string)
+                #self.add_string_len(commit_string)
                 if o_py != self._editor._py_mode:
                     self._refresh_properties ()
                     self._update_ui ()
@@ -1550,34 +1550,35 @@ class tabengine (ibus.EngineBase):
             self.register_properties (self.properties)
             self._refresh_properties ()
             self._update_ui ()
-            try:
-                if self._sm_on:
-                    self._sm.Show ()
-                else:
-                    self._sm.Hide ()
-            except:
-                pass
+            #try:
+            #    if self._sm_on:
+            #        self._sm.Show ()
+            #    else:
+            #        self._sm.Hide ()
+            #except:
+            #    pass
     
     def focus_out (self):
-        try:
-            self._sm.Hide()
-        except:
-            pass
+        #try:
+        #    self._sm.Hide()
+        #except:
+        #    pass
+        pass
 
     def enable (self):
-        try:
-            self._sm.Reset()
-        except:
-            pass
+        #try:
+        #    self._sm.Reset()
+        #except:
+        #    pass
         self._on = True
         self.focus_in()
 
     def disable (self):
         self.reset()
-        try:
-            self._sm.Hide()
-        except:
-            pass
+        #try:
+        #    self._sm.Hide()
+        #except:
+        #    pass
         self._on = False
 
 
