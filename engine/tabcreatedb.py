@@ -161,7 +161,7 @@ def main ():
     def phrase_parser (f):
         list=[]
         for l in f:
-            xingma, phrase, freq = unicode (l, "utf-8").strip ().split ('\t')
+            xingma, phrase, freq = unicode (l, "utf-8").strip ().split ('\t')[:3]
             list.append ( (xingma, phrase, int(freq), 0) )
         return list
 
