@@ -879,6 +879,7 @@ class tabsqlitedb:
         if p_len < 2:
             # phrase should not be shorter than 2
             return []
+        print p_len
         try:
             if p_len >= self.rules['above']:
                 rule = self.rules[ self.rules['above'] ]
@@ -893,7 +894,8 @@ class tabsqlitedb:
             #        zi -= 1
             #    gcm = self.get_gcm_id (phrase[zi])
             #    tabkeylist.append(gcm[ma-1])
-            tabkeylist = map (lambda x: self.get_gcm_id ( phrase[x[0]-1] )[ x[1]-1 ], rule )
+            tabkeylist = map (lambda x: self.get_gcm_id ( phrase[x[0]-1 if x[0] > 0 else x[0]] )\
+                    [ x[1]-1 if x[1] > 0 else x[1] ], rule )
             return [len( tabkeylist)] + [p_len]  + tabkeylist[:] + [phrase]
 
         except:
