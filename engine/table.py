@@ -121,7 +121,7 @@ class editor(object):
                 else:
                     return 1
             else:
-                if self.db._is_chinese():
+                if self.db._is_chinese:
                     # if IME declare as Chinese IME
                     return 0
                 else:
