@@ -879,7 +879,7 @@ class tabsqlitedb:
         if p_len < 2:
             # phrase should not be shorter than 2
             return []
-        print p_len
+        #print p_len
         try:
             if p_len >= self.rules['above']:
                 rule = self.rules[ self.rules['above'] ]
