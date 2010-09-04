@@ -1505,7 +1505,6 @@ class tabengine (ibus.EngineBase):
                         #self.add_string_len(sp_res[1])
                         self.db.check_phrase (sp_res[1], sp_res[2])
                         return True
-
             self._update_ui ()
             return True
         
@@ -1542,11 +1541,16 @@ class tabengine (ibus.EngineBase):
             else:
                 self._editor.commit_to_preedit ()
                 commit_string = self._editor.get_preedit_strings ()
+            # we need to take care of the py_mode here :)
+            py_mode = self._editor._py_mode
             self._editor.clear ()
+            if py_mode:
+                self._refresh_properties ()
             if ascii.ispunct (key.code):
                 self.commit_string ( commit_string + cond_punct_translate (unichr (key.code)))
             else:
                 self.commit_string ( commit_string + cond_letter_translate (unichr (key.code)))
+            
             return True
         return False
     
