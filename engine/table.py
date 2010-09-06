@@ -652,7 +652,6 @@ class editor(object):
         if self._zi:
             # we have pinyin result
             tabcodes = self.db.find_zi_code(self._zi)
-            aux_string = self._zi+u': '
             aux_string = u' '.join(tabcodes)
         #    self._zi = u''
         cstr = u''.join(self._strings)

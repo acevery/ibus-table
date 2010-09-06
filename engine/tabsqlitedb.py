@@ -762,7 +762,7 @@ class tabsqlitedb:
         else:
             x_len = _len
         
-        while x_len < 8:
+        while x_len <= 8:
             sqlstr = '''SELECT * FROM main.pinyin WHERE plen < %(mk)d  %(condition)s 
                 ORDER BY plen ASC, freq DESC;''' % { 'mk':x_len, 'condition':_condition}
             # we have redefine the __int__(self) in class tabdict.tab_key to return the key id, so we can use map to got key id :)
