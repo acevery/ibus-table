@@ -59,7 +59,7 @@ class editor(object):
         self.db = database
         self._config = config
         self._name = self.db.get_ime_property('name')
-        self._config_section = "engine/Table/%s" % self._name
+        self._config_section = "engine/Table/%s" % self._name.replace(' ','_')
         self._pt = phrase_table_index
         self._parser = parser
         self._deparser = deparser
@@ -881,7 +881,7 @@ class tabengine (ibus.EngineBase):
         
         # name for config section
         self._name = self.db.get_ime_property('name')
-        self._config_section = "engine/Table/%s" % self._name
+        self._config_section = "engine/Table/%s" % self._name.replace(' ', '_')
         
         # config module
         self._config = self._bus.get_config ()
