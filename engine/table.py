@@ -286,7 +286,7 @@ class editor(object):
                 else:
                     self._strings[self._cursor[0] - 1] = self._strings[self._cursor[0] - 1][:-1]
         # if we remove all characters in preedit string, we need to clear the self._t_chars
-        if self._cursor == [0,0]:
+        if self._cursor == [0,0] and not self._strings:
             self._t_chars =[]
 
     def remove_after_char (self):
