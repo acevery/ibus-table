@@ -58,4 +58,3 @@ Ctrl + ,            open/close Single Character Mode, only show single
 Ctrl + .            shift between full/half punctuation.
 Ctrl + /            shift between direct/normal commit mode.
 Ctrl + ;            shift between different SubCharset in Chinese
-Ctrl + '            show/hide speedmeter

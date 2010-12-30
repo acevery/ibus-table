@@ -1467,7 +1467,8 @@ class tabengine (ibus.EngineBase):
                 ( self._editor._py_mode and \
                     unichr(key.code) in u'abcdefghijklmnopqrstuvwxyz!@#$%' ):
             if self._auto_commit and ( len(self._editor._chars[0]) == self._ml \
-                    or len (self._editor._chars[0]) in self.db.pkeylens ):
+                    or len (self._editor._chars[0]) in self.db.pkeylens )\
+                    and not self._editor._py_mode:
                 # it is time to direct commit
                 sp_res = self._editor.space ()
                 #return (whethercommit,commitstring)
