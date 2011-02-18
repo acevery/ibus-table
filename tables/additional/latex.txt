@@ -10,26 +10,27 @@ BEGIN_DEFINITION
 
 ### An unique id to distinguish this table among others.
 ### Use uuidgen to generate this kind of id.
-UUID = e9e9e584-2162-17ed-f889-020b5d51dffe
+UUID = a619c0a4-c591-4541-8899-5359dc9c4170 
+# was e9e9e584-2162-17ed-f889-020b5d51dffe
 
 ### A unique number indicates the version of this file.
 ### For example the last modified date of this file.
 ### This number must be less than 2^32.
-SERIAL_NUMBER = 20080218
+SERIAL_NUMBER = 20110210
 
 ### License
 LICENSE = LGPL
 
-ICON = latex.svg
+ICON = latex.png
 
 ### The default name of this table
 NAME = LaTeX
 
 ### Description
-DESCRIPTION = Use LaTeX input keystrokes to input lots of symbols.
+DESCRIPTION = Use LaTeX input keystrokes to input lots of symbols. Latex commands start either by a backslash \ (eg, \lambda) or by a _ or ^ for subscripting and superscripting. The symbols _ and ^ are respectively obtained by \_ and by \hat 
 
 ### Author of this table
-AUTHOR = Somebody unknown
+AUTHOR = Giuseppe Castagna (gc@pps.jussieu.fr)
 
 ### Supported locales of this table
 LANGUAGES = 
@@ -52,7 +53,7 @@ DEF_FULL_WIDTH_LETTER = FALSE
 MAX_KEY_LENGTH = 20
 
 ### Valid input chars.
-VALID_INPUT_CHARS = abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890\_[]{}
+VALID_INPUT_CHARS = abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890^\_[]{}
 
 ### Layout
 LAYOUT = us
@@ -66,9 +67,6 @@ USER_CAN_DEFINE_PHRASE = FALSE
 ### this feature is just for Chinese, set it to False if your IM is not
 ### Chinese.
 PINYIN_MODE = FALSE
-
-### Input keys should start with \
-START_CHARS = \
 
 END_DEFINITION
 
@@ -90,7 +88,6 @@ BEGIN_TABLE
 \circ	°	0
 \pm	±	0
 \acute	´	0
-\mu	µ	0
 \P	¶	0
 \cdot	·	0
 \frac14	¼	0
@@ -112,7 +109,7 @@ BEGIN_TABLE
 \beta	β	0
 \gamma	γ	0
 \delta	δ	0
-\varepsilon	ε	0
+\epsilon	ϵ	0
 \zeta	ζ	0
 \eta	η	0
 \theta	θ	0
@@ -124,7 +121,6 @@ BEGIN_TABLE
 \xi	ξ	0
 \pi	π	0
 \rho	ρ	0
-\varsigma	ς	0
 \sigma	σ	0
 \tau	τ	0
 \upsilon	υ	0
@@ -132,34 +128,88 @@ BEGIN_TABLE
 \chi	χ	0
 \psi	ψ	0
 \omega	ω	0
+\varepsilon	ε	0
 \vartheta	ϑ	0
 \varphi	ϕ	0
 \varpi	ϖ	0
 \varsigma	ϛ	0
 \varrho	ϱ	0
-\epsilon	ϵ	0
 \dag	†	0
 \ddag	‡	0
 \bullet	•	0
 \dots	…	0
-\mathbb{C}	ℂ	0
-\mathcal{E}	ℇ	0
-\mathfrak{H}	ℌ	0
-\mathbb	ℍ	0
+#
+# Subscript - superscript
+#
+_1	₁	0
+_2	₂	0
+_3	₃	0
+_4	₄	0
+_5	₅	0
+_6	₆	0
+_7	₇	0
+_8	₈	0
+_9	₉	0
+_0	₀	0
+_+	₊	0
+_-	₋	0
+_=	₌	0
+_(	₍	0
+_)	₎	0
+_a	ₐ	0
+_e	ₑ	0
+_o	ₒ	0
+_x	ₓ	0
+^0	⁰	0
+^i	ⁱ	0
+^1	¹	0
+^2	²	0
+^3	³	0
+^4	⁴	0
+^5	⁵	0
+^6	⁶	0
+^7	⁷	0
+^8	⁸	0
+^9	⁹	0
+^+	⁺	0
+^-	⁻	0
+^=	⁼	0
+^(	⁽	0
+^)	⁾	0
+^n	ⁿ	0
+#
+# Unicode symbols interval 2100-214F
+#
+#\mathbb--------------
+\mathbbC	ℂ	0
+\mathbbH	ℍ	0
+\mathbbN	ℕ	0
+\mathbbP	ℙ	0
+\mathbbQ	ℚ	0
+\mathbbR	ℝ	0
+\mathbbZ	ℤ	0
+#\mathcal-------------
+\mathcalE	ℰ	0
+\mathcalF	ℱ	0
+\mathcalg	ℊ	0
+\mathcalH	ℋ	0
+\mathcalI	ℐ	0
+\mathcalL	ℒ	0
+\mathcalM	ℳ	0
+\mathcalR	ℛ	0
+\mathcalB	ℬ	0
+#\mathfrak------------
+\mathfrakH	ℌ	0
+\mathfrakR	ℜ	0
+\mathfrakC	ℭ	0
+\mathfrakZ	ℨ	0
 \hbar	ℏ	0
 \Im	ℑ	0
 \ell	ℓ	0
-\mathbb	ℕ	0
 \wp	℘	0
-\mathbb	ℙ	0
-\mathbb	ℚ	0
 \Re	ℜ	0
-\mathbb	ℝ	0
-\mathbb	ℤ	0
 \Omega	Ω	0
 \mho	℧	0
-\mathfrak	ℨ	0
-\mathfrak	ℭ	0
 \Finv	Ⅎ	0
 \aleph	ℵ	0
 \beth	ℶ	0
