@@ -31,6 +31,36 @@ import bz2
 import re
 
 from optparse import OptionParser
+
+_invalid_keyname_chars = " \t\r\n\"$&<>,+=#!()'|{}[]?~`;%\\"
+def gconf_valid_keyname(kn):
+    """
+    Keynames must be ascii, and must not contain any invalid characters
+
+    >>> gconf_valid_keyname('nyannyan')
+    True
+
+    >>> gconf_valid_keyname('nyan nyan')
+    False
+
+    >>> gconf_valid_keyname('nyannyan[')
+    False
+
+    >>> gconf_valid_keyname('nyan\tnyan')
+    False
+    """
+    return not any(c in _invalid_keyname_chars or ord(c) > 127 for c in kn)
+
+class InvalidTableName(Exception):
+    """
+    Raised when an invalid table name is given
+    """
+    def __init__(self, name):
+        self.table_name = name
+
+    def __str__(self):
+        return 'Value of NAME attribute (%s) cannot contain any of %r and must be all ascii' % (self.table_name, _invalid_keyname_chars)
+
 # we use OptionParser to parse the cmd arguments :)
 opt_parser = OptionParser()
 
@@ -77,17 +107,17 @@ def main ():
     def debug_print ( message ):
         if opts.debug:
             print message
-    
+
     if not opts.only_index:
         try:
             os.unlink (opts.name)
         except:
             pass
-    
+
     debug_print ("Processing Database")
     db = tabsqlitedb.tabsqlitedb ( filename = opts.name)
     #db.db.execute( 'PRAGMA synchronous = FULL; ' )
-    
+
     def parse_source (f):
         _attri = []
         _table = []
@@ -95,10 +125,9 @@ def main ():
         patt_com = re.compile(r'^###.*')
         patt_blank = re.compile(r'^[ \t]*$')
         patt_conf = re.compile(r'.*=.*')
-        patt_table = re.compile(r'([^\s]+)\t([^\s]+)\t[^\s]+')
-        patt_gouci = re.compile(r'[^\s]+\t[^\s]+')
-        #patt_s = re.compile(r'(.*)\t([\x00-\xff]{3})\t.*')
-        patt_s = re.compile(r'([^\s]+)\t([^\s]+)\t[^\s]+')
+        patt_table = re.compile(r'(.*)\t(.*)\t.*')
+        patt_gouci = re.compile(r'.*\t.*')
+        patt_s = re.compile(r'(.*)\t([\x00-\xff]{3})\t.*')
 
         for l in f:
             if ( not patt_com.match(l) ) and ( not patt_blank.match(l) ):
@@ -139,21 +168,21 @@ def main ():
                         _pinyins.append("%s\t%s\t%s" \
                                 % (res.group(1), yin, res.group(3)))
         return _pinyins[:]
-    
+
     def parse_extra (f):
         _extra = []
         patt_com = re.compile(r'^###.*')
         patt_blank = re.compile(r'^[ \t]*$')
         patt_extra = re.compile(r'(.*)\t(.*)')
         patt_s = re.compile(r'(.*)\t([\x00-\xff]{3})\t.*')
-        
+
         for l in f:
             if ( not patt_com.match(l) ) and ( not patt_blank.match(l) ):
                 if patt_extra.match(l):
                     _extra.append(l)
-        
+
         return _extra
-    
+
     def pinyin_parser (f):
         for py in f:
             _zi, _pinyin, _freq = unicode (py,'utf-8').strip ().split()
@@ -168,10 +197,9 @@ def main ():
 
     def goucima_parser (f):
         for l in f:
-            #print l
             zi,gcm = unicode (l, "utf-8").strip ().split ()
             yield (zi, gcm)
-    
+
     def attribute_parser (f):
         for l in f:
             try:
@@ -182,8 +210,10 @@ def main ():
             origin_attr = attr
             attr = attr.lower()
             val = val.strip()
+            if attr == 'name' and not gconf_valid_keyname(val):
+                raise InvalidTableName(val)
             yield (attr,val)
-    
+
     def extra_parser (f):
         list = []
         for l in f:
@@ -199,7 +229,7 @@ def main ():
         debug_print ('Only create Indexes')
         debug_print ( "Optimizing database " )
         db.optimize_database ()
-    
+
         debug_print ('Create Indexes ')
         db.create_indexes ('main')
         debug_print ('Done! :D')
@@ -216,7 +246,7 @@ def main ():
     # first get config line and table line and goucima line respectively
     debug_print ('\tParsing table source file ')
     attri,table,gouci =  parse_source ( source )
-    
+
     debug_print ('\t  get attribute of IME :)')
     attributes = attribute_parser ( attri )
     debug_print ('\t  add attributes into DB ')
@@ -226,17 +256,17 @@ def main ():
     # second, we use generators for database generating:
     debug_print ('\t  get phrases of IME :)')
     phrases = phrase_parser ( table)
-    
+
     # now we add things into db
     debug_print ('\t  add phrases into DB ')
     db.add_phrases ( phrases )
-    
+
     if db.get_ime_property ('user_can_define_phrase').lower() == u'true':
         debug_print ('\t  get goucima of IME :)')
         goucima = goucima_parser (gouci)
         debug_print ('\t  add goucima into DB ')
         db.add_goucima ( goucima )
-    
+
     if db.get_ime_property ('pinyin_mode').lower() == u'true':
         debug_print ('\tLoad pinyin source \"%s\"' % opts.pinyin)
         _bz2p = patt_s.match(opts.pinyin)
@@ -253,7 +283,7 @@ def main ():
 
     debug_print ("Optimizing database ")
     db.optimize_database ()
-    
+
     if db.get_ime_property ('user_can_define_phrase').lower() == u'true' and opts.extra:
         debug_print( '\tPreparing for adding extra words' )
         db.create_indexes ('main')
@@ -286,7 +316,7 @@ def main ():
         db.add_phrases (new_phrases)
         debug_print ("Optimizing database ")
         db.optimize_database ()
-    
+
     if opts.index:
         debug_print ('Create Indexes ')
         db.create_indexes ('main')
@@ -294,6 +324,6 @@ def main ():
         debug_print ("We don't create index on database, you should only active this function only for distribution purpose")
         db.drop_indexes ('main')
     debug_print ('Done! :D')
-    
+
 if __name__ == "__main__":
     main ()
