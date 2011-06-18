@@ -16,7 +16,7 @@ UUID = a619c0a4-c591-4541-8899-5359dc9c4170
 ### A unique number indicates the version of this file.
 ### For example the last modified date of this file.
 ### This number must be less than 2^32.
-SERIAL_NUMBER = 20110210
+SERIAL_NUMBER = 20110618
 
 ### License
 LICENSE = LGPL
@@ -506,4 +506,5 @@ _x	ₓ	0
 \flat	♭	0
 \natural	♮	0
 \sharp	♯	0
+\coloncolon	∷	0
 END_TABLE
