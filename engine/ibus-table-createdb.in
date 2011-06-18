@@ -26,4 +26,4 @@ datarootdir=@datarootdir@
 datadir=@datadir@
 export IBUS_TABLE_DATA_DIR=@datarootdir@
 export IBUS_TABLE_BIN_PATH=@bindir@
-exec python @datarootdir@/ibus-table/engine/tabcreatedb.py $@
+exec @PYTHON@ @datarootdir@/ibus-table/engine/tabcreatedb.py $@
