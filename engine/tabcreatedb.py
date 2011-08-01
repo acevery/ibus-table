@@ -192,6 +192,8 @@ def main ():
         list=[]
         for l in f:
             xingma, phrase, freq = unicode (l, "utf-8").strip ().split ('\t')[:3]
+            if phrase == 'NOSYMBOL':
+                phrase = u''
             list.append ( (xingma, phrase, int(freq), 0) )
         return list
 
