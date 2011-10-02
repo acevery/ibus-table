@@ -25,6 +25,12 @@ import sys
 reload (sys)
 sys.setdefaultencoding('utf-8')
 
+def gen_uni(the_string):
+    """
+    call unicode to convert utf-8 to unicode in py, just for convenience.
+    """
+    return unicode(the_string, 'utf-8')
+
 tab_dict = {
     '0':0,
     'a':1, 'b':2, 'c':3, 'd':4, 'e':5, 
@@ -45,7 +51,11 @@ tab_dict = {
     'R':76, 'S':77, 'T':78, 'U':79, 'V':80,
     'W':81, 'X':82, 'Y':83, 'Z':84, '0':85,
     '1':86, '2':87, '3':88, '4':89, '5':90,
-    '6':91, '7':92, '8':93, '9':94
+    '6':91, '7':92, '8':93, '9':94,
+    # for translit
+    gen_uni('ä'):95,
+    gen_uni('ö'):96,
+    gen_uni('ü'):97
     }
 
 tab_key_list = tab_dict.keys()
