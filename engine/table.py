@@ -120,6 +120,9 @@ class editor(object):
                     return 0
                 else:
                     return 1
+            # en_hk is a special case which we need to take care of
+            elif __lc.find('en_hk') == 0:
+                    return 1
             else:
                 if self.db._is_chinese:
                     # if IME declare as Chinese IME
@@ -128,7 +131,7 @@ class editor(object):
                     return -1
         except:
             return -1
-                
+
     def change_chinese_mode (self):
         if self._chinese_mode != -1:
             self._chinese_mode = (self._chinese_mode +1 ) % 5
