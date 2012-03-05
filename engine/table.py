@@ -113,16 +113,11 @@ class editor(object):
             else:
                 __lc = os.environ['LANG'].split('.')[0].lower()
 
-            if __lc.find('zh_') == 0:
-                # this is a zh_XX
-                __place =__lc.split('_')[1]
-                if __place == 'cn':
-                    return 0
-                else:
-                    return 1
-            # en_hk is a special case which we need to take care of
-            elif __lc.find('en_hk') == 0:
-                    return 1
+            if __lc.find('_cn') != -1:
+                return 0
+            # hk and tw is should use tc as default
+            elif __lc.find('_hk') != -1 or __lc.find('_tw') != -1:
+                return 1
             else:
                 if self.db._is_chinese:
                     # if IME declare as Chinese IME
