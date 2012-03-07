@@ -116,7 +116,8 @@ class editor(object):
             if __lc.find('_cn') != -1:
                 return 0
             # hk and tw is should use tc as default
-            elif __lc.find('_hk') != -1 or __lc.find('_tw') != -1:
+            elif __lc.find('_hk') != -1 or __lc.find('_tw') != -1\
+                    or __lc.find('_mo') != -1:
                 return 1
             else:
                 if self.db._is_chinese:
