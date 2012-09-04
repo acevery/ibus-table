@@ -1367,7 +1367,8 @@ class tabengine (ibus.EngineBase):
                 if ascii.isdigit (key.code):
                     self.commit_string (cond_letter_translate (unichr (key.code)))
                     return True
-            elif key.code > 127 and (not self._editor._py_mode):
+            elif key.code > 127 and ( unichr(key.code) not in self._valid_input_chars ) \
+                    and(not self._editor._py_mode):
                 return False
 
         if key.code == keysyms.Escape:
