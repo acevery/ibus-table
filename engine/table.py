@@ -1353,7 +1353,7 @@ class tabengine (ibus.EngineBase):
 
         if self._editor.is_empty ():
             # we have not input anything
-            if key.code <= 127 and ( keychar not in self._valid_input_chars ) \
+            if key.code >= 32 and key.code <= 127 and ( keychar not in self._valid_input_chars ) \
                     and (not key.mask & modifier.ALT_MASK + modifier.CONTROL_MASK):
                 if key.code == keysyms.space:
                     #self.commit_string (cond_letter_translate (keychar))
@@ -1369,7 +1369,7 @@ class tabengine (ibus.EngineBase):
                 if ascii.isdigit (key.code):
                     self.commit_string (cond_letter_translate (keychar))
                     return True
-            elif key.code > 127 and ( keychar not in self._valid_input_chars ) \
+            elif (key.code < 32 or key.code > 127) and ( keychar not in self._valid_input_chars ) \
                     and(not self._editor._py_mode):
                 return False
 
