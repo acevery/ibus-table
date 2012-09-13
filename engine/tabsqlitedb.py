@@ -468,17 +468,27 @@ class tabsqlitedb:
             # make sure that we got a unicode string
             if type(phrase) != type(u''):
                 phrase = phrase.decode('utf8')
+            tmp_phrase = ''.join(re.findall(u'['
+                                            + u'\u4E00-\u9FCB'
+                                            + u'\u3400-\u4DB5'
+                                            + u'\uF900-\uFaFF'
+                                            + u'\U00020000-\U0002A6D6'
+                                            + u'\U0002A700-\U0002B734'
+                                            + u'\U0002B740-\U0002B81D'
+                                            + u'\U0002F800-\U0002FA1D'
+                                            + u']+',
+                                            phrase))
             # first whether in gb2312
             try:
-                phrase.encode('gb2312')
+                tmp_phrase.encode('gb2312')
                 category |= 1
             except:
-                if '〇'.decode('utf8') in phrase:
+                if '〇'.decode('utf8') in tmp_phrase:
                     # we add '〇' into SC as well
                     category |= 1
             # second check big5-hkscs
             try:
-                phrase.encode('big5hkscs')
+                tmp_phrase.encode('big5hkscs')
                 category |= 1 << 1
             except:
                 # then check whether in gbk,
@@ -488,7 +498,7 @@ class tabsqlitedb:
                 else:
                     # need to check
                     try:
-                        phrase.encode('gbk')
+                        tmp_phrase.encode('gbk')
                         category |= 1
                     except:
                         # not in gbk
