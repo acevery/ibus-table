@@ -93,6 +93,12 @@ class editor(object):
         self._caret = 0
         # self._onechar: whether we only select single character
         self._onechar = self._config.get_value (self._config_section, "OneChar", False)
+        
+        # self._auto_select: select automatically the first phrase
+        self._auto_select = self._config.get_value (self._config_section, "AutoSelect", False)
+        if self._auto_select == None:
+            self._auto_select = self.db.get_ime_property('auto_select').lower() == u'true'
+        
         # self._chinese_mode: the candidate filter mode,
         #   0 is simplify Chinese
         #   1 is traditional Chinese
@@ -568,7 +574,8 @@ class editor(object):
                             if ascii.ispunct (self._chars[0][-1].encode('ascii')) \
                                     or len (self._chars[0][:-1]) \
                                     in self.db.pkeylens \
-                                    or only_one_last:
+                                    or only_one_last
+                                    or self._auto_select:
                                 # because we use [!@#$%] to denote [12345]
                                 # in py_mode, so we need to distinguish them
                                 ## old manner:
