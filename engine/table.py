@@ -926,6 +926,14 @@ class tabengine (ibus.EngineBase):
             self._auto_commit = False
         self._auto_commit = self._config.get_value (self._config_section, "AutoCommit",
                 self._auto_commit)
+        
+        try:
+            self._auto_select = self.db.get_ime_property('auto_select').lower() == u'true'
+        except:
+            self._auto_select = False
+        self._auto_select = self._config.get_value (self._config_section, "AutoSelect",
+                self._auto_select)
+
         # the commit phrases length
         self._len_list = [0]
         # connect to SpeedMeter
@@ -1455,7 +1463,10 @@ class tabengine (ibus.EngineBase):
             sp_res = self._editor.space ()
             #return (KeyProcessResult,whethercommit,commitstring)
             if sp_res[0]:
-                self.commit_string (sp_res[1])
+                if self._auto_select:
+                    self.commit_string ("%s " %sp_res[1])
+                else:
+                    self.commit_string (sp_res[1])
                 #self.add_string_len(sp_res[1])
                 self.db.check_phrase (sp_res[1], sp_res[2])
             else:
