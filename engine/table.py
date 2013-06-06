@@ -574,7 +574,7 @@ class editor(object):
                             if ascii.ispunct (self._chars[0][-1].encode('ascii')) \
                                     or len (self._chars[0][:-1]) \
                                     in self.db.pkeylens \
-                                    or only_one_last
+                                    or only_one_last \
                                     or self._auto_select:
                                 # because we use [!@#$%] to denote [12345]
                                 # in py_mode, so we need to distinguish them
