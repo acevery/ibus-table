@@ -2,7 +2,7 @@
 #
 # ibus-table - The Tables engine for IBus
 #
-# Copyright (c) 2008-2009 Yu Yuwei <acevery@gmail.com>
+# Copyright (c) 2008-2009 Yuwei Yu <acevery@gmail.com>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public

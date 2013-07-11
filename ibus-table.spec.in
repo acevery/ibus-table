@@ -88,5 +88,5 @@ ibus-table-createdb -i -n %{_datadir}/ibus-table/tables/additional/latex.db
 %{_datadir}/ibus/engine/latex.engine
 
 %changelog
-* Wed Aug 19 2008 Yu Yuwei <acevery@gmail.com> - @VERSION@-1
+* Wed Aug 19 2008 Yuwei Yu <acevery@gmail.com> - @VERSION@-1
 - The first version.

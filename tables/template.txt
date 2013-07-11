@@ -45,7 +45,7 @@ DESCRIPTION = This is a template engine table for IBus Table.
 LANGUAGES = zh_CN,zh_SG,zh_TW,zh_HK
 
 ### The author of this table
-AUTHOR = Yu Yuwei <acevery@gmail.com> 
+AUTHOR = Yuwei Yu <acevery@gmail.com> 
 
 ### Prompt string to be displayed in the status area, CN will be replaced by
 ### the gettext tools in runtime as 中.

@@ -38,7 +38,7 @@ NAME = Compose
 ### Supported languages of this table
 LANGUAGES = 
 
-AUTHOR = Yu Yuwei <yu-yuwei@xmu.edu.cn> 
+AUTHOR = Yuwei Yu <yu-yuwei@xmu.edu.cn> 
 
 ### Prompt string to be displayed in the status area.
 STATUS_PROMPT = C
