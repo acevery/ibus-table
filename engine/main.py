@@ -208,6 +208,11 @@ def main():
             _desc = SubElement (_engine, 'description')
             _desc.text = _sq_db.get_ime_property ('description')
 
+            # use the first character of longname as the IME symbol in
+            # gnome-shell panel
+            _symbol = SubElement(_engine, 'symbol')
+            _symbol.text = _longname.text[0]
+
         # now format the xmlout pretty
         indent (egs)
         egsout = tostring (egs, encoding='utf8')
