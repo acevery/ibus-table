@@ -33,23 +33,23 @@ from re import compile as re_compile
 path_patt = re_compile(r'[^a-zA-Z0-9_/]')
 
 from gettext import dgettext
-_  = lambda a : dgettext ("ibus-table", a)
+_  = lambda a : dgettext("ibus-table", a)
 N_ = lambda a : a
 
 engine_base_path = "/com/redhat/IBus/engines/table/%s/engine/"
 
 
-class EngineFactory (ibus.EngineFactoryBase):
+class EngineFactory(ibus.EngineFactoryBase):
     """Table IM Engine Factory"""
-    def __init__ (self, bus, db="", icon=""):
+    def __init__(self, bus, db="", icon=""):
         # here the db should be the abs path to sql db
         # this is the backend sql db we need for our IME
         # we need get lots of IME property from this db :)
-        #self.db = tabsqlitedb.tabsqlitedb( name = database )
-        
+        #self.db = tabsqlitedb.tabsqlitedb(name=database)
+
         if db:
             self.dbusname = os.path.basename(db).replace('.db','')
-            udb = os.path.basename(db).replace('.db','-user.db') 
+            udb = os.path.basename(db).replace('.db','-user.db')
             self.db = tabsqlitedb.tabsqlitedb( name = db,user_db = udb )
             self.db.db.commit()
             self.dbdict = {self.dbusname:self.db}
@@ -57,37 +57,37 @@ class EngineFactory (ibus.EngineFactoryBase):
             self.db = None
             self.dbdict = {}
 
-        
+
         # init factory
         self.bus = bus
-        super(EngineFactory,self).__init__ (bus)
+        super(EngineFactory,self).__init__(bus)
         self.engine_id=0
         try:
             bus = dbus.Bus()
-            user = os.path.basename( os.path.expanduser('~') )
-            self._sm_bus = bus.get_object ("org.ibus.table.SpeedMeter.%s"\
+            user = os.path.basename(os.path.expanduser('~'))
+            self._sm_bus = bus.get_object("org.ibus.table.SpeedMeter.%s"\
                     % user, "/org/ibus/table/SpeedMeter")
             self._sm =  dbus.Interface(self._sm_bus,\
-                    "org.ibus.table.SpeedMeter") 
+                    "org.ibus.table.SpeedMeter")
         except:
             self._sm = None
-    
+
     def create_engine(self, engine_name):
         # because we need db to be past to Engine
-        # the type (engine_name) == dbus.String
-        name = engine_name.encode ('utf8')
-        self.engine_path = engine_base_path % path_patt.sub ('_', name)
+        # the type(engine_name) == dbus.String
+        name = engine_name.encode('utf8')
+        self.engine_path = engine_base_path % path_patt.sub('_', name)
         try:
             if not self.db:
                 # first check self.dbdict
                 if not name in self.dbdict:
                     try:
-                        db_dir = os.path.join (os.getenv('IBUS_TABLE_LOCATION'),'tables')
+                        db_dir = os.path.join(os.getenv('IBUS_TABLE_LOCATION'),'tables')
                     except:
                         db_dir = "/usr/share/ibus-table/tables"
-                    db = os.path.join (db_dir,name+'.db')
+                    db = os.path.join(db_dir,name+'.db')
                     udb = name+'-user.db'
-                    _sq_db = tabsqlitedb.tabsqlitedb( name = db,user_db = udb )
+                    _sq_db = tabsqlitedb.tabsqlitedb(name = db,user_db = udb)
                     _sq_db.db.commit()
                     self.dbdict[name] = _sq_db
             else:
@@ -101,15 +101,15 @@ class EngineFactory (ibus.EngineFactoryBase):
         except:
             print "fail to create engine %s" % engine_name
             import traceback
-            traceback.print_exc ()
+            traceback.print_exc()
             raise IBusException("Can not create engine %s" % engine_name)
 
-    def do_destroy (self):
+    def do_destroy(self):
         '''Destructor, which finish some task for IME'''
         # 
         ## we need to sync the temp userdb in memory to the user_db on disk
         for _db in self.dbdict:
-            self.dbdict[_db].sync_usrdb ()
+            self.dbdict[_db].sync_usrdb()
         ##print "Have synced user db\n"
         try:
             self._sm.Quit()

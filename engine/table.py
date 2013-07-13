@@ -34,14 +34,12 @@ from ibus import ascii
 #import tabsqlitedb
 import tabdict
 import re
-patt_edit = re.compile (r'(.*)###(.*)###(.*)')
-patt_uncommit = re.compile (r'(.*)@@@(.*)')
+patt_edit = re.compile(r'(.*)###(.*)###(.*)')
+patt_uncommit = re.compile(r'(.*)@@@(.*)')
 
 from gettext import dgettext
-_  = lambda a : dgettext ("ibus-table", a)
+_  = lambda a : dgettext("ibus-table", a)
 N_ = lambda a : a
-
-import dbus
 
 class KeyEvent:
     def __init__(self, keyval, is_press, state):
@@ -55,7 +53,9 @@ class KeyEvent:
 
 class editor(object):
     '''Hold user inputs chars and preedit string'''
-    def __init__ (self, config, phrase_table_index,valid_input_chars, max_key_length, database, parser = tabdict.parse, deparser = tabdict.deparse, max_length = 64):
+    def __init__(self, config, phrase_table_index, valid_input_chars,
+                 max_key_length, database,
+                 parser=tabdict.parse, deparser=tabdict.deparse, max_length=64):
         self.db = database
         self._config = config
         self._name = self.db.get_ime_property('name')
@@ -76,7 +76,8 @@ class editor(object):
         self._t_chars = []
         # self._u_chars: hold user input but not manual comitted chars
         self._u_chars = []
-        # self._tabkey_list: hold tab_key objects transform from user input chars
+        # self._tabkey_list: hold tab_key objects transform from user
+        #     input chars
         self._tabkey_list = []
         # self._strings: hold preedit strings
         self._strings = []
@@ -84,7 +85,7 @@ class editor(object):
         self._cursor = [0,0]
         # self._candidates: hold candidates selected from database [[now],[pre]]
         self._candidates = [[],[]]
-        self._lookup_table = ibus.LookupTable (tabengine._page_size)
+        self._lookup_table = ibus.LookupTable(tabengine._page_size)
         # self._py_mode: whether in pinyin mode
         self._py_mode = False
         # self._zi: the last Zi commit to preedit
@@ -92,13 +93,18 @@ class editor(object):
         # self._caret: caret position in lookup_table
         self._caret = 0
         # self._onechar: whether we only select single character
-        self._onechar = self._config.get_value (self._config_section, "OneChar", False)
-        
+        self._onechar = self._config.get_value(self._config_section,
+                                               "OneChar",
+                                               False)
+
         # self._auto_select: select automatically the first phrase
-        self._auto_select = self._config.get_value (self._config_section, "AutoSelect", False)
+        self._auto_select = self._config.get_value(self._config_section,
+                                                   "AutoSelect",
+                                                   False)
         if self._auto_select == None:
-            self._auto_select = self.db.get_ime_property('auto_select').lower() == u'true'
-        
+            self._auto_select = self.db.get_ime_property(
+                'auto_select').lower() == u'true'
+
         # self._chinese_mode: the candidate filter mode,
         #   0 is simplify Chinese
         #   1 is traditional Chinese
@@ -106,12 +112,13 @@ class editor(object):
         #   3 is Big charset mode, but traditional Chinese first
         #   4 is Big charset mode.
         # we use LC_CTYPE or LANG to determine which one to use
-        self._chinese_mode = self._config.get_value (
-                self._config_section,
+        self._chinese_mode = self._config.get_value(
+            self._config_section,
                 "ChineseMode",
-                self.get_chinese_mode())
+                self.get_chinese_mode()
+        )
 
-    def get_chinese_mode (self):
+    def get_chinese_mode(self):
         '''Use LC_CTYPE in your box to determine the _chinese_mode'''
         try:
             if os.environ.has_key('LC_CTYPE'):
@@ -122,8 +129,8 @@ class editor(object):
             if __lc.find('_cn') != -1:
                 return 0
             # hk and tw is should use tc as default
-            elif __lc.find('_hk') != -1 or __lc.find('_tw') != -1\
-                    or __lc.find('_mo') != -1:
+            elif (__lc.find('_hk') != -1 or __lc.find('_tw') != -1
+                  or __lc.find('_mo') != -1):
                 return 1
             else:
                 if self.db._is_chinese:
@@ -134,17 +141,16 @@ class editor(object):
         except:
             return -1
 
-    def change_chinese_mode (self):
+    def change_chinese_mode(self):
         if self._chinese_mode != -1:
-            self._chinese_mode = (self._chinese_mode +1 ) % 5
-        self._config.set_value (
-                self._config_section,
-                "ChineseMode",
-                self._chinese_mode )
+            self._chinese_mode = (self._chinese_mode +1) % 5
+        self._config.set_value(self._config_section,
+                               "ChineseMode",
+                               self._chinese_mode)
 
-    def clear (self):
+    def clear(self):
         '''Remove data holded'''
-        self.over_input ()
+        self.over_input()
         self._t_chars = []
         self._strings = []
         self._cursor = [0,0]
@@ -152,10 +158,10 @@ class editor(object):
         self._zi = u''
         self.update_candidates
 
-    def is_empty (self):
+    def is_empty(self):
         return len(self._t_chars) == 0
 
-    def clear_input (self):
+    def clear_input(self):
         '''
         Remove input characters held for Table mode,
         '''
@@ -165,81 +171,87 @@ class editor(object):
         self._lookup_table.show_cursor(False)
         self._candidates = [[],[]]
 
-    def over_input (self):
+    def over_input(self):
         '''
         Remove input characters held for Table mode,
         '''
-        self.clear_input ()
+        self.clear_input()
         self._u_chars = []
 
-    def set_parser (self, parser):
+    def set_parser(self, parser):
         '''change input parser'''
-        self.clear ()
+        self.clear()
         self._parser = parser
 
-    def add_input (self,c):
+    def add_input(self,c):
         '''add input character'''
-        if len (self._t_chars) == self._max_length:
+        if len(self._t_chars) == self._max_length:
             return True
         self._zi = u''
         if self._cursor[1]:
             self.split_phrase()
-        if (len (self._chars[0]) == self._max_key_len and (not self._py_mode)) or ( len (self._chars[0]) == 7 and self._py_mode ) :
+        if ((len(self._chars[0]) == self._max_key_len and (not self._py_mode))
+            or
+            (len(self._chars[0]) == 7 and self._py_mode)):
             self.auto_commit_to_preedit()
             res = self.add_input (c)
             return res
         elif self._chars[1]:
-            self._chars[1].append (c)
+            self._chars[1].append(c)
         else:
-            if (not self._py_mode and ( c in self._valid_input_chars)) or\
-                (self._py_mode and (c in u'abcdefghijklmnopqrstuvwxyz!@#$%')):
+            if ((not self._py_mode and (c in self._valid_input_chars))
+                or
+                (self._py_mode and (c in u'abcdefghijklmnopqrstuvwxyz!@#$%'))):
                 try:
-                    self._tabkey_list += self._parser (c)
-                    self._chars[0].append (c)
+                    self._tabkey_list += self._parser(c)
+                    self._chars[0].append(c)
                 except:
-                    self._chars[1].append (c)
+                    self._chars[1].append(c)
             else:
-                self._chars[1].append (c)
+                self._chars[1].append(c)
         self._t_chars.append(c)
-        res = self.update_candidates ()
+        res = self.update_candidates()
         return res
 
-    def pop_input (self):
+    def pop_input(self):
         '''remove and display last input char held'''
         _c =''
         if self._chars[1]:
-            _c = self._chars[1].pop ()
+            _c = self._chars[1].pop()
         elif self._chars[0]:
-            _c = self._chars[0].pop ()
+            _c = self._chars[0].pop()
             self._tabkey_list.pop()
             if (not self._chars[0]) and self._u_chars:
                 self._chars[0] = self._u_chars.pop()
                 self._chars[1] = self._chars[1][:-1]
-                self._tabkey_list = self._parser (self._chars[0])
-                self._strings.pop (self._cursor[0] - 1 )
+                self._tabkey_list = self._parser(self._chars[0])
+                self._strings.pop(self._cursor[0] - 1 )
                 self._cursor[0] -= 1
         self._t_chars.pop()
-        self.update_candidates ()
+        self.update_candidates()
         return _c
 
-    def get_input_chars (self):
+    def get_input_chars(self):
         '''get characters held, valid and invalid'''
         return self._chars[0] + self._chars[1]
 
-    def get_input_chars_string (self):
+    def get_input_chars_string(self):
         '''Get valid input char string'''
-        return u''.join(map(str,self._t_chars))
+        return u''.join(map(str, self._t_chars))
 
-    def get_all_input_strings (self):
-        '''Get all uncommit input characters, used in English mode or direct commit'''
-        return  u''.join( map(u''.join, self._u_chars + [self._chars[0]] \
-            + [self._chars[1]]) )
+    def get_all_input_strings(self):
+        '''Get all uncommit input characters, used in English mode or direct
+        commit
+
+        '''
+        return  u''.join(map(u''.join, self._u_chars + [self._chars[0]] +
+                             [self._chars[1]]))
 
     def get_index(self,key):
         '''Get the index of key in database table'''
         return self._pt.index(key)
 
-    def split_phrase (self):
+    def split_phrase(self):
         '''Splite current phrase into two phrase'''
         _head = u''
         _end = u''
@@ -254,7 +266,7 @@ class editor(object):
         except:
             pass
 
-    def remove_before_string (self):
+    def remove_before_string(self):
         '''Remove string before cursor'''
         if self._cursor[1] != 0:
             self.split_phrase()
@@ -263,94 +275,108 @@ class editor(object):
             self._cursor[0] -= 1
         else:
             pass
-        # if we remove all characters in preedit string, we need to clear the self._t_chars
+        # if we remove all characters in preedit string, we need to
+        # clear the self._t_chars
         if self._cursor == [0,0]:
-            self._t_chars =[]
+            self._t_chars = []
 
-    def remove_after_string (self):
+    def remove_after_string(self):
         '''Remove string after cursor'''
         if self._cursor[1] != 0:
             self.split_phrase()
-        if self._cursor[0] >= len (self._strings):
+        if self._cursor[0] >= len(self._strings):
             pass
         else:
             self._strings.pop(self._cursor[0])
 
-    def remove_before_char (self):
+    def remove_before_char(self):
         '''Remove character before cursor'''
         if self._cursor[1] > 0:
-            _str = self._strings[ self._cursor[0] ]
-            self._strings[ self._cursor[0] ] = _str[ : self._cursor[1]-1] + _str[ self._cursor[1] :]
+            _str = self._strings[self._cursor[0]]
+            self._strings[self._cursor[0]] = (_str[:self._cursor[1]-1] +
+                                              _str[self._cursor[1]:])
             self._cursor[1] -= 1
         else:
             if self._cursor[0] == 0:
                 pass
             else:
-                if len ( self._strings[self._cursor[0] - 1] ) == 1:
+                if len(self._strings[self._cursor[0] - 1]) == 1:
                     self.remove_before_string()
                 else:
                     self._strings[self._cursor[0] - 1] = self._strings[self._cursor[0] - 1][:-1]
-        # if we remove all characters in preedit string, we need to clear the self._t_chars
+        # if we remove all characters in preedit string,
+        # we need to clear the self._t_chars
         if self._cursor == [0,0] and not self._strings:
             self._t_chars =[]
 
-    def remove_after_char (self):
+    def remove_after_char(self):
         '''Remove character after cursor'''
         if self._cursor[1] == 0:
-            if self._cursor[0] == len ( self._strings):
+            if self._cursor[0] == len(self._strings):
                 pass
             else:
-                if len( self._strings[ self._cursor[0] ]) == 1:
-                    self.remove_after_string ()
+                if len(self._strings[self._cursor[0]]) == 1:
+                    self.remove_after_string()
                 else:
-                    self._strings[ self._cursor[0] ] = self._strings[ self._cursor[0] ][1:]
+                    self._strings[self._cursor[0]] = self._strings[self._cursor[0]][1:]
         else:
-            if ( self._cursor[1] + 1 ) == len( self._strings[ self._cursor[0] ] ) :
-                self.split_phrase ()
-                self.remove_after_string ()
+            if (self._cursor[1] + 1) == len(self._strings[self._cursor[0]]):
+                self.split_phrase()
+                self.remove_after_string()
             else:
-                string = self._strings[ self._cursor[0] ]
-                self._strings[ self._cursor[0] ] = string[:self._cursor[1]] + string[ self._cursor[1] + 1 : ]
+                string = self._strings[self._cursor[0]]
+                self._strings[self._cursor[0]] = string[:self._cursor[1]] + \
+                                                 string[self._cursor[1] + 1: ]
 
-    def get_invalid_input_chars (self):
+    def get_invalid_input_chars(self):
         '''get invalid characters held'''
         return self._chars[1]
 
-    def get_invalid_input_string (self):
+    def get_invalid_input_string(self):
         '''get invalid characters in string form'''
-        return u''.join (self._chars[1])
+        return u''.join(self._chars[1])
 
-    def get_preedit_strings (self):
+    def get_preedit_strings(self):
         '''Get preedit strings'''
         if self._candidates[0]:
             if self._py_mode:
                 _p_index = 8
             else:
-                _p_index = self.get_index ('phrase')
-            _candi = u'###' + self._candidates[0][ int (self._lookup_table.get_cursor_pos() ) ][ _p_index ] + u'###' 
+                _p_index = self.get_index('phrase')
+            _candi = u'###' + self._candidates[0][
+                int(self._lookup_table.get_cursor_pos())
+            ][_p_index] + u'###'
         else:
-            input_chars = self.get_input_chars ()
+            input_chars = self.get_input_chars()
             if input_chars:
-                _candi = u''.join( ['###'] + map( str, input_chars) + ['###'] )
+                _candi = u''.join(['###'] + map( str, input_chars) + ['###'])
             else:
                 _candi = u''
         if self._strings:
             res = u''
             _cursor = self._cursor[0]
-            _luc = len (self._u_chars)
+            _luc = len(self._u_chars)
             if _luc:
                 _candi = _candi == u'' and u'######' or _candi
-                res =u''.join( self._strings[ : _cursor - _luc] +[u'@@@'] + self._strings[_cursor - _luc : _cursor ]  + [ _candi  ] + self._strings[ _cursor : ])
+                res =u''.join(
+                    self._strings[ : _cursor - _luc] +
+                    [u'@@@'] +
+                    self._strings[_cursor - _luc: _cursor] +
+                    [_candi] +
+                    self._strings[_cursor: ])
             else:
-                res = u''.join( self._strings[ : _cursor ] + [ _candi  ] + self._strings[ _cursor : ])
+                res = u''.join(
+                    self._strings[: _cursor] +
+                    [_candi] +
+                    self._strings[_cursor: ])
             return res
         else:
-            return _candi 
-    def add_caret (self, addstr):
+            return _candi
+    def add_caret(self, addstr):
         '''add length to caret position'''
         self._caret += len(addstr)
 
-    def get_caret (self):
+    def get_caret(self):
         '''Get caret position in preedit strings'''
         self._caret = 0
         if self._cursor[0] and self._strings:
@@ -361,86 +387,90 @@ class editor(object):
                 _p_index = 8
             else:
                 _p_index = self.get_index ('phrase')
-            _candi =self._candidates[0][ int (self._lookup_table.get_cursor_pos() ) ][ _p_index ] 
+            _candi =self._candidates[0][
+                int(self._lookup_table.get_cursor_pos())
+            ][_p_index]
         else:
-            _candi = u''.join( map( str,self.get_input_chars()) )
-        self._caret += len( _candi ) 
+            _candi = u''.join(map(str,self.get_input_chars()))
+        self._caret += len(_candi)
         return self._caret
 
-    def arrow_left (self):
+    def arrow_left(self):
         '''Process Arrow Left Key Event.
         Update cursor data when move caret left'''
-        if self.get_preedit_strings ():
-            if not( self.get_input_chars () or self._u_chars ):
+        if self.get_preedit_strings():
+            if not(self.get_input_chars() or self._u_chars):
                 if self._cursor[1] > 0:
                     self._cursor[1] -= 1
                 else:
                     if self._cursor[0] > 0:
-                        self._cursor[1] = len (self._strings[self._cursor[0]-1]) - 1
+                        self._cursor[1] = len(
+                            self._strings[self._cursor[0]-1]
+                        ) - 1
                         self._cursor[0] -= 1
                     else:
                         self._cursor[0] = len(self._strings)
                         self._cursor[1] = 0
-                self.update_candidates ()
+                self.update_candidates()
             return True
         else:
             return False
 
-    def arrow_right (self):
+    def arrow_right(self):
         '''Process Arrow Right Key Event.
         Update cursor data when move caret right'''
-        if self.get_preedit_strings ():
-            if not( self.get_input_chars () or self._u_chars ):
+        if self.get_preedit_strings():
+            if not(self.get_input_chars() or self._u_chars):
                 if self._cursor[1] == 0:
-                    if self._cursor[0] == len (self._strings):
+                    if self._cursor[0] == len(self._strings):
                         self._cursor[0] = 0
                     else:
                         self._cursor[1] += 1
                 else:
                     self._cursor[1] += 1
-                if self._cursor[1] == len(self._strings[ self._cursor[0] ]):
+                if self._cursor[1] == len(self._strings[self._cursor[0]]):
                     self._cursor[0] += 1
                     self._cursor[1] = 0
-                self.update_candidates ()
+                self.update_candidates()
             return True
         else:
             return False
 
-    def control_arrow_left (self):
+    def control_arrow_left(self):
         '''Process Control + Arrow Left Key Event.
         Update cursor data when move caret to string left'''
-        if self.get_preedit_strings ():
-            if not( self.get_input_chars () or self._u_chars ):
+        if self.get_preedit_strings():
+            if not(self.get_input_chars() or self._u_chars):
                 if self._cursor[1] == 0:
                     if self._cursor[0] == 0:
-                        self._cursor[0] = len (self._strings) - 1
+                        self._cursor[0] = len(self._strings) - 1
                     else:
                         self._cursor[0] -= 1
                 else:
                     self._cursor[1] = 0
-                self.update_candidates ()
+                self.update_candidates()
             return True
         else:
             return False
 
-    def control_arrow_right (self):
+    def control_arrow_right(self):
         '''Process Control + Arrow Right Key Event.
         Update cursor data when move caret to string right'''
-        if self.get_preedit_strings ():
-            if not( self.get_input_chars () or self._u_chars ):
+        if self.get_preedit_strings():
+            if not(self.get_input_chars() or self._u_chars):
                 if self._cursor[1] == 0:
-                    if self._cursor[0] == len (self._strings):
+                    if self._cursor[0] == len(self._strings):
                         self._cursor[0] = 1
                     else:
                         self._cursor[0] += 1
                 else:
                     self._cursor[0] += 1
                     self._cursor[1] = 0
-                self.update_candidates ()
+                self.update_candidates()
             return True
         else:
             return False
-    def ap_candidate (self, candi):
+    def ap_candidate(self, candi):
         '''append candidate to lookup_table'''
         if not self._py_mode:
             _p_index = self.get_index('phrase')
@@ -449,7 +479,7 @@ class editor(object):
             _p_index = 8
             _fkey = 1
         if self.db._is_chinese:
-            _tbks = u''.join( map(self._deparser , candi[_fkey + len(self._tabkey_list) : _p_index-1 ] ) )
+            _tbks = u''.join(map(self._deparser, candi[_fkey + len(self._tabkey_list): _p_index-1]))
             if self._py_mode:
                 # restore tune symbol
                 _tbks = _tbks.replace('!','↑1').replace('@','↑2').replace('#','↑3').replace('$','↑4').replace('%','↑5')
