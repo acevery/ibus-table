@@ -733,7 +733,7 @@ class Editor(object):
                             # is a punctuation or not, if is a punct,
                             # then we use old maner to summit the former valid
                             # candidate
-                            if ispunct(self._chars[0][-1].encode('ascii')) \
+                            if (self._chars[0][-1].encode('ascii') in string.punctuation) \
                                     or len(self._chars[0][:-1]) \
                                     in self.db.pkeylens \
                                     or only_one_last \
@@ -1582,7 +1582,7 @@ class EngineTable(IBus.Engine):
             return False
 
         keychar = unichr(key.code)
-        if ispunct(key.code): # if key code is a punctation
+        if ispunct(key.code): # if key code is a punctuation
             if self._full_width_punct[self._mode]:
                 self.commit_string (self._convert_to_full_width (keychar))
                 return True
