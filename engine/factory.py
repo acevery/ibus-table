@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # vim:et sw=4 sts=4 sw=4
 #
-# ibus-table - The Tables engine for IBus
+# IBus-table - The Tables engine for IBus
 #
 # Copyright (c) 2008-2013 Yuwei Yu <acevery@gmail.com>
 #
@@ -22,12 +22,11 @@
 # $Id: $
 #
 
-import ibus
-from ibus.exception import *
+from gi.repository import IBus
 import table
 import tabsqlitedb
 import os
-import dbus
+# import dbus
 from re import compile as re_compile
 
 path_patt = re_compile(r'[^a-zA-Z0-9_/]')
@@ -39,7 +38,7 @@ N_ = lambda a : a
 engine_base_path = "/com/redhat/IBus/engines/table/%s/engine/"
 
 
-class EngineFactory(ibus.EngineFactoryBase):
+class EngineFactory(IBus.Factory):
     """Table IM Engine Factory"""
     def __init__(self, bus, db="", icon=""):
         # here the db should be the abs path to sql db
@@ -48,11 +47,11 @@ class EngineFactory(ibus.EngineFactoryBase):
         #self.db = tabsqlitedb.tabsqlitedb(name=database)
 
         if db:
-            self.dbusname = os.path.basename(db).replace('.db','')
+            self.dbbasename = os.path.basename(db).replace('.db','')
             udb = os.path.basename(db).replace('.db','-user.db')
             self.db = tabsqlitedb.tabsqlitedb( name = db,user_db = udb )
             self.db.db.commit()
-            self.dbdict = {self.dbusname:self.db}
+            self.dbdict = {self.dbbasename:self.db}
         else:
             self.db = None
             self.dbdict = {}
@@ -60,19 +59,11 @@ class EngineFactory(ibus.EngineFactoryBase):
 
         # init factory
         self.bus = bus
-        super(EngineFactory,self).__init__(bus)
+        super(EngineFactory,self).__init__(connection=bus.get_connection(),
+                                           object_path=IBus.PATH_FACTORY)
         self.engine_id=0
-        try:
-            bus = dbus.Bus()
-            user = os.path.basename(os.path.expanduser('~'))
-            self._sm_bus = bus.get_object("org.ibus.table.SpeedMeter.%s"\
-                    % user, "/org/ibus/table/SpeedMeter")
-            self._sm =  dbus.Interface(self._sm_bus,\
-                    "org.ibus.table.SpeedMeter")
-        except:
-            self._sm = None
 
-    def create_engine(self, engine_name):
+    def do_create_engine(self, engine_name):
         # because we need db to be past to Engine
         # the type(engine_name) == dbus.String
         name = engine_name.encode('utf8')
@@ -91,9 +82,9 @@ class EngineFactory(ibus.EngineFactoryBase):
                     _sq_db.db.commit()
                     self.dbdict[name] = _sq_db
             else:
-                name = self.dbusname
+                name = self.dbbasename
 
-            engine = table.tabengine(self.bus, self.engine_path \
+            engine = table.EngineTable(self.bus, self.engine_path \
                     + str(self.engine_id), self.dbdict[name])
             self.engine_id += 1
             #return engine.get_dbus_object()
@@ -102,19 +93,16 @@ class EngineFactory(ibus.EngineFactoryBase):
             print "fail to create engine %s" % engine_name
             import traceback
             traceback.print_exc()
-            raise IBusException("Can not create engine %s" % engine_name)
+            raise Exception("Can not create engine %s" % engine_name)
 
     def do_destroy(self):
         '''Destructor, which finish some task for IME'''
-        # 
         ## we need to sync the temp userdb in memory to the user_db on disk
         for _db in self.dbdict:
             self.dbdict[_db].sync_usrdb()
         ##print "Have synced user db\n"
-        try:
-            self._sm.Quit()
-        except:
-            pass
-        super(EngineFactory,self).do_destroy()
-
-
+        # try:
+        #     self._sm.Quit()
+        # except:
+        #     pass
+        super(EngineFactory,self).destroy()
