@@ -474,7 +474,7 @@ class Editor(object):
             else:
                 _p_index = self.get_index('phrase')
             _candi = u'###' + self._candidates[0][
-                int(self._lookup_table.get_cursor_pos())
+                int(self.get_cursor_pos())
             ][_p_index] + u'###'
         else:
             input_chars = self.get_input_chars()
@@ -518,7 +518,7 @@ class Editor(object):
             else:
                 _p_index = self.get_index ('phrase')
             _candi =self._candidates[0][
-                int(self._lookup_table.get_cursor_pos())
+                int(self.get_cursor_pos())
             ][_p_index]
         else:
             _candi = u''.join(map(str,self.get_input_chars()))
@@ -863,36 +863,43 @@ class Editor(object):
             return True
         return res
 
-    def number (self, index):
+    def number(self, index):
         '''Select the candidates in Lookup Table
         index should start from 0'''
-        self._lookup_table.set_cursor_pos_in_current_page ( index )
-        if index != self._lookup_table.get_cursor_pos_in_current_page ():
-            # the index given is out of range we do not commit string
-            return False
+        real_index = self.calc_cursor_real_index(index)
+        if real_index < len(self._candidates[0]):
+            # only submit the valid selection
+            self._lookup_table.set_cursor_pos(real_index)
+
         self.commit_to_preedit ()
         return True
 
-    def alt_number (self,index):
+    def alt_number(self, index):
         '''Remove the candidates in Lookup Table from user_db index should start from 0'''
-        cps = self._lookup_table.get_current_page_start()
-        pos = cps + index
-        if  len (self._candidates[0]) > pos:
+        real_index = self.calc_cursor_real_index(index)
+        if real_index < len(self._candidates[0]):
             # this index is valid
-            can = self._candidates[0][pos]
+            can = self._candidates[0][real_index]
             if can[-2] < 0:
                 # freq of this candidate is -1, means this a user phrase
                 self.db.remove_phrase (can)
                 # make update_candidates do sql enquiry
                 self._chars[2].pop()
                 self.update_candidates ()
-            return True
-        else:
-            return False
 
-    def get_cursor_pos (self):
+        return True
+
+    def get_cursor_pos(self):
         '''get lookup table cursor position'''
         return self._lookup_table.get_cursor_pos()
+
+    def get_cursor_offset(self):
+        pos = self._lookup_table.get_cursor_pos()
+        orig_index = self._lookup_table.get_cursor_in_page()
+        return (pos - orig_index)
+
+    def calc_cursor_real_index(self, index):
+        return self.get_cursor_offset() + index
 
     def get_lookup_table (self):
         '''Get lookup table'''
