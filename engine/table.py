@@ -1657,31 +1657,33 @@ class EngineTable(IBus.Engine):
         #
         keychar = unichr (key.code)
 
+        print (keychar not in self._valid_input_chars)
         if self._editor.is_empty ():
             # we have not input anything
             if key.code >= 32 and key.code <= 127 and ( keychar not in self._valid_input_chars ) \
-                    and (not key.mask & IBus.ModifierType.MOD1_MASK | IBus.ModifierType.CONTROL_MASK):
+                    and (not key.mask & (IBus.ModifierType.MOD1_MASK | IBus.ModifierType.CONTROL_MASK)):
+
                 if key.code == IBus.KEY_space:
                     #self.commit_string (cond_letter_translate (keychar))
                     # little hack to make ibus to input space in gvim :)
                     if self._full_width_letter [self._mode]:
-                        self.commit_string (cond_letter_translate (keychar))
+                        self.commit_string(cond_letter_translate(keychar))
                         return True
                     else:
                         return False
                 if ispunct(key.code):
-                    self.commit_string (cond_punct_translate (keychar))
+                    self.commit_string(cond_punct_translate(keychar))
                     return True
                 if isdigit(key.code):
-                    self.commit_string (cond_letter_translate (keychar))
+                    self.commit_string(cond_letter_translate(keychar))
                     return True
-            elif (key.code < 32 or key.code > 127) and ( keychar not in self._valid_input_chars ) \
+            elif (key.code < 32 or key.code > 127) and (keychar not in self._valid_input_chars) \
                     and(not self._editor._py_mode):
                 return False
 
         if key.code == IBus.KEY_Escape:
-            self.reset ()
-            self._update_ui ()
+            self.reset()
+            self._update_ui()
             return True
 
         elif key.code in (IBus.KEY_Return, IBus.KEY_KP_Enter):
