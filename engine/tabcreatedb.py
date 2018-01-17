@@ -259,7 +259,7 @@ def main():
     if _bz2s:
         source = bz2.BZ2File(opts.source, "r")
     else:
-        source = file(opts.source, 'r')
+        source = open(opts.source, 'r')
     # first get config line and table line and goucima line respectively
     debug_print('\tParsing table source file ')
     attri,table,gouci =  parse_source(source)
@@ -290,7 +290,7 @@ def main():
         if _bz2p:
             pinyin_s = bz2.BZ2File(opts.pinyin, "r")
         else:
-            pinyin_s = file(opts.pinyin, 'r')
+            pinyin_s = open(opts.pinyin, 'r')
         debug_print('\tParsing pinyin source file ')
         pyline = parse_pinyin(pinyin_s)
         debug_print('\tPreapring pinyin entries')
